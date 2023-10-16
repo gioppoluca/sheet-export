@@ -1,0 +1,18 @@
+<form id="sheet-export-form">
+
+    <header id="sheet-export-header">
+        <input id="sheet-export-upload" type="file" name="upload" accept="application/pdf" />
+        {{#if download.show}}
+        <button id="sheet-export-download" title="{{download.title}}" onclick="window.open('{{download.url}}', '_blank')">
+            <i class="fas fa-download"></i> {{download.label}}
+        </button>
+        {{/if}}
+    </header>
+
+    <ul id="fieldList"></ul>
+
+    <button id="sheet-export-final">
+        <i class="fas fa-print"></i>
+    </button>
+
+</form>

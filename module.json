@@ -1,20 +1,20 @@
 {
-  "id": "module",
-  "title": "New Module",
-  "description": "",
+  "id": "sheet-export",
+  "title": "Sheet export",
+  "description": "Module to export Foundry sheets",
   "version": "#{VERSION}#",
   "library": "false",
   "manifestPlusVersion": "1.2.0",
   "compatibility": {
-    "minimum": 10,
-    "verified": 10,
+    "minimum": 11,
+    "verified": 11,
     "maximum": 11
   },
   "authors": [
     {
-      "name": "The League of Extraordinary FVTT Developers",
-      "url": "https://github.com/League-of-Foundry-Developers",
-      "discord": "discordID#0001"
+      "name": "Luca Gioppo",
+      "url": "https://github.com/gioppoluca",
+      "discord": "gioppoluca"
     }
   ],
   "relationships": {
@@ -25,7 +25,7 @@
     "scripts/module.js"
   ],
   "scripts": [
-    "scripts/lib/lib.js"
+    "scripts/lib/pdf-lib.min.js"
   ],
   "styles": [
     "styles/module.css"
