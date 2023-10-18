@@ -1,5 +1,7 @@
 
 import { PDFDocument } from './lib/pdf-lib.esm.js';
+import { registerSettings } from "./settings.js";
+import { systemMapping } from "./systemMapping.js";
 
 Hooks.once('ready', async function () {
 
@@ -8,6 +10,7 @@ Hooks.once('ready', async function () {
 
 // Store mapping
 Hooks.once('init', async function () {
+	// TODO refactor this moving to settings
 	game.settings.register(SheetExportconfig.ID, "mapping", {
 		name: "sheet-export.settings.mapping.Name",
 		hint: "sheet-export.settings.mapping.Hint",
@@ -38,6 +41,7 @@ Hooks.once('init', async function () {
 			},
 		});
 	}
+	registerSettings();
 });
 
 // Inject editor into the settings menu
@@ -254,7 +258,20 @@ Hooks.on("getActorSheetHeaderButtons", (sheet, buttons) => {
 	// If this is not a player character sheet, return without adding the button
 	// added pc for cypher system
 	// TODO: have to refactor this with something generic
-	if (!["character", "PC", "Player", "npc", "pc"].includes(sheet.actor.type ?? sheet.actor.data.type)) return;
+	let systemMappings = systemMapping();
+	let sheetType = "";
+	if (systemMappings[game.system.id] == undefined) {
+		console.log("game system not yet supported by sheet-export");
+		return;
+	} else if (systemMappings[game.system.id].player.includes(sheet.actor.type ?? sheet.actor.data.type)) {
+		sheetType = "player";
+	} else if (systemMappings[game.system.id].npc.includes(sheet.actor.type ?? sheet.actor.data.type)) {
+		sheetType = "npc";
+	} else {
+		console.log("the sheet for this Document Type is not supported by sheet-export");
+		return;
+	}
+	//	if (!["character", "PC", "Player", "npc", "pc"].includes(sheet.actor.type ?? sheet.actor.data.type)) return;
 
 	buttons.unshift({
 		label: "Export to PDF",
@@ -262,7 +279,7 @@ Hooks.on("getActorSheetHeaderButtons", (sheet, buttons) => {
 		icon: "fas fa-file-export",
 		onclick: () => {
 			// Open Config window
-			new SheetExportconfig(sheet.actor).render(true);
+			new SheetExportconfig(sheet.actor, sheetType).render(true);
 
 			// Bring window to top
 			Object.values(ui.windows)
@@ -273,9 +290,11 @@ Hooks.on("getActorSheetHeaderButtons", (sheet, buttons) => {
 });
 
 class SheetExportconfig extends FormApplication {
-	constructor(actor) {
+	constructor(actor, sheetType) {
 		super();
+		this.sheetType = sheetType;
 		this.actor = actor;
+		this.filledPdf = new ArrayBuffer();
 		this.currentBuffer = new ArrayBuffer();
 	}
 
@@ -481,6 +500,7 @@ class SheetExportconfig extends FormApplication {
 	*/
 	/** Get values and download PDF */
 	download(buffer) {
+		/*
 		const fieldList = document.getElementById("fieldList");
 		const fields = {};
 		fieldList.querySelectorAll("input, textarea, select").forEach(input => {
@@ -502,11 +522,11 @@ class SheetExportconfig extends FormApplication {
 						: input.value;
 			fields[key][index] = value;
 		});
-
+*/
 		//		const filled_pdf = pdfform(minipdf).transform(buffer, fields);
 
-		//		const blob = new Blob([filled_pdf], { type: "application/pdf" });
-		//		saveAs(blob, `${this.actor.name ?? "character"}.pdf`);
+		const blob = new Blob([this.filledPdf], { type: "application/pdf" });
+		saveAs(blob, `${this.actor.name ?? "character"}.pdf`);
 	}
 
 	/** Manage new PDF upload */
@@ -515,7 +535,7 @@ class SheetExportconfig extends FormApplication {
 		this.createForm(this.currentBuffer);
 
 		document.getElementById("sheet-export-header").setAttribute("style", "display: none");
-		document.getElementById("sheet-export").style.display = "block";
+		document.getElementById("sheet-export-final").style.display = "block";
 	}
 
 
@@ -528,11 +548,15 @@ class SheetExportconfig extends FormApplication {
 			response.text()
 		);
 		console.log(mapping);
-		return mapping;
+		try {
+			return JSON.parse(mapping);
+		} catch (err) {
+			console.error('Error parsing JSON:', err);
+			return {};
+		}
 	}
 
 	async getPdf(pdfUrl) {
-		const formUrl = 'https://pdf-lib.js.org/assets/dod_character.pdf';
 		console.log(pdfUrl);
 		const formBytes = await fetch(getRoute(pdfUrl)).then((res) => res.arrayBuffer());
 
@@ -545,8 +569,9 @@ class SheetExportconfig extends FormApplication {
 		const inputForm = document.getElementById("fieldList");
 
 		// get the mapping
-		// TODO move the json parse to the get mapping function
-		const mapping = JSON.parse(await this.getMapping("standard", "latest", "player"));
+		let mappingVersion = game.settings.get(SheetExportconfig.ID, "mapping-version");
+		let mappingRelease = game.settings.get(SheetExportconfig.ID, "mapping-release");
+		const mapping = await this.getMapping(mappingVersion, mappingRelease, this.sheetType);
 		console.log("got mapping");
 		const pdf = await this.getPdf(mapping.pdfUrl);
 		const form = pdf.getForm();
@@ -581,8 +606,8 @@ class SheetExportconfig extends FormApplication {
 			console.log(contentMapping);
 			var mappingValue = "";
 			const actor = this.actor;
-//			console.log("the actor");
-//			console.log(actor);
+			//			console.log("the actor");
+			//			console.log(actor);
 			try {
 				// Return as evaluated JavaScript with the actor as an argument
 				mappingValue = Function(`"use strict"; return function(actor) { return ${contentMapping} };`)()(actor);
@@ -595,11 +620,14 @@ class SheetExportconfig extends FormApplication {
 					//					input.setAttribute("type", "string");
 					console.log(mappingValue.calculated);
 					input.innerHTML = mappingValue ? mappingValue.calculated : "";
+					field.setText(mappingValue ? (mappingValue.calculated ? mappingValue.calculated.toString() : "") : "");
 					break;
 				case "PDFCheckBox":
 					console.log(mappingValue.calculated);
 					input.setAttribute("type", "checkbox");
 					input.checked = mappingValue ? mappingValue.calculated : "";
+					// before check if mappingValue is defined, than since we expect a boolean we can set the value directly
+					mappingValue ? (mappingValue.calculated ? field.check() : field.uncheck()) : field.uncheck();
 					break;
 
 				default:
@@ -610,5 +638,7 @@ class SheetExportconfig extends FormApplication {
 
 			i++;
 		})
+		// elaborated all the fields, now we can download the pdf
+		this.filledPdf = await pdf.save();
 	}
 }
