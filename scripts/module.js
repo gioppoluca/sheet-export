@@ -1,7 +1,7 @@
 
 import { PDFDocument } from './lib/pdf-lib.esm.js';
 import { registerSettings } from "./settings.js";
-import { systemMapping } from "./systemMapping.js";
+import { getMapping, getPdf, getSheeType } from "./sheet-export-api.js";
 
 Hooks.once('ready', async function () {
 
@@ -257,20 +257,7 @@ Hooks.on("getActorSheetHeaderButtons", (sheet, buttons) => {
 	console.log(sheet.actor)
 	// If this is not a player character sheet, return without adding the button
 	// added pc for cypher system
-	// TODO: have to refactor this with something generic
-	let systemMappings = systemMapping();
-	let sheetType = "";
-	if (systemMappings[game.system.id] == undefined) {
-		console.log("game system not yet supported by sheet-export");
-		return;
-	} else if (systemMappings[game.system.id].player.includes(sheet.actor.type ?? sheet.actor.data.type)) {
-		sheetType = "player";
-	} else if (systemMappings[game.system.id].npc.includes(sheet.actor.type ?? sheet.actor.data.type)) {
-		sheetType = "npc";
-	} else {
-		console.log("the sheet for this Document Type is not supported by sheet-export");
-		return;
-	}
+	let sheetType = getSheeType(actor);
 	//	if (!["character", "PC", "Player", "npc", "pc"].includes(sheet.actor.type ?? sheet.actor.data.type)) return;
 
 	buttons.unshift({
@@ -538,32 +525,33 @@ class SheetExportconfig extends FormApplication {
 		document.getElementById("sheet-export-final").style.display = "block";
 	}
 
-
-
-	async getMapping(mappingChoice, mappingRelease, mappingElement) {
-		console.log("get mapping");
-		console.log(`/modules/sheet-export/mappings/${game.system.id}/${mappingChoice}/${mappingRelease}/${mappingElement}.json`);
-		console.log(getRoute(`/modules/sheet-export/mappings/${game.system.id}/${mappingChoice}/${mappingRelease}/${mappingElement}.json`));
-		const mapping = await fetch(getRoute(`/modules/sheet-export/mappings/${game.system.id}/${mappingChoice}/${mappingRelease}/${mappingElement}.json`)).then(response =>
-			response.text()
-		);
-		console.log(mapping);
-		try {
-			return JSON.parse(mapping);
-		} catch (err) {
-			console.error('Error parsing JSON:', err);
-			return {};
+	getMapping = getMapping;
+	getPdf = getPdf;
+	/*
+		async getMapping(mappingChoice, mappingRelease, mappingElement) {
+			console.log("get mapping");
+			console.log(`/modules/sheet-export/mappings/${game.system.id}/${mappingChoice}/${mappingRelease}/${mappingElement}.json`);
+			console.log(getRoute(`/modules/sheet-export/mappings/${game.system.id}/${mappingChoice}/${mappingRelease}/${mappingElement}.json`));
+			const mapping = await fetch(getRoute(`/modules/sheet-export/mappings/${game.system.id}/${mappingChoice}/${mappingRelease}/${mappingElement}.json`)).then(response =>
+				response.text()
+			);
+			console.log(mapping);
+			try {
+				return JSON.parse(mapping);
+			} catch (err) {
+				console.error('Error parsing JSON:', err);
+				return {};
+			}
 		}
-	}
-
-	async getPdf(pdfUrl) {
-		console.log(pdfUrl);
-		const formBytes = await fetch(getRoute(pdfUrl)).then((res) => res.arrayBuffer());
-
-		const pdfDoc = await PDFDocument.load(formBytes);
-		return pdfDoc;
-	}
-
+	
+		async getPdf(pdfUrl) {
+			console.log(pdfUrl);
+			const formBytes = await fetch(getRoute(pdfUrl)).then((res) => res.arrayBuffer());
+	
+			const pdfDoc = await PDFDocument.load(formBytes);
+			return pdfDoc;
+		}
+	*/
 	async createForm() {
 		console.log("create form");
 		const inputForm = document.getElementById("fieldList");

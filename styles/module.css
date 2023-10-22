@@ -34,6 +34,23 @@
     margin: 0;
 }
 
+#sheet-export-mappingedit-save {
+    position: absolute;
+    height: 40px;
+    width: 40px;
+    border-radius: 100px;
+    right: 20px;
+    bottom: 20px;
+    border: solid;
+    background-image: url(/ui/parchment.jpg);
+}
+
+/* Fix icon margin */
+#sheet-export-mappingedit-save .fas {
+    margin: 0;
+}
+
+
 #fieldList {
     flex: 1;
     list-style: none;
