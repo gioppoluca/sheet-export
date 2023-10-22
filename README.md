@@ -17,11 +17,15 @@ This module aims to offer the ability to export in PDF all the sheets for PC, NP
 At the moment the module manages:
 
 
-| Game System | Version  | Release | Sheets  |   Description |
-| ------------- | ---------- | --------- | --------- | ---- |
-| dnd5e       | standard | latest  | PC; NPC | The classical PC PDF from WotC for the PC; a custom PDF for NPC |
-|  | extended| latest | PC; NPC | A union of the classical WotC with extended pages for equipment and spells; a custom PDF for NPC |
-
-
+| Game System | Version  | Release | Sheets | Description                                                                |
+| ------------- | ---------- | --------- | -------- | ---------------------------------------------------------------------------- |
+| dnd5e       | standard | latest  | PC     | The classical PC PDF from WotC for the PC                                  |
+|             |          |         | NPC    | a custom PDF for NPC                                                       |
+|             | extended | latest  | PC     | A union of the classical WotC with extended pages for equipment and spells |
+|             |          |         | NPC    | a custom PDF for NPC                                                       |
 
 ## Changelog
+
+```{include} CHANGELOG.md
+
+```
