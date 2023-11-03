@@ -1,0 +1,14 @@
+{
+    "releasemin": "",
+    "pdfUrl": "/modules/sheet-export/mappings/dnd5e/experimental/latest/5e-model.pdf",
+    "fields": [
+      {
+        "content": " @items.filter(i => i.type === 'class').map(i => `${i.name} ${i.system.levels}`).join(' / ') ",
+        "pdf": "player"
+      },
+      {
+        "content": " @items.filter(i => i.type === 'class').map(i => `${i.name} ${i.system.levels}`).join(' / ') ",
+        "pdf": "ClassLevel"
+      }
+    ]
+}

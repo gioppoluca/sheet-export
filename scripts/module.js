@@ -1,7 +1,8 @@
 
-import { PDFDocument } from './lib/pdf-lib.esm.js';
+import { PDFDocument, PDFRawStream, PDFName } from './lib/pdf-lib.esm.js';
 import { registerSettings } from "./settings.js";
 import { getMapping, getPdf, getSheeType } from "./sheet-export-api.js";
+//import Jimp from './lib/jimp.js'
 
 Hooks.once('ready', async function () {
 
@@ -257,7 +258,10 @@ Hooks.on("getActorSheetHeaderButtons", (sheet, buttons) => {
 	console.log(sheet.actor)
 	// If this is not a player character sheet, return without adding the button
 	// added pc for cypher system
-	let sheetType = getSheeType(actor);
+	let sheetType = getSheeType(sheet.actor);
+	// TODO check if sheetTtype is undefined
+	console.log(sheetType);
+	console.log(sheet.actor);
 	//	if (!["character", "PC", "Player", "npc", "pc"].includes(sheet.actor.type ?? sheet.actor.data.type)) return;
 
 	buttons.unshift({
@@ -280,7 +284,9 @@ class SheetExportconfig extends FormApplication {
 	constructor(actor, sheetType) {
 		super();
 		this.sheetType = sheetType;
+		console.log(this.sheetType);
 		this.actor = actor;
+		console.log(this.actor);
 		this.filledPdf = new ArrayBuffer();
 		this.currentBuffer = new ArrayBuffer();
 	}
@@ -559,11 +565,126 @@ class SheetExportconfig extends FormApplication {
 		// get the mapping
 		let mappingVersion = game.settings.get(SheetExportconfig.ID, "mapping-version");
 		let mappingRelease = game.settings.get(SheetExportconfig.ID, "mapping-release");
+		console.log(this.sheetType);
 		const mapping = await this.getMapping(mappingVersion, mappingRelease, this.sheetType);
 		console.log("got mapping");
 		const pdf = await this.getPdf(mapping.pdfUrl);
+		console.log(pdf);
 		const form = pdf.getForm();
+		console.log(form);
 		const fields = form.getFields()
+		console.log(fields);
+		// Manage the images
+		//	let img_path = this.actor.img
+		let img_path = "/modules/sheet-export/mappings/dnd5e/experimental/latest/Goblin.jpeg";
+		console.log(img_path);
+		const pl_image = new Uint8Array(await fetch(getRoute(img_path)).then(response => response.arrayBuffer()));
+		const arrayBuffer = await fetch(getRoute(img_path)).then(res => res.arrayBuffer())
+        const image4 = await pdf.embedJpg(arrayBuffer)
+		const page = pdf.getPage(0);
+
+// Draw the JPG image in the center of the page
+page.drawImage(image4, {
+  x: 10,
+  y: 10,
+  width: image4.width,
+  height: image4.height,
+})
+		console.log("embedded image");
+		console.log(image4);
+		console.log("pl_image");
+		console.log(pl_image);
+		let img = await fetch(getRoute(img_path));
+		console.log("alternate fetch");
+		console.log(img);
+		//let canvas = document.createElement("canvas");
+//		const canvas = new OffscreenCanvas(width, height);
+// chat
+
+  // Create an OffscreenCanvas
+  const offscreenCanvas = new OffscreenCanvas(1, 1);
+  const offscreenContext = offscreenCanvas.getContext('2d');
+
+  // Load the image
+  const image = new Image();
+  image.src = img_path;
+
+  // Wait for the image to load
+  await new Promise((resolve, reject) => {
+    image.onload = resolve;
+    image.onerror = reject;
+  });
+
+  // Resize the OffscreenCanvas to match the image dimensions
+  offscreenCanvas.width = image.width;
+  offscreenCanvas.height = image.height;
+
+  // Draw the image on the OffscreenCanvas
+  offscreenContext.drawImage(image, 0, 0);
+
+  // Generate a bitmap from the OffscreenCanvas
+  const bitmapC = await offscreenCanvas.convertToBlob({ type: 'image/jpeg' });
+console.log(bitmapC)
+const blobArrayBuffer = await new Response(bitmapC).arrayBuffer();
+console.log(blobArrayBuffer);
+const uint8Array = new Uint8Array(blobArrayBuffer);
+console.log(uint8Array);
+// end chat
+/*
+		let ctx = canvas.getContext("2d");
+		let imgData = new ImageData(img.response.arrayBuffer(), width, height);
+		ctx.putImageData(imgData, 0, 0);
+		const bitmap = canvas.transferToImageBitmap();
+		img = await img.blob();
+		console.log(img);
+		let bitmap = await createImageBitmap(img);
+		console.log(bitmap);
+		canvas.width = bitmap.width;
+		canvas.height = bitmap.height;
+		ctx.drawImage(bitmap, 0, 0, bitmap.width, bitmap.height);
+		let img_data = ctx.getImageData(0, 0, bitmap.width, bitmap.height);
+		ctx.putImageData(img_data, 0, 0);
+		//    const bitmap2 = canvas.transferToImageBitmap();
+		//	console.log(bitmap2);
+		console.log(img_data);
+		const pl_image2 = new Uint8Array(img_data.data.buffer);
+*/
+
+		console.log(pl_image);
+//		console.log(pl_image2);
+		pdf.context.indirectObjects.forEach((pdfObject, ref, themap) => {
+//			if (!(pdfObject instanceof PDFRawStream)) return;
+			console.log("found raw stream");
+			console.log(pdfObject);
+			console.log(ref);
+			console.log(pdfObject?.dict?.dict?.get(PDFName.of('Subtype'))?pdfObject.dict.dict.get(PDFName.of('Subtype')):"");
+//			console.log(pdfObject.dict.dict.get(PDFName.of('Name')));
+			if ((ref.tag === "7 0 R" || ref.tag === "7 0 R") && pdfObject?.dict?.dict?.get(PDFName.of('Subtype')) === PDFName.of('Image')) {
+				console.log("found image");
+				//let bufferData = Buffer.from(pl_image);
+				pdfObject.contents = uint8Array;
+//				pdfObject.dict.dict.set(PDFName.of('Width'), {"numberValue": image.width, "stringValue": image.width.toString() });
+//				pdfObject.dict.dict.set(PDFName.of('Height'), image.height);
+//				pdfObject.dict.dict.set(PDFName.of('Length'), uint8Array.length);
+//				pdfObject.dict.dict.delete(PDFName.of('SMask'));
+			}
+			
+			if ((ref.tag === "8 0 R" || ref.tag === "8 0 R") ) {
+				console.log("found number");
+				pdfObject.numberValue= uint8Array.length
+				pdfObject.stringValue =  uint8Array.length.toString() 
+				//let bufferData = Buffer.from(pl_image);
+//				themap.delete(ref);
+			}
+			/*
+			if ((ref.tag === "8 0 R" || ref.tag === "8 0 R") && pdfObject.dict.dict.get(PDFName.of('Subtype')) === PDFName.of('Image')) {
+				console.log("found image mask");
+				//let bufferData = Buffer.from(pl_image);
+				themap.delete(ref);
+			}
+			*/
+		});
+		// Manage the form fields
 		var i = 0;
 		fields.forEach(field => {
 			const type = field.constructor.name.trim();

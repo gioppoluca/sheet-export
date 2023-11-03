@@ -2,7 +2,7 @@ import { PDFDocument } from './lib/pdf-lib.esm.js';
 import { systemMapping } from './systemMapping.js';
 
 
-async function  getMapping(mappingChoice, mappingRelease, mappingElement) {
+async function getMapping(mappingChoice, mappingRelease, mappingElement) {
 	console.log("get mapping");
 	console.log(`/modules/sheet-export/mappings/${game.system.id}/${mappingChoice}/${mappingRelease}/${mappingElement}.json`);
 	console.log(getRoute(`/modules/sheet-export/mappings/${game.system.id}/${mappingChoice}/${mappingRelease}/${mappingElement}.json`));
@@ -17,7 +17,7 @@ async function  getMapping(mappingChoice, mappingRelease, mappingElement) {
 	}
 }
 
-async  function  getPdf(pdfUrl) {
+async function getPdf(pdfUrl) {
 	console.log(pdfUrl);
 	const formBytes = await fetch(getRoute(pdfUrl)).then((res) => res.arrayBuffer());
 
@@ -25,7 +25,7 @@ async  function  getPdf(pdfUrl) {
 	return pdfDoc;
 }
 
-function getSheeType(actor){
+function getSheeType(actor) {
 	let systemMappings = systemMapping();
 	let sheetType = "";
 	if (systemMappings[game.system.id] == undefined) {
@@ -39,7 +39,7 @@ function getSheeType(actor){
 		console.log("the sheet for this Document Type is not supported by sheet-export");
 		return;
 	}
-
+	return sheetType;
 }
 
 export { getMapping, getPdf, getSheeType };
