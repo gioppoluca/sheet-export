@@ -4,6 +4,12 @@
   "helperFunctions": {
     "testFunction": "function testFunction(items) {console.log(items);}"
   },
+  "globalContent": [
+    {
+      "content": " @items.filter(i => ['feat', 'trait'].includes(i.type)).map(i => `${i.name} - ${i.system.source}`).join('\\n')",
+      "id": "feat_traits"
+    }
+  ],
   "images": [
     {
       "path": "'/modules/sheet-export/mappings/dnd5e/experimental/latest/PaladinTW2.png'",

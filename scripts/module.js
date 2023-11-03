@@ -451,13 +451,10 @@ class SheetExportconfig extends FormApplication {
 			console.log(error);
 			return;
 		}
-		// Manage the images
-		// get the images from mapping
-		let images = mapping.images;
-		if (images) {
-			await this.embedImages(pdf, images);
-		}
+		const actor = this.actor;
+
 		// manage helper functions
+		// TODO export the helper functions to a file
 		let functionSet = {
 			testFunction2: function (actor) {
 				console.log("test");
@@ -472,8 +469,28 @@ class SheetExportconfig extends FormApplication {
 			}
 		}
 		console.log(functionSet);
-
-
+		// Manage the images
+		// get the images from mapping
+		let images = mapping.images;
+		if (images) {
+			await this.embedImages(pdf, images);
+		}
+		// manage global content
+		let globalContentMapping = mapping.globalContent;
+		let globalContent = {};
+		if (globalContentMapping) {
+			console.log("global content");
+			globalContentMapping.forEach(content => {
+				console.log(content);
+				let replacedContent = content.content.replaceAll("@", game.release.generation > 10 ? "actor." : "actor.data.");
+				console.log(replacedContent);
+				console.log(actor);
+				let contentValue = Function(`"use strict"; return function(actor,functionSet) { return ${replacedContent} };`)()(actor, functionSet);
+				console.log(contentValue);
+				globalContent[content.id] = contentValue
+			});
+		}
+		console.log(globalContent);
 		// Manage the form fields
 		var i = 0;
 		fields.forEach(field => {
@@ -504,7 +521,6 @@ class SheetExportconfig extends FormApplication {
 			contentMapping = "{'calculated': " + contentMapping + " }";
 			console.log(contentMapping);
 			var mappingValue = "";
-			const actor = this.actor;
 			//			console.log("the actor");
 			//			console.log(actor);
 			try {
