@@ -2,7 +2,6 @@
 import { PDFDocument, PDFRawStream, PDFName } from './lib/pdf-lib.esm.js';
 import { registerSettings } from "./settings.js";
 import { getMapping, getPdf, getSheeType } from "./sheet-export-api.js";
-//import Jimp from './lib/jimp.js'
 
 Hooks.once('ready', async function () {
 
@@ -315,6 +314,11 @@ class SheetExportconfig extends FormApplication {
 			reader.readAsArrayBuffer(file);
 		});
 
+		document.getElementById("sheet-export-apply").addEventListener("click", event => {
+			console.log("apply");
+			this.createForm(null);
+		});
+
 		document.getElementById("sheet-export-final").addEventListener("click", event => {
 			event.preventDefault();
 			this.download(this.currentBuffer);
@@ -336,188 +340,8 @@ class SheetExportconfig extends FormApplication {
 		};
 	}
 
-	/** Create a form with inputs for each PDF field and fill them in with Actor data */
-	/*
-		createForm(buffer) {
-			const inputForm = document.getElementById("fieldList");
-	
-			// Empty input form
-			let child;
-			while ((child = inputForm.lastChild)) {
-				inputForm.removeChild(child);
-			}
-	
-			// Get PDF fields
-			const pdfFields = pdfform(minipdf).list_fields(buffer);
-			// Get Actor data
-			const actor = this.actor;
-	
-			// Begin grouping logs
-			console.group("PDF Sheet");
-			// Log Actor Data
-			console.log("Actor Data:", actor);
-			// Log all PDF fields
-			console.log("PDF fields:", pdfFields);
-	
-			// Get mapping from settings
-			let mapping = ""
-	
-			if (["character", "PC", "Player", "pc"].includes(actor.type ?? actor.data.type)) {
-				console.log("got mapping for PC")
-				mapping = game.settings.get(SheetExportconfig.ID, "mapping");
-			}
-			if (["npc"].includes(actor.type ?? actor.data.type)) {
-				console.log("got mapping for NPC")
-				mapping = game.settings.get(SheetExportconfig.ID, "mapping-npc");
-			}
-	
-	
-			// Parse dynamic keys
-			mapping = mapping.replaceAll("@", game.release.generation > 10 ? "actor." : "actor.data.");
-	
-	
-			// Log un-evaluated mapping
-			console.log("Raw mapping:", mapping);
-	
-			// Try to deserialize mapping
-			try {
-				// Return as evaluated JavaScript with the actor as an argument
-				mapping = Function(`"use strict"; return function(actor) { return ${mapping} };`)()(actor);
-			} catch (err) {
-				// End console group
-				console.groupEnd();
-				// Close the application
-				this.close();
-	
-				// Alert if invalid
-				ui.notifications.error(
-					'PDF Sheet | Invalid mapping JavaScript Object. See the <a href="https://github.com/arcanistzed/sheet-export/blob/main/README.md">README</a> for more info.'
-				);
-	
-				// Evaluate the JS again to throw the error
-				Function(`"use strict"; return function(actor) { return ${mapping} };`)()(actor);
-			}
-	
-			// Log parsed mapping
-			console.log("Parsed mapping:", mapping);
-			// Close log grouping
-			console.groupEnd();
-	
-			// Loop through each key
-			Object.keys(pdfFields).forEach(pdfFieldKey => {
-				// Create row
-				const row = document.createElement("li");
-	
-				// Create label
-				const label = document.createElement("label");
-				label.innerText = `${pdfFieldKey}: `;
-				label.htmlFor = pdfFieldKey;
-	
-				// Insert label
-				row.prepend(label);
-				inputForm.appendChild(row);
-	
-				pdfFields[pdfFieldKey].forEach((field, i) => {
-					if (field.type === "radio" && field.options) {
-						const fieldSet = document.createElement("fieldset");
-						fieldSet.id = pdfFieldKey;
-	
-						field.options.forEach(value => {
-							const radioLabel = document.createElement("label");
-							const radio = document.createElement("input");
-							radio.disabled = true;
-	
-							radio.setAttribute("type", "radio");
-							radio.setAttribute("value", value);
-							radio.setAttribute("name", pdfFieldKey + i);
-							radio.setAttribute("data-idx", i);
-							radio.setAttribute("data-key", pdfFieldKey);
-	
-							radioLabel.appendChild(radio);
-							radioLabel.innerText = value;
-							fieldSet.appendChild(radioLabel);
-						});
-	
-						row.appendChild(fieldSet);
-						return;
-					}
-	
-					// Create an input
-					const input = document.createElement(
-						field.type === "select" ? "select" : field.type === "string" ? "textarea" : "input"
-					);
-					input.disabled = true;
-					input.setAttribute("data-idx", i);
-					input.setAttribute("data-key", pdfFieldKey);
-					input.id = pdfFieldKey;
-	
-					// Make a checkbox if the type is boolean
-					if (field.type === "boolean") {
-						input.setAttribute("type", "checkbox");
-	
-						// Make a drop down menu if the type is select and it has options
-					} else if (field.type === "select" && field.options) {
-						field.options.forEach(value => {
-							const option = document.createElement("option");
-							option.innerText = Array.isArray(value) ? value[1] : value;
-							option.setAttribute("value", Array.isArray(value) ? value[0] : value);
-							input.appendChild(option);
-						});
-					}
-					row.appendChild(input); // Add to DOM
-	
-					// Add values from character sheet
-					// Loop through all entries in the mapping
-					mapping.forEach(entry => {
-						// Check if the current field in the PDF matches an entry in the mapping
-						if (pdfFieldKey.trim() === entry.pdf) {
-							// Set the input to what is on the character sheet
-							if (field.type === "boolean") {
-								// If it's a checkbox
-								input.checked = entry.foundry;
-							} else if (field.type === "string") {
-								// If it's a textarea
-								input.innerHTML = entry.foundry;
-							} else if (field.type === "select") {
-								// If it's a selectbox
-								input.value = entry.foundry;
-							} else {
-								// If it's anything else
-								input.setAttribute("value", entry.foundry);
-							}
-						}
-					});
-				});
-			});
-		}
-	*/
 	/** Get values and download PDF */
 	download(buffer) {
-		/*
-		const fieldList = document.getElementById("fieldList");
-		const fields = {};
-		fieldList.querySelectorAll("input, textarea, select").forEach(input => {
-			if (input.getAttribute("type") === "radio" && !input.checked) {
-				return;
-			}
-
-			const key = input.getAttribute("data-key");
-			if (!fields[key]) {
-				fields[key] = [];
-			}
-			const index = parseInt(input.getAttribute("data-idx"), 10);
-
-			const value =
-				input.type === "textarea"
-					? input.innerHTML
-					: input.getAttribute("type") === "checkbox"
-						? input.checked
-						: input.value;
-			fields[key][index] = value;
-		});
-*/
-		//		const filled_pdf = pdfform(minipdf).transform(buffer, fields);
-
 		const blob = new Blob([this.filledPdf], { type: "application/pdf" });
 		saveAs(blob, `${this.actor.name ?? "character"}.pdf`);
 	}
@@ -526,39 +350,84 @@ class SheetExportconfig extends FormApplication {
 	onFileUpload(buffer) {
 		this.currentBuffer = buffer;
 		this.createForm(this.currentBuffer);
-
-		document.getElementById("sheet-export-header").setAttribute("style", "display: none");
-		document.getElementById("sheet-export-final").style.display = "block";
 	}
 
 	getMapping = getMapping;
 	getPdf = getPdf;
-	/*
-		async getMapping(mappingChoice, mappingRelease, mappingElement) {
-			console.log("get mapping");
-			console.log(`/modules/sheet-export/mappings/${game.system.id}/${mappingChoice}/${mappingRelease}/${mappingElement}.json`);
-			console.log(getRoute(`/modules/sheet-export/mappings/${game.system.id}/${mappingChoice}/${mappingRelease}/${mappingElement}.json`));
-			const mapping = await fetch(getRoute(`/modules/sheet-export/mappings/${game.system.id}/${mappingChoice}/${mappingRelease}/${mappingElement}.json`)).then(response =>
-				response.text()
-			);
-			console.log(mapping);
+
+	async embedImages(pdf, images) {
+		//	console.log(Jimp);
+		const actor = this.actor;
+		for (let i = 0; i < images.length; i++) {
+			let img_path = images[i].path;
+			console.log(img_path);
+			img_path = img_path.replaceAll("@", game.release.generation > 10 ? "actor." : "actor.data.");
+			let actual_path = "";
 			try {
-				return JSON.parse(mapping);
-			} catch (err) {
-				console.error('Error parsing JSON:', err);
-				return {};
+				actual_path = Function(`"use strict"; return function(actor) { return ${img_path} };`)()(actor);
+
+			} catch (error) {
+				ui.notifications.error(`The image: ${img_path} is not mapped correctly; got error: ${error.message}`);
+
 			}
-		}
-	
-		async getPdf(pdfUrl) {
-			console.log(pdfUrl);
-			const formBytes = await fetch(getRoute(pdfUrl)).then((res) => res.arrayBuffer());
-	
-			const pdfDoc = await PDFDocument.load(formBytes);
-			return pdfDoc;
-		}
-	*/
-	async createForm() {
+			console.log(actual_path);
+			console.log(images[i]);
+			let img_ext = actual_path.split('.').pop();
+			console.log(img_ext);
+			const arrayBuffer = await fetch(getRoute(actual_path)).then(res => res.arrayBuffer())
+			let embedding_image = null;
+			switch (img_ext) {
+				case "png":
+					embedding_image = await pdf.embedPng(arrayBuffer)
+					break;
+				case "jpg":
+				case "jpeg":
+					embedding_image = await pdf.embedPng(arrayBuffer)
+					break;
+				case "webp":
+					// Create an OffscreenCanvas and draw the WebP image
+					const offscreenCanvas = new OffscreenCanvas(1, 1);
+					const offscreenContext = offscreenCanvas.getContext('2d');
+
+					const img = new Image();
+					img.src = URL.createObjectURL(new Blob([arrayBuffer], { type: 'image/webp' }));
+					await img.decode();
+					offscreenCanvas.width = img.width;
+					offscreenCanvas.height = img.height;
+					offscreenContext.drawImage(img, 0, 0);
+
+					// Convert the canvas to a PNG Blob
+					const pngBlob = await offscreenCanvas.convertToBlob({ type: 'image/png' });
+
+					// Read the Blob as an ArrayBuffer
+					const pngArrayBuffer = await new Response(pngBlob).arrayBuffer();
+					embedding_image = await pdf.embedPng(pngArrayBuffer)
+					break;
+
+				default:
+					ui.notifications.error(`We cannot manage: ${img_path}; format unsupported`);
+					break;
+			}
+			if (embedding_image != null) {
+				const page = pdf.getPage(images[i].page);
+
+				// Draw the JPG image in the center of the page
+				page.drawImage(embedding_image, {
+					x: images[i].pos_x,
+					y: images[i].pos_x,
+					width: images[i].width,
+					height: images[i].height,
+				})
+			}
+		};
+	}
+
+	testFunction(actor) {
+		console.log("test");
+		console.log(actor);
+	}
+
+	async createForm(buffer) {
 		console.log("create form");
 		const inputForm = document.getElementById("fieldList");
 
@@ -568,122 +437,43 @@ class SheetExportconfig extends FormApplication {
 		console.log(this.sheetType);
 		const mapping = await this.getMapping(mappingVersion, mappingRelease, this.sheetType);
 		console.log("got mapping");
-		const pdf = await this.getPdf(mapping.pdfUrl);
+		const pdf = await this.getPdf(mapping.pdfUrl, buffer);
 		console.log(pdf);
-		const form = pdf.getForm();
-		console.log(form);
-		const fields = form.getFields()
-		console.log(fields);
+		let form = null;
+		let fields = null;
+		try {
+			form = pdf.getForm();
+			console.log(form);
+			fields = form.getFields()
+			console.log(fields);
+		} catch (error) {
+			ui.notifications.error("error in loading PDF form fields:" + error.message);
+			console.log(error);
+			return;
+		}
 		// Manage the images
-		//	let img_path = this.actor.img
-		let img_path = "/modules/sheet-export/mappings/dnd5e/experimental/latest/Goblin.jpeg";
-		console.log(img_path);
-		const pl_image = new Uint8Array(await fetch(getRoute(img_path)).then(response => response.arrayBuffer()));
-		const arrayBuffer = await fetch(getRoute(img_path)).then(res => res.arrayBuffer())
-        const image4 = await pdf.embedJpg(arrayBuffer)
-		const page = pdf.getPage(0);
-
-// Draw the JPG image in the center of the page
-page.drawImage(image4, {
-  x: 10,
-  y: 10,
-  width: image4.width,
-  height: image4.height,
-})
-		console.log("embedded image");
-		console.log(image4);
-		console.log("pl_image");
-		console.log(pl_image);
-		let img = await fetch(getRoute(img_path));
-		console.log("alternate fetch");
-		console.log(img);
-		//let canvas = document.createElement("canvas");
-//		const canvas = new OffscreenCanvas(width, height);
-// chat
-
-  // Create an OffscreenCanvas
-  const offscreenCanvas = new OffscreenCanvas(1, 1);
-  const offscreenContext = offscreenCanvas.getContext('2d');
-
-  // Load the image
-  const image = new Image();
-  image.src = img_path;
-
-  // Wait for the image to load
-  await new Promise((resolve, reject) => {
-    image.onload = resolve;
-    image.onerror = reject;
-  });
-
-  // Resize the OffscreenCanvas to match the image dimensions
-  offscreenCanvas.width = image.width;
-  offscreenCanvas.height = image.height;
-
-  // Draw the image on the OffscreenCanvas
-  offscreenContext.drawImage(image, 0, 0);
-
-  // Generate a bitmap from the OffscreenCanvas
-  const bitmapC = await offscreenCanvas.convertToBlob({ type: 'image/jpeg' });
-console.log(bitmapC)
-const blobArrayBuffer = await new Response(bitmapC).arrayBuffer();
-console.log(blobArrayBuffer);
-const uint8Array = new Uint8Array(blobArrayBuffer);
-console.log(uint8Array);
-// end chat
-/*
-		let ctx = canvas.getContext("2d");
-		let imgData = new ImageData(img.response.arrayBuffer(), width, height);
-		ctx.putImageData(imgData, 0, 0);
-		const bitmap = canvas.transferToImageBitmap();
-		img = await img.blob();
-		console.log(img);
-		let bitmap = await createImageBitmap(img);
-		console.log(bitmap);
-		canvas.width = bitmap.width;
-		canvas.height = bitmap.height;
-		ctx.drawImage(bitmap, 0, 0, bitmap.width, bitmap.height);
-		let img_data = ctx.getImageData(0, 0, bitmap.width, bitmap.height);
-		ctx.putImageData(img_data, 0, 0);
-		//    const bitmap2 = canvas.transferToImageBitmap();
-		//	console.log(bitmap2);
-		console.log(img_data);
-		const pl_image2 = new Uint8Array(img_data.data.buffer);
-*/
-
-		console.log(pl_image);
-//		console.log(pl_image2);
-		pdf.context.indirectObjects.forEach((pdfObject, ref, themap) => {
-//			if (!(pdfObject instanceof PDFRawStream)) return;
-			console.log("found raw stream");
-			console.log(pdfObject);
-			console.log(ref);
-			console.log(pdfObject?.dict?.dict?.get(PDFName.of('Subtype'))?pdfObject.dict.dict.get(PDFName.of('Subtype')):"");
-//			console.log(pdfObject.dict.dict.get(PDFName.of('Name')));
-			if ((ref.tag === "7 0 R" || ref.tag === "7 0 R") && pdfObject?.dict?.dict?.get(PDFName.of('Subtype')) === PDFName.of('Image')) {
-				console.log("found image");
-				//let bufferData = Buffer.from(pl_image);
-				pdfObject.contents = uint8Array;
-//				pdfObject.dict.dict.set(PDFName.of('Width'), {"numberValue": image.width, "stringValue": image.width.toString() });
-//				pdfObject.dict.dict.set(PDFName.of('Height'), image.height);
-//				pdfObject.dict.dict.set(PDFName.of('Length'), uint8Array.length);
-//				pdfObject.dict.dict.delete(PDFName.of('SMask'));
+		// get the images from mapping
+		let images = mapping.images;
+		if (images) {
+			await this.embedImages(pdf, images);
+		}
+		// manage helper functions
+		let functionSet = {
+			testFunction2: function (actor) {
+				console.log("test");
+				console.log(actor);
 			}
-			
-			if ((ref.tag === "8 0 R" || ref.tag === "8 0 R") ) {
-				console.log("found number");
-				pdfObject.numberValue= uint8Array.length
-				pdfObject.stringValue =  uint8Array.length.toString() 
-				//let bufferData = Buffer.from(pl_image);
-//				themap.delete(ref);
+		}
+		let helperFunctions = mapping.helperFunctions;
+		if (helperFunctions) {
+			for (const [key, value] of Object.entries(helperFunctions)) {
+				console.log(`${key}: ${value}`);
+				functionSet[key] = eval("(" + value + ")");;
 			}
-			/*
-			if ((ref.tag === "8 0 R" || ref.tag === "8 0 R") && pdfObject.dict.dict.get(PDFName.of('Subtype')) === PDFName.of('Image')) {
-				console.log("found image mask");
-				//let bufferData = Buffer.from(pl_image);
-				themap.delete(ref);
-			}
-			*/
-		});
+		}
+		console.log(functionSet);
+
+
 		// Manage the form fields
 		var i = 0;
 		fields.forEach(field => {
@@ -710,7 +500,7 @@ console.log(uint8Array);
 
 			var fieldMapping = mapping.fields.find(f => f.pdf === name)
 			console.log(fieldMapping)
-			var contentMapping = fieldMapping ? fieldMapping.content.replaceAll("@", game.release.generation > 10 ? "actor." : "actor.data.") : "";
+			var contentMapping = fieldMapping ? fieldMapping.content.replaceAll("@", game.release.generation > 10 ? "actor." : "actor.data.") : "\"\"";
 			contentMapping = "{'calculated': " + contentMapping + " }";
 			console.log(contentMapping);
 			var mappingValue = "";
@@ -719,10 +509,11 @@ console.log(uint8Array);
 			//			console.log(actor);
 			try {
 				// Return as evaluated JavaScript with the actor as an argument
-				mappingValue = Function(`"use strict"; return function(actor) { return ${contentMapping} };`)()(actor);
+				mappingValue = Function(`"use strict"; return function(actor,functionSet) { return ${contentMapping} };`)()(actor, functionSet);
 				console.log(mappingValue);
 			} catch (err) {
 				console.log(err);
+				ui.notifications.error(`The field: ${name} is not mapped correctly using: ${contentMapping}; got error: ${err.message}`);
 			}
 			switch (type) {
 				case "PDFTextField":
@@ -738,6 +529,14 @@ console.log(uint8Array);
 					// before check if mappingValue is defined, than since we expect a boolean we can set the value directly
 					mappingValue ? (mappingValue.calculated ? field.check() : field.uncheck()) : field.uncheck();
 					break;
+				case "PDFCheckBox":
+					console.log(mappingValue.calculated);
+					console.log("PDFButton");
+					break;
+				case "PDFRadioGroup":
+					console.log(mappingValue.calculated);
+					console.log("PDFRadioGroup");
+					break;
 
 				default:
 					console.log("nothing in switch");
@@ -749,5 +548,7 @@ console.log(uint8Array);
 		})
 		// elaborated all the fields, now we can download the pdf
 		this.filledPdf = await pdf.save();
+		document.getElementById("sheet-export-header").setAttribute("style", "display: none");
+		document.getElementById("sheet-export-final").style.display = "block";
 	}
 }

@@ -17,11 +17,17 @@ async function getMapping(mappingChoice, mappingRelease, mappingElement) {
 	}
 }
 
-async function getPdf(pdfUrl) {
+async function getPdf(pdfUrl,buffer = null) {
 	console.log(pdfUrl);
-	const formBytes = await fetch(getRoute(pdfUrl)).then((res) => res.arrayBuffer());
+	let pdfBytes = null
+	if (buffer == null) {
+		pdfBytes = await fetch(getRoute(pdfUrl)).then((res) => res.arrayBuffer());
+	} else {
+		pdfBytes = buffer;
+	}
+//	const formBytes = await fetch(getRoute(pdfUrl)).then((res) => res.arrayBuffer());
 
-	const pdfDoc = await PDFDocument.load(formBytes);
+	const pdfDoc = await PDFDocument.load(pdfBytes);
 	return pdfDoc;
 }
 

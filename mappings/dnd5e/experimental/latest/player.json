@@ -1,14 +1,39 @@
 {
-    "releasemin": "",
-    "pdfUrl": "/modules/sheet-export/mappings/dnd5e/experimental/latest/5e-model.pdf",
-    "fields": [
-      {
-        "content": " @items.filter(i => i.type === 'class').map(i => `${i.name} ${i.system.levels}`).join(' / ') ",
-        "pdf": "player"
-      },
-      {
-        "content": " @items.filter(i => i.type === 'class').map(i => `${i.name} ${i.system.levels}`).join(' / ') ",
-        "pdf": "ClassLevel"
-      }
-    ]
+  "releasemin": "",
+  "pdfUrl": "/modules/sheet-export/mappings/dnd5e/experimental/latest/5e-model.pdf",
+  "helperFunctions": {
+    "testFunction": "function testFunction(items) {console.log(items);}"
+  },
+  "images": [
+    {
+      "path": "'/modules/sheet-export/mappings/dnd5e/experimental/latest/PaladinTW2.png'",
+      "page": 0,
+      "pos_x": 0,
+      "pos_y": 0,
+      "width": 100,
+      "height": 100
+    },
+    {
+      "path": "@img",
+      "page": 0,
+      "pos_x": 0,
+      "pos_y": 0,
+      "width": 100,
+      "height": 100
+    }
+  ],
+  "fields": [
+    {
+      "content": " @items.filter(i => i.type === 'class').map(i => `${i.name} ${i.system.levels}`).join(' / ') ",
+      "pdf": "player"
+    },
+    {
+      "content": " @items.filter(i => i.type === 'class').map(i => `${i.name} ${i.system.levels}`).join(' / ') ",
+      "pdf": "ClassLevel"
+    },
+    {
+      "content": " functionSet.testFunction(@items)",
+      "pdf": "Casella di testo 1"
+    }
+  ]
 }

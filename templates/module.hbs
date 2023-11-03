@@ -1,9 +1,12 @@
 <form id="sheet-export-form">
 
     <header id="sheet-export-header">
-        <input id="sheet-export-upload" type="file" name="upload" accept="application/pdf" />
+        <label for="sheet-export-upload" class="btn">Override mapping's PDF</label>
+        <input id="sheet-export-upload" type="file" name="upload" accept="application/pdf" style="visibility:hidden;" />
+        <input id="sheet-export-apply" type="button" name="apply" value="Apply" />
         {{#if download.show}}
-        <button id="sheet-export-download" title="{{download.title}}" onclick="window.open('{{download.url}}', '_blank')">
+        <button id="sheet-export-download" title="{{download.title}}"
+            onclick="window.open('{{download.url}}', '_blank')">
             <i class="fas fa-download"></i> {{download.label}}
         </button>
         {{/if}}
