@@ -3,7 +3,7 @@ import { PDFDocument, PDFRawStream, PDFName, StandardFonts } from './lib/pdf-lib
 import fontkit from './lib/fontkit.es.js';
 import { registerSettings } from "./settings.js";
 import { getMapping, getPdf, getSheeType } from "./sheet-export-api.js";
-import { SheetExportOverloadManager } from "./sheet-export-overload-manager.js";
+import { SheetExportContentManager } from "./sheet-export-content-manager.js";
 Hooks.once('ready', async function () {
 
 });
@@ -514,7 +514,7 @@ const ubuntuFont = await pdfDoc.embedFont(fontBytes);
 		}
 		console.log(globalContent);
 		// Add global content to OverloadManager
-		functionSet.seom = new SheetExportOverloadManager(globalContent, functionSet);
+		functionSet.secm = new SheetExportContentManager(globalContent, functionSet);
 		functionSet.customFonts = customFonts;
 		functionSet.defaultFont = helveticaFont;
 		// Manage the form fields
@@ -550,10 +550,10 @@ const ubuntuFont = await pdfDoc.embedFont(fontBytes);
 			var contentMapping = fieldMapping ? fieldMapping.content.replaceAll("@", game.release.generation > 10 ? "actor." : "actor.data.") : "\"\"";
 			contentMapping = "{'calculated': " + contentMapping + " }";
 			console.log(contentMapping);
-			functionSet.seom.setCurrentField(field);
+			functionSet.secm.setCurrentField(field);
 			if (fieldMapping) {
-				fieldMapping.font ? functionSet.seom.setCurrentFont(customFonts[fieldMapping.font.id]) : functionSet.seom.setCurrentFont(helveticaFont);
-				fieldMapping.font ? functionSet.seom.setCurrentFontsize(customFonts[fieldMapping.font.font_size]) : functionSet.seom.setCurrentFontsize(10);
+				fieldMapping.font ? functionSet.secm.setCurrentFont(customFonts[fieldMapping.font.id]) : functionSet.secm.setCurrentFont(helveticaFont);
+				fieldMapping.font ? functionSet.secm.setCurrentFontsize(customFonts[fieldMapping.font.font_size]) : functionSet.secm.setCurrentFontsize(10);
 			}
 			var mappingValue = "";
 			//			console.log("the actor");

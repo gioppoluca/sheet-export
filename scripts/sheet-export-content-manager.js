@@ -1,6 +1,6 @@
 
 
-export class SheetExportOverloadManager {
+export class SheetExportContentManager {
     constructor(originalGlobalContent, fset) {
         this.originalGlobalContent = originalGlobalContent;
         this.reminderContent = originalGlobalContent;
@@ -10,8 +10,17 @@ export class SheetExportOverloadManager {
     getContentChunk(id) {
         let width = 100;
         let height = 100;
-        let chunk = this.wrapText(this.reminderContent[id], width, this.font, this.fontSize);
+        const widgets = this.field.acroField.getWidgets();
+        widgets.forEach((w) => {
+            const rect = w.getRectangle();
+            console.log(rect);
+        });
+        let chunk = this.wrapText(this.reminderContent[id], widgets[0].getRectangle().width, this.font, this.fontSize);
         return chunk;
+        // the algo should be: cycle on a single word of increasing widest letter to find the max chars per line and than the height of the font at that size
+        // this way we can take a chunk of chars*max_lines, than cut the content and return it
+        // evenif th problem is with the \n that will mess all
+        // than probably getting the text char by char
     }
 
     setCurrentField(field) {
