@@ -4,10 +4,20 @@
   "helperFunctions": {
     "testFunction": "function testFunction(items) {console.log(items);}"
   },
+  "fonts": [
+    {
+      "id": "ubuntucondensed",
+      "path": "/modules/sheet-export/mappings/dnd5e/experimental/latest/UbuntuCondensed-Regular.ttf"
+    }
+  ],
   "globalContent": [
     {
       "content": " @items.filter(i => ['feat', 'trait'].includes(i.type)).map(i => `${i.name} - ${i.system.source}`).join('\\n')",
       "id": "feat_traits"
+    },
+    {
+      "content": "(function(h) {\n      const d = document.createElement(\"div\");\n      d.innerHTML = h;\n      return d.textContent || d.innerText || \"\";\n    })(@system.details.biography.value)\n ",
+      "id": "biography"
     }
   ],
   "images": [
@@ -31,15 +41,17 @@
   "fields": [
     {
       "content": " @items.filter(i => i.type === 'class').map(i => `${i.name} ${i.system.levels}`).join(' / ') ",
-      "pdf": "player"
+      "pdf": "player",
+      "font": "ubuntucondensed",
+      "font_size": 19
     },
     {
       "content": " @items.filter(i => i.type === 'class').map(i => `${i.name} ${i.system.levels}`).join(' / ') ",
       "pdf": "ClassLevel"
     },
     {
-      "content": " functionSet.testFunction(@items)",
-      "pdf": "Casella di testo 1"
+      "content": " functionSet.seom.getContentChunk('biography')",
+      "pdf": "testo1"
     }
   ]
 }
