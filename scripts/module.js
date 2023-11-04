@@ -1,8 +1,9 @@
 
-import { PDFDocument, PDFRawStream, PDFName } from './lib/pdf-lib.esm.js';
+import { PDFDocument, PDFRawStream, PDFName, StandardFonts } from './lib/pdf-lib.esm.js';
+import fontkit from './lib/fontkit.es.js';
 import { registerSettings } from "./settings.js";
 import { getMapping, getPdf, getSheeType } from "./sheet-export-api.js";
-
+import { SheetExportOverloadManager } from "./sheet-export-overload-manager.js";
 Hooks.once('ready', async function () {
 
 });
@@ -437,7 +438,28 @@ class SheetExportconfig extends FormApplication {
 		console.log(this.sheetType);
 		const mapping = await this.getMapping(mappingVersion, mappingRelease, this.sheetType);
 		console.log("got mapping");
+		// get the PDF
 		const pdf = await this.getPdf(mapping.pdfUrl, buffer);
+		pdf.registerFontkit(fontkit);
+
+		//manage fonts
+		// Embed the Helvetica font
+		const helveticaFont = await pdf.embedFont(StandardFonts.Helvetica)
+		const fonts = mapping.fonts;
+		let customFonts = [];
+		for (let i = 0; i < fonts.length; i++) {
+			let fontBytes = await fetch(getRoute(fonts[i].path)).then((res) => res.arrayBuffer());
+			let theFont = await pdf.embedFont(fontBytes);
+			customFonts[fonts[i].id] = theFont;
+		}
+		console.log(customFonts);
+		// Fetch the Ubuntu font
+		/*
+const fontUrl = 'https://pdf-lib.js.org/assets/ubuntu/Ubuntu-R.ttf';
+const fontBytes = await fetch(fontUrl).then((res) => res.arrayBuffer());
+pdfDoc.registerFontkit(fontkit);
+const ubuntuFont = await pdfDoc.embedFont(fontBytes);
+*/
 		console.log(pdf);
 		let form = null;
 		let fields = null;
@@ -491,12 +513,20 @@ class SheetExportconfig extends FormApplication {
 			});
 		}
 		console.log(globalContent);
+		// Add global content to OverloadManager
+		functionSet.seom = new SheetExportOverloadManager(globalContent, functionSet);
+		functionSet.customFonts = customFonts;
+		functionSet.defaultFont = helveticaFont;
 		// Manage the form fields
 		var i = 0;
 		fields.forEach(field => {
 			const type = field.constructor.name.trim();
 			const name = field.getName().trim();
 			console.log(`${type}: ${name}`)
+			console.log(field);
+			console.log("dafault appearance");
+			console.log(field.acroField.getDefaultAppearance());
+			console.log(field.acroField.DA());
 			// Create row
 			const row = document.createElement("li");
 
@@ -520,6 +550,11 @@ class SheetExportconfig extends FormApplication {
 			var contentMapping = fieldMapping ? fieldMapping.content.replaceAll("@", game.release.generation > 10 ? "actor." : "actor.data.") : "\"\"";
 			contentMapping = "{'calculated': " + contentMapping + " }";
 			console.log(contentMapping);
+			functionSet.seom.setCurrentField(field);
+			if (fieldMapping) {
+				fieldMapping.font ? functionSet.seom.setCurrentFont(customFonts[fieldMapping.font.id]) : functionSet.seom.setCurrentFont(helveticaFont);
+				fieldMapping.font ? functionSet.seom.setCurrentFontsize(customFonts[fieldMapping.font.font_size]) : functionSet.seom.setCurrentFontsize(10);
+			}
 			var mappingValue = "";
 			//			console.log("the actor");
 			//			console.log(actor);
@@ -537,6 +572,9 @@ class SheetExportconfig extends FormApplication {
 					console.log(mappingValue.calculated);
 					input.innerHTML = mappingValue ? mappingValue.calculated : "";
 					field.setText(mappingValue ? (mappingValue.calculated ? mappingValue.calculated.toString() : "") : "");
+					if (fieldMapping.font) {
+						field.updateAppearances(functionSet.defaultFont);
+					}
 					break;
 				case "PDFCheckBox":
 					console.log(mappingValue.calculated);
