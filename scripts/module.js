@@ -552,8 +552,10 @@ const ubuntuFont = await pdfDoc.embedFont(fontBytes);
 			console.log(contentMapping);
 			functionSet.secm.setCurrentField(field);
 			if (fieldMapping) {
-				fieldMapping.font ? functionSet.secm.setCurrentFont(customFonts[fieldMapping.font.id]) : functionSet.secm.setCurrentFont(helveticaFont);
-				fieldMapping.font ? functionSet.secm.setCurrentFontsize(customFonts[fieldMapping.font.font_size]) : functionSet.secm.setCurrentFontsize(10);
+				console.log("field mapping exists so I set font and fontsize");
+				console.log(customFonts);
+				fieldMapping.font ? functionSet.secm.setCurrentFont(customFonts[fieldMapping.font]) : functionSet.secm.setCurrentFont(helveticaFont);
+				fieldMapping.font ? functionSet.secm.setCurrentFontsize(fieldMapping.font_size) : functionSet.secm.setCurrentFontsize(10);
 			}
 			var mappingValue = "";
 			//			console.log("the actor");
