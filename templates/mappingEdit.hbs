@@ -1,6 +1,8 @@
 <form id="sheet-export-mappingedit">
 
     <header id="sheet-export-mappingedit-header">
+        <label for="sheet-export-mappingedit-upload" class="btn">Generate mapping from PDF</label>
+        <input id="sheet-export-mappingedit-upload" type="file" name="generate" accept="application/pdf" style="visibility:hidden;" />
         <button id="sheet-export-mappingedit-pc" type="button" name="PC" {{#if disabledPc}}disabled="true"{{/if}}>PC</button>
         <button id="sheet-export-mappingedit-npc" type="button" {{#if disabledNpc}}disabled="true"{{/if}}>NPC</button>
     </header>

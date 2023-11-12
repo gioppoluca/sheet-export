@@ -73,8 +73,84 @@ export class MappingEdit extends FormApplication {
     }
     activateListeners(html) {
         super.activateListeners(html);
+        document.getElementById("sheet-export-mappingedit-upload").addEventListener("change", event => {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+            reader.onload = ev => this.onFileUpload(ev.target.result);
+            reader.readAsArrayBuffer(file);
+            console.log("change");
+            console.log(event.target.files[0]);
+            console.log(event.target.files[0].name);
+            console.log(file);
+        });
+        //    $('input[name="generate"]', html).click(this.generateMapping.bind(this));
         $('button[name="PC"]', html).click(this.showPCmapping.bind(this));
         $('button[name="save"]', html).click(this.saveMapping.bind(this));
+    }
+    onFileUpload(buffer) {
+        this.generateMapping(buffer);
+
+    }
+    async generateMapping(buffer) {
+        console.log("generateMapping");
+        const pdf = await getPdf("", buffer);
+        console.log(pdf);
+        let form = null;
+        let fields = null;
+        try {
+            form = pdf.getForm();
+            console.log(form);
+            fields = form.getFields()
+            console.log(fields);
+        } catch (error) {
+            ui.notifications.error("error in loading PDF form fields:" + error.message);
+            console.log(error);
+            return;
+        }
+        let new_mapping = {
+            "releasemin": "",
+            "pdfUrl": "insert_your_pdf_url_here",
+            "helperFunctions": {
+                "testFunction": "function testFunction(items) {console.log(items);}"
+            },
+            "fonts": [
+                {
+                    "id": "UbuntuCondensed-Regular",
+                    "path": "/modules/sheet-export/mappings/dnd5e/experimental/latest/UbuntuCondensed-Regular.ttf"
+                }
+            ],
+            "globalContent": [
+                {
+                    "content": " global_content_expression",
+                    "id": "global_content_id"
+                }
+            ],
+            "images": [
+                {
+                    "path": "@img",
+                    "page": 0,
+                    "pos_x": 0,
+                    "pos_y": 0,
+                    "width": 100,
+                    "height": 100
+                }
+            ],
+            "fields": [
+            ]
+        };
+
+        fields.forEach(field => {
+            let new_field = {
+                "content": " content_expression_formula_here ",
+                "pdf": field.getName().trim(),
+                "font": "Helvetica",
+                "font_size": 9
+              }
+              new_mapping.fields.push(new_field);
+        });
+        console.log(new_mapping);
+        const blob = new Blob([JSON.stringify(new_mapping,null,2)], { type: "application/json" });
+		saveAs(blob, "new_mapping.json");
     }
     async saveMapping() {
         console.log("saveMapping");
