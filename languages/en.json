@@ -9,6 +9,10 @@
           "Name": "Edit internal mapping",
           "Hint": "Edit the internal mapping files of the version-release chosen above"
         },
+        "setCustomMapping":{
+          "Name": "Set custom mapping",
+          "Hint": "set the own custom mapping"
+        },
         "mapping": {
           "Name": "Mapping",
           "Hint": "JSON which is used to map the PDF fields to information on the Foundry character sheet. See the README for details."

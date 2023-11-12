@@ -1,4 +1,5 @@
 import { MappingEdit } from "./apps/mappingEdit.js";
+import { CustomMapping } from "./apps/customMapping.js";
 
 export const registerSettings = function () {
 	let mappingOptions = {};
@@ -62,13 +63,22 @@ export const registerSettings = function () {
 		requiresReload: true,
 	});
 	
-	game.settings.registerMenu(modulename, 'resetPosition', {
+	game.settings.registerMenu(modulename, 'mappingEdit', {
 		name: game.i18n.localize(`${modulename}.settings.mappingEdit.Name`),
 		label: game.i18n.localize(`${modulename}.settings.mappingEdit.Name`),
-		hint: 'Edit the mapping files',
+		hint: game.i18n.localize(`${modulename}.settings.mappingEdit.Hint`),
 		icon: 'fas fa-desktop',
 		restricted: true,
 		type: MappingEdit,
+	});
+
+	game.settings.registerMenu(modulename, 'setCustomMapping', {
+		name: game.i18n.localize(`${modulename}.settings.setCustomMapping.Name`),
+		label: game.i18n.localize(`${modulename}.settings.setCustomMapping.Name`),
+		hint: game.i18n.localize(`${modulename}.settings.setCustomMapping.Hint`),
+		icon: 'fas fa-desktop',
+		restricted: true,
+		type: CustomMapping,
 	});
 
 }
