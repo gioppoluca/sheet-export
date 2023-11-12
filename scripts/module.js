@@ -574,6 +574,7 @@ const ubuntuFont = await pdfDoc.embedFont(fontBytes);
 					console.log(mappingValue.calculated);
 					input.innerHTML = mappingValue ? mappingValue.calculated : "";
 					field.setText(mappingValue ? (mappingValue.calculated ? mappingValue.calculated.toString() : "") : "");
+					field.updateAppearances(customFonts[fieldMapping.font])
 					if (fieldMapping.font) {
 						field.updateAppearances(functionSet.defaultFont);
 					}
@@ -603,6 +604,7 @@ const ubuntuFont = await pdfDoc.embedFont(fontBytes);
 			i++;
 		})
 		// elaborated all the fields, now we can download the pdf
+		//form.flatten();
 		this.filledPdf = await pdf.save();
 		document.getElementById("sheet-export-header").setAttribute("style", "display: none");
 		document.getElementById("sheet-export-final").style.display = "block";

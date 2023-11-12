@@ -8,6 +8,10 @@
     {
       "id": "UbuntuCondensed-Regular",
       "path": "/modules/sheet-export/mappings/dnd5e/experimental/latest/UbuntuCondensed-Regular.ttf"
+    },
+    {
+      "id": "StintUltraCondensed-Regular",
+      "path": "/modules/sheet-export/mappings/dnd5e/experimental/latest/StintUltraCondensed-Regular.ttf"
     }
   ],
   "globalContent": [
@@ -52,13 +56,13 @@
     {
       "content": " functionSet.secm.getContentChunk('biography')",
       "pdf": "testo1",
-      "font": "UbuntuCondensed-Regular",
+      "font": "StintUltraCondensed-Regular",
       "font_size": 9
     },
     {
       "content": " functionSet.secm.getContentChunk('biography')",
       "pdf": "testo2",
-      "font": "UbuntuCondensed-Regular",
+      "font": "StintUltraCondensed-Regular",
       "font_size": 9
     }
   ]
