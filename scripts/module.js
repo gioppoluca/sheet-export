@@ -1,5 +1,5 @@
 
-import { PDFDocument, PDFRawStream, PDFName, StandardFonts } from './lib/pdf-lib.esm.js';
+import { PDFDocument, PDFRawStream, PDFName, StandardFonts, getDefaultFontSize } from './lib/pdf-lib.esm.js';
 import fontkit from './lib/fontkit.es.js';
 import { registerSettings } from "./settings.js";
 import { getMapping, getPdf, getSheeType } from "./sheet-export-api.js";
@@ -450,8 +450,10 @@ class SheetExportconfig extends FormApplication {
 		for (let i = 0; i < fonts.length; i++) {
 			let fontBytes = await fetch(getRoute(fonts[i].path)).then((res) => res.arrayBuffer());
 			let theFont = await pdf.embedFont(fontBytes);
+			console.log(theFont);
 			customFonts[fonts[i].id] = theFont;
 		}
+
 		console.log(customFonts);
 		// Fetch the Ubuntu font
 		/*
@@ -517,6 +519,11 @@ const ubuntuFont = await pdfDoc.embedFont(fontBytes);
 		functionSet.secm = new SheetExportContentManager(globalContent, functionSet);
 		functionSet.customFonts = customFonts;
 		functionSet.defaultFont = helveticaFont;
+		/*
+		const url = 'https://pdf-lib.js.org/assets/ubuntu/Pacifico-Regular.ttf'
+		const ubuntuBytes = await fetch(url).then(res => res.arrayBuffer())
+		const font5 = await pdf.embedFont(ubuntuBytes)
+		*/
 		// Manage the form fields
 		var i = 0;
 		fields.forEach(field => {
@@ -526,7 +533,15 @@ const ubuntuFont = await pdfDoc.embedFont(fontBytes);
 			console.log(field);
 			console.log("dafault appearance");
 			console.log(field.acroField.getDefaultAppearance());
+			const fontExp = /\/(?<font>.*?)\s/gm
+			var fieldFont = fontExp.exec(field.acroField.getDefaultAppearance()).groups.font;
+			//			var defApp = field.acroField.getDefaultAppearance().split(" ");
+			//			var fieldFont = defApp[0].slice(1);
+			console.log(fieldFont);
 			console.log(field.acroField.DA());
+			var widg = field.acroField.getWidgets()
+			console.log("widgets");
+			console.log(widg);
 			// Create row
 			const row = document.createElement("li");
 
@@ -547,16 +562,40 @@ const ubuntuFont = await pdfDoc.embedFont(fontBytes);
 
 			var fieldMapping = mapping.fields.find(f => f.pdf === name)
 			console.log(fieldMapping)
-			var contentMapping = fieldMapping ? fieldMapping.content.replaceAll("@", game.release.generation > 10 ? "actor." : "actor.data.") : "\"\"";
-			contentMapping = "{'calculated': " + contentMapping + " }";
 			console.log(contentMapping);
 			functionSet.secm.setCurrentField(field);
+			functionSet.secm.setCurrentFontsize(getDefaultFontSize(field.acroField));
 			if (fieldMapping) {
 				console.log("field mapping exists so I set font and fontsize");
 				console.log(customFonts);
-				fieldMapping.font ? functionSet.secm.setCurrentFont(customFonts[fieldMapping.font]) : functionSet.secm.setCurrentFont(helveticaFont);
-				fieldMapping.font ? functionSet.secm.setCurrentFontsize(fieldMapping.font_size) : functionSet.secm.setCurrentFontsize(10);
+				// check if there is an overload of the font for the field
+				if (fieldMapping.font) {
+					console.log("font is overloaded");
+					functionSet.secm.setCurrentFont(customFonts[fieldMapping.font])
+
+				}
+				// check if the font of the field is one of the embedded fonts
+				else if (customFonts[fieldFont]) {
+					console.log("font is embedded");
+					functionSet.secm.setCurrentFont(customFonts[fieldFont]);
+				}
+				else {
+					console.log("font is dedfault helvetica");
+					functionSet.secm.setCurrentFont(helveticaFont);
+				}
+				// check if the font size is overloaded
+				if (fieldMapping.font_size) {
+					console.log("font size is overloaded");
+					functionSet.secm.setCurrentFontsize(fieldMapping.font_size)
+				} else {
+					console.log("font size is default");
+					functionSet.secm.setCurrentFontsize(getDefaultFontSize(field.acroField));
+				}
+				console.log(fieldMapping.font);
+				console.log(fieldMapping.font_size);
 			}
+			var contentMapping = fieldMapping ? fieldMapping.content.replaceAll("@", game.release.generation > 10 ? "actor." : "actor.data.") : "\"\"";
+			contentMapping = "{'calculated': " + contentMapping + " }";
 			var mappingValue = "";
 			//			console.log("the actor");
 			//			console.log(actor);
@@ -574,10 +613,15 @@ const ubuntuFont = await pdfDoc.embedFont(fontBytes);
 					console.log(mappingValue.calculated);
 					input.innerHTML = mappingValue ? mappingValue.calculated : "";
 					field.setText(mappingValue ? (mappingValue.calculated ? mappingValue.calculated.toString() : "") : "");
-					field.updateAppearances(customFonts[fieldMapping.font])
+					field.setFontSize(functionSet.secm.fontSize);
+					console.log(fieldMapping.font);
+					console.log(functionSet.secm.font);
+					field.updateAppearances(functionSet.secm.font);
+					/*
 					if (fieldMapping.font) {
 						field.updateAppearances(functionSet.defaultFont);
 					}
+					*/
 					break;
 				case "PDFCheckBox":
 					console.log(mappingValue.calculated);

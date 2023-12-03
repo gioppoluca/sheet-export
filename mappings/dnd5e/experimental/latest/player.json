@@ -6,12 +6,12 @@
   },
   "fonts": [
     {
-      "id": "UbuntuCondensed-Regular",
-      "path": "/modules/sheet-export/mappings/dnd5e/experimental/latest/UbuntuCondensed-Regular.ttf"
+      "id": "Pacifico-Regular",
+      "path": "/modules/sheet-export/mappings/dnd5e/experimental/latest/Pacifico-Regular.ttf"
     },
     {
-      "id": "StintUltraCondensed-Regular",
-      "path": "/modules/sheet-export/mappings/dnd5e/experimental/latest/StintUltraCondensed-Regular.ttf"
+      "id": "UbuntuCondensed",
+      "path": "/modules/sheet-export/mappings/dnd5e/experimental/latest/UbuntuCondensed-Regular.ttf"
     }
   ],
   "globalContent": [
@@ -46,7 +46,7 @@
     {
       "content": " @items.filter(i => i.type === 'class').map(i => `${i.name} ${i.system.levels}`).join(' / ') ",
       "pdf": "player",
-      "font": "UbuntuCondensed-Regular",
+      "font": "Pacifico-Regular",
       "font_size": 19
     },
     {
@@ -56,14 +56,12 @@
     {
       "content": " functionSet.secm.getContentChunk('biography')",
       "pdf": "testo1",
-      "font": "StintUltraCondensed-Regular",
+      "font": "UbuntuCondensed",
       "font_size": 9
     },
     {
       "content": " functionSet.secm.getContentChunk('biography')",
-      "pdf": "testo2",
-      "font": "StintUltraCondensed-Regular",
-      "font_size": 9
+      "pdf": "testo2"
     }
   ]
 }

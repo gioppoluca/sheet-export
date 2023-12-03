@@ -36,7 +36,9 @@ export class SheetExportContentManager {
     }
 
     wrapText = (text, width, height, font, fontSize) => {
+        console.log("wrapText");
         console.log(font.name);
+        console.log(fontSize);
         //    let charWw = font.widthOfTextAtSize("W", fontSize);
         let charWh = font.heightAtSize(fontSize);
         //     let charXrow = Math.floor(width / charWw);
@@ -59,7 +61,7 @@ export class SheetExportContentManager {
         for (let n = 0; n < words.length; n++) {
             const testLine = line + words[n] + ' ';
             const testWidth = font.widthOfTextAtSize(testLine, fontSize);
-            if (testWidth > (width * 0.91)) {
+            if (testWidth > (width * 0.9)) {
                 result.push(line);
                 console.log(line);
                 let newLines = line.split('\n').length - 1;
