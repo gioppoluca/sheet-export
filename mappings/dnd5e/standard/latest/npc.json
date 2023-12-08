@@ -1,0 +1,238 @@
+[
+  {
+    "content": " @name ", 
+    "pdf": "NpcName"
+  }, 
+  {
+    "content": " @system.details.race ", 
+    "pdf": "Race"
+  }, 
+  {
+    "content": " @system.details.type.value + \" (\" + game.dnd5e.config.actorSizes[@system.traits.size] + \")\" + \" - \" + @system.details.alignment", 
+    "pdf": "Type"
+  }, 
+  {
+    "content": " @system.abilities.str.value ", 
+    "pdf": "str"
+  }, 
+  {
+    "content": " @system.abilities.str.mod + \" (sv: \" + @system.abilities.str.save + \")\"", 
+    "pdf": "STRmod"
+  }, 
+  {
+    "content": " @system.abilities.dex.value ", 
+    "pdf": "dex"
+  }, 
+  {
+    "content": " @system.abilities.dex.mod + \" (sv: \" + @system.abilities.dex.save + \")\" ", 
+    "pdf": "DEXmod"
+  }, 
+  {
+    "content": " @system.abilities.con.value ", 
+    "pdf": "con"
+  }, 
+  {
+    "content": " @system.abilities.con.mod + \" (sv: \" + @system.abilities.con.save + \")\" ", 
+    "pdf": "CONmod"
+  }, 
+  {
+    "content": " @system.abilities.int.value ", 
+    "pdf": "int"
+  }, 
+  {
+    "content": " @system.abilities.int.mod + \" (sv: \" + @system.abilities.int.save + \")\" ", 
+    "pdf": "INTmod"
+  }, 
+  {
+    "content": " @system.abilities.wis.value ", 
+    "pdf": "wis"
+  }, 
+  {
+    "content": " @system.abilities.wis.mod + \" (sv: \" + @system.abilities.wis.save + \")\" ", 
+    "pdf": "WISmod"
+  }, 
+  {
+    "content": " @system.abilities.cha.value ", 
+    "pdf": "cha"
+  }, 
+  {
+    "content": " @system.abilities.cha.mod + \" (sv: \" + @system.abilities.cha.save + \")\" ", 
+    "pdf": "CHAmod"
+  }, 
+  {
+    "content": " @system.attributes.prof ", 
+    "pdf": "ProfBonus"
+  }, 
+  {
+    "content": " @system.attributes.ac.value ", 
+    "pdf": "AC"
+  }, 
+  {
+    "content": " @system.attributes.init.total ", 
+    "pdf": "initiative"
+  }, 
+  {
+    "content": " @system.attributes.hp.max ", 
+    "pdf": "HPMax"
+  }, 
+  {
+    "content": " @system.attributes.hp.value ", 
+    "pdf": "HPCurrent"
+  }, 
+  {
+    "content": " (function() {\n      const mo = actor.system.attributes.movement;\n      const mt = Object.entries(game.dnd5e.config.movementTypes).map(e => e[0]);\n      const ma = Object.entries(mo).filter(e => e[1] && mt.includes(e[0]));\n      if (mo.walk && ma?.length === 1) {\n        return `${ma[0][1]}${mo.units}${mo.hover ? \"\\n(hover)\" : \"\"}`;\n      } else {\n        return ma.map(m => `${m[0].substring(0,2)}:${m[1]}${mo.units}`).join('\\n').concat(mo.hover ? \"\\n(hover)\" : \"\");\n      }\n    })()\n  ", 
+    "pdf": "Speed"
+  }, 
+  {
+    "content": " @items.filter(i => [\"feat\", \"trait\"].includes(i.type)).slice(0, 16).map(i => `${i.name} - ${i.system.source}: \\n${((h) => {\n      const d = document.createElement(\"div\");\n      d.innerHTML = h;\n      return d.textContent || d.innerText || \"\";\n    })(i.system.description.value.substring(0,599))}${(i.system.description.value.length>600)?'...':''}\\n`).join(\"\\n\")\n  ", 
+    "pdf": "features"
+  }, 
+  {
+    "content": " @items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[0]?.name || \"\" ", 
+    "pdf": "Wpn1 Name"
+  }, 
+  {
+    "content": " (function() {\n    const theWeapon = actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[0];\n    theWeapon?.prepareFinalAttributes();\n    return theWeapon?.labels?.toHit?.replace(/^\\+ $/,\"0\") || \"\"\n    })()\n  ", 
+    "pdf": "Wpn1 AtkBonus"
+  }, 
+  {
+    "content": " (function() {\n      const dda = Array.from(actor.itemTypes.weapon.filter(i => i.system.equipped && i.hasAttack && i.hasDamage))?.[0]?.labels.derivedDamage;\n      return !dda ? \"\" : dda.map(dd => `${dd.formula || \"\"} ${game.dnd5e.config.damageTypes[dd.damageType]}`).join('\\n');\n    })()\n  ", 
+    "pdf": "Wpn1 Damage"
+  }, 
+  {
+    "content": " @items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[1]?.name || \"\" ", 
+    "pdf": "Wpn2 Name"
+  }, 
+  {
+    "content": " (function() {\n    const theWeapon = actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[1];\n    theWeapon?.prepareFinalAttributes();\n    return theWeapon?.labels?.toHit?.replace(/^\\+ $/,\"0\") || \"\"\n    })()\n  ", 
+    "pdf": "Wpn2 AtkBonus"
+  }, 
+  {
+    "content": " (function() {\n      const dda = Array.from(actor.itemTypes.weapon.filter(i => i.system.equipped && i.hasAttack && i.hasDamage))?.[1]?.labels.derivedDamage;\n      return !dda ? \"\" : dda.map(dd => `${dd.formula || \"\"} ${game.dnd5e.config.damageTypes[dd.damageType]}`).join('\\n');\n    })()\n  ", 
+    "pdf": "Wpn2 Damage"
+  }, 
+  {
+    "content": " @items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[2]?.name || \"\" ", 
+    "pdf": "Wpn3 Name"
+  }, 
+  {
+    "content": " (function() {\n    const theWeapon = actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[2];\n    theWeapon?.prepareFinalAttributes();\n    return theWeapon?.labels?.toHit?.replace(/^\\+ $/,\"0\") || \"\"\n    })()\n  ", 
+    "pdf": "Wpn3 AtkBonus"
+  }, 
+  {
+    "content": " (function() {\n      const dda = Array.from(actor.itemTypes.weapon.filter(i => i.system.equipped && i.hasAttack && i.hasDamage))?.[2]?.labels.derivedDamage;\n      return !dda ? \"\" : dda.map(dd => `${dd.formula || \"\"} ${game.dnd5e.config.damageTypes[dd.damageType]}`).join('\\n');\n    })()\n  ", 
+    "pdf": "Wpn3 Damage"
+  }, 
+  {
+    "content": " @items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[3]?.name || \"\" ", 
+    "pdf": "Wpn4 Name"
+  }, 
+  {
+    "content": " (function() {\n    const theWeapon = actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[3];\n    theWeapon?.prepareFinalAttributes();\n    return theWeapon?.labels?.toHit?.replace(/^\\+ $/,\"0\") || \"\"\n    })()\n  ", 
+    "pdf": "Wpn4 AtkBonus"
+  }, 
+  {
+    "content": " (function() {\n      const dda = Array.from(actor.itemTypes.weapon.filter(i => i.system.equipped && i.hasAttack && i.hasDamage))?.[3]?.labels.derivedDamage;\n      return !dda ? \"\" : dda.map(dd => `${dd.formula || \"\"} ${game.dnd5e.config.damageTypes[dd.damageType]}`).join('\\n');\n    })()\n  ", 
+    "pdf": "Wpn4 Damage"
+  }, 
+  {
+    "content": " @items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[4]?.name || \"\" ", 
+    "pdf": "Wpn5 Name"
+  }, 
+  {
+    "content": " (function() {\n    const theWeapon = actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[4];\n    theWeapon?.prepareFinalAttributes();\n    return theWeapon?.labels?.toHit?.replace(/^\\+ $/,\"0\") || \"\"\n    })()\n  ", 
+    "pdf": "Wpn5 AtkBonus"
+  }, 
+  {
+    "content": " (function() {\n      const dda = Array.from(actor.itemTypes.weapon.filter(i => i.system.equipped && i.hasAttack && i.hasDamage))?.[4]?.labels.derivedDamage;\n      return !dda ? \"\" : dda.map(dd => `${dd.formula || \"\"} ${game.dnd5e.config.damageTypes[dd.damageType]}`).join('\\n');\n    })()\n  ", 
+    "pdf": "Wpn5 Damage"
+  }, 
+  {
+    "content": " @items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[5]?.name || \"\" ", 
+    "pdf": "Wpn6 Name"
+  }, 
+  {
+    "content": " (function() {\n    const theWeapon = actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[5];\n    theWeapon?.prepareFinalAttributes();\n    return theWeapon?.labels?.toHit?.replace(/^\\+ $/,\"0\") || \"\"\n    })()\n  ", 
+    "pdf": "Wpn6 AtkBonus"
+  }, 
+  {
+    "content": " (function() {\n      const dda = Array.from(actor.itemTypes.weapon.filter(i => i.system.equipped && i.hasAttack && i.hasDamage))?.[5]?.labels.derivedDamage;\n      return !dda ? \"\" : dda.map(dd => `${dd.formula || \"\"} ${game.dnd5e.config.damageTypes[dd.damageType]}`).join('\\n');\n    })()\n  ", 
+    "pdf": "Wpn6 Damage"
+  }, 
+  {
+    "content": " @items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[6]?.name || \"\" ", 
+    "pdf": "Wpn7 Name"
+  }, 
+  {
+    "content": " (function() {\n    const theWeapon = actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[6];\n    theWeapon?.prepareFinalAttributes();\n    return theWeapon?.labels?.toHit?.replace(/^\\+ $/,\"0\") || \"\"\n    })()\n  ", 
+    "pdf": "Wpn7 AtkBonus"
+  }, 
+  {
+    "content": " (function() {\n      const dda = Array.from(actor.itemTypes.weapon.filter(i => i.system.equipped && i.hasAttack && i.hasDamage))?.[6]?.labels.derivedDamage;\n      return !dda ? \"\" : dda.map(dd => `${dd.formula || \"\"} ${game.dnd5e.config.damageTypes[dd.damageType]}`).join('\\n');\n    })()\n  ", 
+    "pdf": "Wpn7 Damage"
+  }, 
+  {
+    "content": " (function() {\n      let skill_text = \"\";\n      Object.keys(actor.system.skills).forEach(key => {\n        let row = game.dnd5e.config.skills[key].label + \": \" + actor.system.skills[key].mod;\n        skill_text += row + \"\\n\";\n      });\n      return skill_text;\n    })()\n  ", 
+    "pdf": "Skills"
+  }, 
+  {
+    "content": " (function(h) {\n      const d = document.createElement(\"div\");\n      d.innerHTML = h;\n      return d.textContent || d.innerText || \"\";\n    })(@system.details.trait)\n  ", 
+    "pdf": "PersonalityTraits"
+  }, 
+  {
+    "content": " (function(h) {\n      const d = document.createElement(\"div\");\n      d.innerHTML = h;\n      return d.textContent || d.innerText || \"\";\n    })(@system.details.ideal)\n  ", 
+    "pdf": "Ideals"
+  }, 
+  {
+    "content": " (function(h) {\n      const d = document.createElement(\"div\");\n      d.innerHTML = h;\n      return d.textContent || d.innerText || \"\";\n    })(@system.details.bond)\n  ", 
+    "pdf": "Bonds"
+  }, 
+  {
+    "content": " @system.attributes.hp.formula ", 
+    "pdf": "HD"
+  }, 
+  {
+    "content": " (function(h) {\n      const d = document.createElement(\"div\");\n      d.innerHTML = h;\n      return d.textContent || d.innerText || \"\";\n    })(@system.details.flaw)\n  ", 
+    "pdf": "Flaws"
+  }, 
+  {
+    "content": " @items.filter(i => ['weapon', 'equipment', 'tool'].includes(i.type)).map(i => (i.system.quantity <= 1) ? i.name : `${i.name} (${i.system.quantity})`).join(', ') ", 
+    "pdf": "equipment"
+  }, 
+  {
+    "content": " @system.currency.cp || \"\" ", 
+    "pdf": "CP"
+  }, 
+  {
+    "content": " @system.currency.sp || \"\" ", 
+    "pdf": "SP"
+  }, 
+  {
+    "content": " @system.currency.ep || \"\" ", 
+    "pdf": "EP"
+  }, 
+  {
+    "content": " @system.currency.gp || \"\" ", 
+    "pdf": "GP"
+  }, 
+  {
+    "content": " @system.currency.pp || \"\" ", 
+    "pdf": "PP"
+  }, 
+  {
+    "content": " @system.skills.prc.passive ", 
+    "pdf": "PPerception"
+  }, 
+  {
+    "content": " (function(h) {\n      const d = document.createElement(\"div\");\n      d.innerHTML = h.value;\n      return d.textContent || d.innerText || \"\";\n    })(@system.details.biography)\n  ", 
+    "pdf": "biography"
+  }, 
+  {
+    "content": " (function() {\n      let senses_text = \"\";\n      Object.keys(actor.system.attributes.senses).forEach(key => {\n        if(key != \"units\" && actor.system.attributes.senses[key] > 0){\n          let row = key + \": \" + actor.system.attributes.senses[key] + \" \" + actor.system.attributes.senses[\"units\"];\n          senses_text += row + \"\\n\";\n        };\n      });\n      return senses_text;\n    })()\n  ", 
+    "pdf": "senses"
+  }, 
+  {
+    "content": " (function() {\n      let spell_text = \"\";\n      actor.items.filter(i => i.type === 'spell').sort((a,b)=>{return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => {x.name = x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' +fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : '');return x} ).forEach(object => {\n        let row = object.system.level + \" - \" + object.name;\n        spell_text += row + \"\\n\";\n      });\n        \n      return spell_text;\n    })()\n  ", 
+    "pdf": "spells"
+  }
+]
