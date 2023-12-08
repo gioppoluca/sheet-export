@@ -12,6 +12,8 @@ Hooks.once('ready', async function () {
 // Store mapping
 Hooks.once('init', async function () {
 	// TODO refactor this moving to settings
+
+	/*
 	game.settings.register(SheetExportconfig.ID, "mapping", {
 		name: "sheet-export.settings.mapping.Name",
 		hint: "sheet-export.settings.mapping.Hint",
@@ -29,7 +31,7 @@ Hooks.once('init', async function () {
 		type: String,
 		default: "[]",
 	});
-
+*/
 	if (game.version && isNewerVersion(game.version, "9.230")) {
 		game.keybindings.register(SheetExportconfig.ID, "showConfig", {
 			name: "Show Config",
