@@ -6,6 +6,7 @@ export class MappingEdit extends FormApplication {
     disabledPc = false;
     disabledNpc = false;
     static ID = "sheet-export";
+    saveFile = "player";
     workingMapping = {};
     constructor(object, options = {}) {
         super(object, options);
@@ -145,12 +146,12 @@ export class MappingEdit extends FormApplication {
                 "pdf": field.getName().trim(),
                 "font": "Helvetica",
                 "font_size": 9
-              }
-              new_mapping.fields.push(new_field);
+            }
+            new_mapping.fields.push(new_field);
         });
         console.log(new_mapping);
-        const blob = new Blob([JSON.stringify(new_mapping,null,2)], { type: "application/json" });
-		saveAs(blob, "new_mapping.json");
+        const blob = new Blob([JSON.stringify(new_mapping, null, 2)], { type: "application/json" });
+        saveAs(blob, "new_mapping.json");
     }
     async saveMapping() {
         console.log("saveMapping");
@@ -158,10 +159,31 @@ export class MappingEdit extends FormApplication {
         console.log(inputForm);
         inputForm.childNodes.forEach(element => {
             console.log(element);
+            console.log(element.children[1]);
             console.log(element.children[1].id);
-            this.workingMapping.fields.find((el) => el.pdf == element.children[1].id).content = element.children[1].innerText;
+            console.log(element.children[1].value);
+            if (this.workingMapping.fields.find((el) => el.pdf == element.children[1].id) === undefined) {
+                var newField = {
+                    "content": "",
+                    "pdf": element.children[1].id
+                }
+                this.workingMapping.fields.push(newField);
+
+            }
+            this.workingMapping.fields.find((el) => el.pdf == element.children[1].id).content = element.children[1].value;
+
         });
         console.log(this.workingMapping);
+        const text = JSON.stringify(this.workingMapping, null, 2);
+        const blob = new Blob([text], { type: "text/plain" });
+        var newFile = new File([blob], this.saveFile + '.json', { type: "application/json" });
+        let response = await FilePicker.upload("data", `modules/sheet-export/mappings/${game.system.id}/custom/latest`, newFile, {});
+        console.log(response);
+        /*
+        const reader = new FileReader();
+        reader.onload = ev => this.onFileUpload(ev.target.result);
+        reader.readAsArrayBuffer(newFile);
+        */
     }
     async showPCmapping() {
         console.log("showPCmapping");
@@ -175,6 +197,7 @@ export class MappingEdit extends FormApplication {
         const form = pdf.getForm();
         const fields = form.getFields()
         const inputForm = document.getElementById("fieldList");
+        this.saveFile ="player1";
         var i = 0;
         fields.forEach(field => {
             const row = document.createElement("li");
