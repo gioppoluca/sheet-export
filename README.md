@@ -1,11 +1,5 @@
-![](https://img.shields.io/badge/Foundry-v11-informational)
-
-<!--- Downloads @ Latest Badge -->
-
+- ![](https://img.shields.io/badge/Foundry-v11-informational)
 - ![Latest Release Download Count](https://img.shields.io/github/downloads/gioppoluca/sheet-export/latest/module.zip)
-
-<!--- Forge Bazaar Install % Badge -->
-
 - ![Forge Installs](https://img.shields.io/badge/dynamic/json?label=Forge%20Installs&query=package.installs&suffix=%25&url=https%3A%2F%2Fforge-vtt.com%2Fapi%2Fbazaar%2Fpackage%2Fsheet-export&colorB=4aa94a)
 
 # Sheet Export
@@ -80,7 +74,10 @@ The button **Set custom mapping** in the settings form allows you to upload your
 ![custom mapping](img/custom-mapping.png)
 
 ## Changelog
+[Changelog](CHANGELOG.md)
 
-```{include} CHANGELOG.md
+## Support
+Please open issues on this repo for any problems that you can have using this module.
 
-```
+If you want to support this work 
+<a href="https://www.buymeacoffee.com/lucagioppo" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
