@@ -218,7 +218,7 @@ export class MappingEdit extends FormApplication {
             input.id = name;
             var fieldMapping = mapping.fields.find(f => f.pdf === name)
 
-            input.innerHTML = fieldMapping ? fieldMapping.content : "MAPPING NOT FOUND";
+            input.innerHTML = fieldMapping ? fieldMapping.content : "";
             row.appendChild(input); // Add to DOM
 
             i++;
