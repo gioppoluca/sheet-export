@@ -413,11 +413,11 @@ class SheetExportconfig extends FormApplication {
 			}
 			if (embedding_image != null) {
 				const page = pdf.getPage(images[i].page);
-
+				console.log(images[i]);
 				// Draw the JPG image in the center of the page
 				page.drawImage(embedding_image, {
 					x: images[i].pos_x,
-					y: images[i].pos_x,
+					y: images[i].pos_y,
 					width: images[i].width,
 					height: images[i].height,
 				})
@@ -533,17 +533,17 @@ const ubuntuFont = await pdfDoc.embedFont(fontBytes);
 			const name = field.getName().trim();
 			console.log(`${type}: ${name}`)
 			console.log(field);
-			console.log("dafault appearance");
-			console.log(field.acroField.getDefaultAppearance());
+			//	console.log("dafault appearance");
+			//	console.log(field.acroField.getDefaultAppearance());
 			const fontExp = /\/(?<font>.*?)\s/gm
-			var fieldFont = fontExp.exec(field.acroField.getDefaultAppearance()).groups.font;
+			var fieldFont = fontExp.exec(field.acroField.getDefaultAppearance())?.groups?.font;
 			//			var defApp = field.acroField.getDefaultAppearance().split(" ");
 			//			var fieldFont = defApp[0].slice(1);
-			console.log(fieldFont);
-			console.log(field.acroField.DA());
+			//		console.log(fieldFont);
+			//		console.log(field.acroField.DA());
 			var widg = field.acroField.getWidgets()
-			console.log("widgets");
-			console.log(widg);
+			//		console.log("widgets");
+			//		console.log(widg);
 			// Create row
 			const row = document.createElement("li");
 
@@ -563,16 +563,16 @@ const ubuntuFont = await pdfDoc.embedFont(fontBytes);
 			input.id = name;
 
 			var fieldMapping = mapping.fields.find(f => f.pdf === name)
-			console.log(fieldMapping)
-			console.log(contentMapping);
+			//		console.log(fieldMapping)
+			//		console.log(contentMapping);
 			functionSet.secm.setCurrentField(field);
 			functionSet.secm.setCurrentFontsize(getDefaultFontSize(field.acroField));
 			if (fieldMapping) {
-				console.log("field mapping exists so I set font and fontsize");
-				console.log(customFonts);
+				//	console.log("field mapping exists so I set font and fontsize");
+				//	console.log(customFonts);
 				// check if there is an overload of the font for the field
 				if (fieldMapping.font) {
-					console.log("font is overloaded");
+					//		console.log("font is overloaded");
 					functionSet.secm.setCurrentFont(customFonts[fieldMapping.font])
 
 				}
@@ -582,7 +582,7 @@ const ubuntuFont = await pdfDoc.embedFont(fontBytes);
 					functionSet.secm.setCurrentFont(customFonts[fieldFont]);
 				}
 				else {
-					console.log("font is dedfault helvetica");
+					console.log("font is default helvetica");
 					functionSet.secm.setCurrentFont(helveticaFont);
 				}
 				// check if the font size is overloaded
@@ -593,8 +593,8 @@ const ubuntuFont = await pdfDoc.embedFont(fontBytes);
 					console.log("font size is default");
 					functionSet.secm.setCurrentFontsize(getDefaultFontSize(field.acroField));
 				}
-				console.log(fieldMapping.font);
-				console.log(fieldMapping.font_size);
+				//			console.log(fieldMapping.font);
+				//			console.log(fieldMapping.font_size);
 			}
 			var contentMapping = fieldMapping ? fieldMapping.content.replaceAll("@", game.release.generation > 10 ? "actor." : "actor.data.") : "\"\"";
 			contentMapping = "{'calculated': " + contentMapping + " }";
@@ -604,20 +604,24 @@ const ubuntuFont = await pdfDoc.embedFont(fontBytes);
 			try {
 				// Return as evaluated JavaScript with the actor as an argument
 				mappingValue = Function(`"use strict"; return function(actor,functionSet) { return ${contentMapping} };`)()(actor, functionSet);
-				console.log(mappingValue);
+				//			console.log(mappingValue);
 			} catch (err) {
 				console.log(err);
-				ui.notifications.error(`The field: ${name} is not mapped correctly using: ${contentMapping}; got error: ${err.message}`);
+				console.log(actor);
+				ui.notifications.error(`The field: ${name} is not mapped correctly using: ${contentMapping}; got error: ${err.message}`, { permanent: true });
 			}
 			switch (type) {
 				case "PDFTextField":
 					//					input.setAttribute("type", "string");
-					console.log(mappingValue.calculated);
+					//				console.log(mappingValue.calculated);
 					input.innerHTML = mappingValue ? mappingValue.calculated : "";
 					field.setText(mappingValue ? (mappingValue.calculated ? mappingValue.calculated.toString() : "") : "");
-					field.setFontSize(functionSet.secm.fontSize);
-					console.log(fieldMapping.font);
-					console.log(functionSet.secm.font);
+					console.log(functionSet.secm.fontSize);
+					if (functionSet.secm.fontSize) {
+						field.setFontSize(functionSet.secm.fontSize);
+					}
+					//					console.log(fieldMapping.font);
+								console.log(functionSet.secm.font);
 					field.updateAppearances(functionSet.secm.font);
 					/*
 					if (fieldMapping.font) {
@@ -626,23 +630,23 @@ const ubuntuFont = await pdfDoc.embedFont(fontBytes);
 					*/
 					break;
 				case "PDFCheckBox":
-					console.log(mappingValue.calculated);
+					//			console.log(mappingValue.calculated);
 					input.setAttribute("type", "checkbox");
 					input.checked = mappingValue ? mappingValue.calculated : "";
 					// before check if mappingValue is defined, than since we expect a boolean we can set the value directly
 					mappingValue ? (mappingValue.calculated ? field.check() : field.uncheck()) : field.uncheck();
 					break;
 				case "PDFCheckBox":
-					console.log(mappingValue.calculated);
+					//			console.log(mappingValue.calculated);
 					console.log("PDFButton");
 					break;
 				case "PDFRadioGroup":
-					console.log(mappingValue.calculated);
+					//			console.log(mappingValue.calculated);
 					console.log("PDFRadioGroup");
 					break;
 
 				default:
-					console.log("nothing in switch");
+					//				console.log("nothing in switch");
 					break;
 			}
 			row.appendChild(input); // Add to DOM
