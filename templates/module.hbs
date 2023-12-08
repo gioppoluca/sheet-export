@@ -1,7 +1,7 @@
 <form id="sheet-export-form">
 
     <header id="sheet-export-header">
-        <label for="sheet-export-upload" class="btn">Override mapping's PDF</label>
+        <label for="sheet-export-upload" class="sheet-export-btn">{{ localize 'sheet-export.sheet.override' }}</label>
         <input id="sheet-export-upload" type="file" name="upload" accept="application/pdf" style="visibility:hidden;" />
         <input id="sheet-export-apply" type="button" name="apply" value="Apply" />
         {{#if download.show}}

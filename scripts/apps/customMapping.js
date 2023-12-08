@@ -1,10 +1,14 @@
+import { PDFDocument } from '../lib/pdf-lib.esm.js';
+import fontkit from '../lib/fontkit.es.js';
+
+
 export class CustomMapping extends FormApplication {
     static get defaultOptions() {
         return mergeObject(super.defaultOptions, {
             id: "sheet-export-customMapping",
             title: 'Custom Mappings',
             template: "./modules/sheet-export/templates/customMapping.hbs",
-            width: 600,
+            width: 650,
             closeOnSubmit: true,
             resizable: true,
             popOut: true,
@@ -21,7 +25,7 @@ export class CustomMapping extends FormApplication {
                 return;
             }
             var blob = file.slice(0, file.size, file.type);
-            var newFile = new File([blob], 'player.json', {type: file.type});
+            var newFile = new File([blob], 'player.json', { type: file.type });
             this.saveFile(newFile);
         });
 
@@ -43,7 +47,7 @@ export class CustomMapping extends FormApplication {
                 return;
             }
             var blob = file.slice(0, file.size, file.type);
-            var newFile = new File([blob], 'npc.json', {type: file.type});
+            var newFile = new File([blob], 'npc.json', { type: file.type });
             this.saveFile(newFile);
         });
 
@@ -57,19 +61,37 @@ export class CustomMapping extends FormApplication {
             this.saveFile(file);
         });
     }
-/*
-    async saveJsonBuffer(file, type) {
-        console.log("saveJsonBuffer");
-        console.log(file);
-        console.log(type);
-        let response = await FilePicker.upload("data", "modules/sheet-export/mappings/dnd5e/custom/latest", file, {});
-        console.log(response);
-    }
-*/
+    /*
+        async saveJsonBuffer(file, type) {
+            console.log("saveJsonBuffer");
+            console.log(file);
+            console.log(type);
+            let response = await FilePicker.upload("data", "modules/sheet-export/mappings/dnd5e/custom/latest", file, {});
+            console.log(response);
+        }
+    */
     async saveFile(file) {
         console.log("saveJsonBuffer");
         console.log(file);
         let response = await FilePicker.upload("data", `modules/sheet-export/mappings/${game.system.id}/custom/latest`, file, {});
         console.log(response);
+        const reader = new FileReader();
+        reader.onload = ev => this.onFileUpload(ev.target.result);
+        reader.readAsArrayBuffer(file);
+    }
+
+    async onFileUpload(buffer) {
+        console.log("onFileUpload");
+        console.log(buffer);
+        const pdfDoc = await PDFDocument.load(buffer);
+        pdfDoc.registerFontkit(fontkit);
+        var form = pdfDoc.getForm();
+        console.log(form);
+        var fields = form.getFields()
+        console.log(fields);
+        var info = pdfDoc.getInfoDict();
+        console.log(info);
+        console.log(pdfDoc);
+        console.log(pdfDoc.fonts);
     }
 }

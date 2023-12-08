@@ -81,3 +81,12 @@
     min-height: 2em;
     height: 2em;
 }
+
+
+.sheet-export-btn {
+	margin: auto;
+	border: 1px solid #666;
+	border-radius: 0.25em;
+	box-shadow: inset 0 0 0.1em #fff, 0.2em 0.2em 0.2em rgba( 0, 0, 0, 0.3 );
+	padding: 0 0.62em;
+}
