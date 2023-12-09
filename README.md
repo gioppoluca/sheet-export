@@ -57,6 +57,81 @@ Applying the data to the PDF could require some time so wait untill it is finish
 
 By pressing the round printer button the PDF is generated and downloaded to your computer.
 
+### Mapping file
+The json example rpresents the new mapping file.
+Each PDF field is part of the fields element that can container a **pdf** field that HAVE to be tha same name of the field in the PDF, **content** is the javascript coded to execute to retrieve the proper content to place in the filed, the optional fields **font** and **font_size** allow to override font and its size.
+
+**Helper functions**
+
+The **helperFunctions** field allow to add custom functions needed in the content generation; to use tham, following the example the function MUST be invoked using the following syntax: **functionSet.**testFunction()
+
+**Overriding fonts**
+To override fonts you have to add an object in the **fonts** array with the following structure:
+- id: the same ID used in the PDF file
+- path: the path to the font file; local to the mapping file.
+
+The ID will HAVE to be used in the field element with the **font** field.
+
+**Images**
+Images can be embedded in the generated PDF, the fields describe where position it considering that the PDF (0,0) origin start in the left bottom of each page and pages start with 0 index.
+
+**Global content**
+In the **globalContent** element we can add custom javascript code that will create content that will be accessible to each following fields execution.  This can be used to generate content that have to be splitted into several different fields.
+There is the `functionSet.secm.getContentChunk('name_of_the_global_content')` to retrieve the content by automatically filling the PDF field with the chunk that will fit it.
+
+``` json
+{
+  "releasemin": "",
+  "pdfUrl": "/modules/sheet-export/mappings/game_system/standard/latest/pdf_file_name.pdf",
+  "helperFunctions": {
+    "testFunction": "function testFunction(items) {console.log(items);}"
+  },
+  "fonts": [
+    {
+      "id": "font_name",
+      "path": "/modules/sheet-export/mappings/game_system/standard/latest/font_name.ttf"
+    }
+  ],
+  "globalContent": [
+    {
+      "content": "(function(h) {\n      const d = document.createElement(\"div\");\n      d.innerHTML = h;\n      return d.textContent || d.innerText || \"\";\n    })(@system.details.biography.value)\n ",
+      "id": "biography"
+    }
+  ],
+  "images": [
+    {
+      "path": "@img",
+      "page": 0,
+      "pos_x": 0,
+      "pos_y": 0,
+      "width": 100,
+      "height": 100
+    }
+  ],
+  "fields": [
+    {
+      "content": " @items.filter(i => i.type === 'class').map(i => `${i.name} ${i.system.levels}`).join(' / ') ",
+      "pdf": "player",
+      "font": "font_name",
+      "font_size": 19
+    },
+    {
+      "content": " functionSet.testFunction(@items) ",
+      "pdf": "ClassLevel"
+    },
+    {
+      "content": " functionSet.secm.getContentChunk('biography')",
+      "pdf": "text1",
+      "font": "font_name",
+      "font_size": 9
+    },
+    {
+      "content": " functionSet.secm.getContentChunk('biography')",
+      "pdf": "text2"
+    }
+  ]
+}
+```
 ### Settings
 
 The settings form presents the drop down list for choosing the mapping for the game system of the world for your game; after saving a refresh will be asked.
