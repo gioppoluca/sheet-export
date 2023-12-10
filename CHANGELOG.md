@@ -1,4 +1,24 @@
 
+## [0.0.5] - 2023-12-10
+### :sparkles: New Features
+- [`5c75058`](https://github.com/gioppoluca/sheet-export/commit/5c750589376ee19b7d346b7f5c1440f50494cc2f) - added custom mapping management *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+- [`172d755`](https://github.com/gioppoluca/sheet-export/commit/172d755ed571f92f061b6be06a18f79678bd6843) - managing fonts *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+- [`041b193`](https://github.com/gioppoluca/sheet-export/commit/041b193a343cc3f1e8882f9ed2ff435d8bc7dd29) - managing editing of current mapping (PC) *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+- [`8b078e6`](https://github.com/gioppoluca/sheet-export/commit/8b078e651798114ee1d8cc9ebc56d262170af21f) - extended mopping for dnd5e *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+- [`6303352`](https://github.com/gioppoluca/sheet-export/commit/6303352f54b5bb88d78a98cac3bbd98985099497) - standard mapping for dnd5e *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+- [`4214328`](https://github.com/gioppoluca/sheet-export/commit/4214328b5fe7a09404a414fe8077f266eb1a5fc1) - dnd5e BR *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+- [`985c6c8`](https://github.com/gioppoluca/sheet-export/commit/985c6c83c1f479676bd2c1c89cdeb453be520aec) - dnd5e extended *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+- [`d39d158`](https://github.com/gioppoluca/sheet-export/commit/d39d158a282a37579840f4ffaa6631dbed7e126c) - added DE converted *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+- [`180e937`](https://github.com/gioppoluca/sheet-export/commit/180e93778dd2146270895e254198b36a7648a363) - dnd5e complete also for 2.4.1 *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+### :bug: Bug Fixes
+- [`ee1d143`](https://github.com/gioppoluca/sheet-export/commit/ee1d143c4d41111fa0c5dcb3892e7ffcdc7b2e25) - managed strings in language file *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+- [`60fda72`](https://github.com/gioppoluca/sheet-export/commit/60fda72b38a0471f35ccf23b15f014ad7415e003) - better css for buttons and internazionalization *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+- [`bff84a3`](https://github.com/gioppoluca/sheet-export/commit/bff84a35255c857265bb804eef3222b0152b2779) - removed old settings *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+- [`d4c612a`](https://github.com/gioppoluca/sheet-export/commit/d4c612aae0fcabed65975bd0a3842c95a36bce4f) - leave empty fields empty *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+- [`bff383d`](https://github.com/gioppoluca/sheet-export/commit/bff383d188fc8930593bcb67b194c1115baf76bc) - image position, font and size *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+
 ## [0.0.4] - 2023-11-12
 ### :sparkles: New Features
 - [`2c90c86`](https://github.com/gioppoluca/sheet-export/commit/2c90c86f405b54e5f4094ee1495ef276fd974d6e) - manage images *(commit by [@gioppoluca](https://github.com/gioppoluca))*
@@ -16,3 +36,4 @@
 
 
 [0.0.4]: https://github.com/gioppoluca/sheet-export/compare/0.0.3...0.0.4
+[0.0.5]: https://github.com/gioppoluca/sheet-export/compare/0.0.4...0.0.5
