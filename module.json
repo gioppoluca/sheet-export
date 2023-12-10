@@ -1,7 +1,7 @@
 {
   "id": "sheet-export",
   "title": "Sheet export",
-  "description": "Module to export Foundry sheets",
+  "description": "Module to export Foundry sheets in PDF",
   "version": "#{VERSION}#",
   "library": "false",
   "manifestPlusVersion": "1.2.0",
@@ -25,7 +25,7 @@
     "scripts/module.js"
   ],
   "scripts": [
-    "scripts/lib/pdf-lib.min.js"
+    "scripts/lib/pdf-lib.esm.min.js"
   ],
   "styles": [
     "styles/module.css"

@@ -7,31 +7,9 @@ import { SheetExportContentManager } from "./sheet-export-content-manager.js";
 Hooks.once('ready', async function () {
 
 });
-/* global pdfform minipdf saveAs */
 
 // Store mapping
 Hooks.once('init', async function () {
-	// TODO refactor this moving to settings
-
-	/*
-	game.settings.register(SheetExportconfig.ID, "mapping", {
-		name: "sheet-export.settings.mapping.Name",
-		hint: "sheet-export.settings.mapping.Hint",
-		scope: "world",
-		config: true,
-		type: String,
-		default: "[]",
-	});
-
-	game.settings.register(SheetExportconfig.ID, "mapping-npc", {
-		name: "sheet-export.settings.mapping-npc.Name",
-		hint: "sheet-export.settings.mapping-npc.Hint",
-		scope: "world",
-		config: true,
-		type: String,
-		default: "[]",
-	});
-*/
 	if (game.version && isNewerVersion(game.version, "9.230")) {
 		game.keybindings.register(SheetExportconfig.ID, "showConfig", {
 			name: "Show Config",
@@ -439,7 +417,7 @@ class SheetExportconfig extends FormApplication {
 		let mappingRelease = game.settings.get(SheetExportconfig.ID, "mapping-release");
 		console.log(this.sheetType);
 		const mapping = await this.getMapping(mappingVersion, mappingRelease, this.sheetType);
-		console.log("got mapping");
+//		console.log("got mapping");
 		// get the PDF
 		const pdf = await this.getPdf(mapping.pdfUrl, buffer);
 		pdf.registerFontkit(fontkit);
@@ -452,18 +430,11 @@ class SheetExportconfig extends FormApplication {
 		for (let i = 0; i < fonts.length; i++) {
 			let fontBytes = await fetch(getRoute(fonts[i].path)).then((res) => res.arrayBuffer());
 			let theFont = await pdf.embedFont(fontBytes);
-			console.log(theFont);
+//			console.log(theFont);
 			customFonts[fonts[i].id] = theFont;
 		}
 
 		console.log(customFonts);
-		// Fetch the Ubuntu font
-		/*
-const fontUrl = 'https://pdf-lib.js.org/assets/ubuntu/Ubuntu-R.ttf';
-const fontBytes = await fetch(fontUrl).then((res) => res.arrayBuffer());
-pdfDoc.registerFontkit(fontkit);
-const ubuntuFont = await pdfDoc.embedFont(fontBytes);
-*/
 		console.log(pdf);
 		let form = null;
 		let fields = null;
@@ -482,10 +453,6 @@ const ubuntuFont = await pdfDoc.embedFont(fontBytes);
 		// manage helper functions
 		// TODO export the helper functions to a file
 		let functionSet = {
-			testFunction2: function (actor) {
-				console.log("test");
-				console.log(actor);
-			}
 		}
 		let helperFunctions = mapping.helperFunctions;
 		if (helperFunctions) {
@@ -509,10 +476,10 @@ const ubuntuFont = await pdfDoc.embedFont(fontBytes);
 			globalContentMapping.forEach(content => {
 				console.log(content);
 				let replacedContent = content.content.replaceAll("@", game.release.generation > 10 ? "actor." : "actor.data.");
-				console.log(replacedContent);
-				console.log(actor);
+//				console.log(replacedContent);
+//				console.log(actor);
 				let contentValue = Function(`"use strict"; return function(actor,functionSet) { return ${replacedContent} };`)()(actor, functionSet);
-				console.log(contentValue);
+//				console.log(contentValue);
 				globalContent[content.id] = contentValue
 			});
 		}
@@ -521,11 +488,6 @@ const ubuntuFont = await pdfDoc.embedFont(fontBytes);
 		functionSet.secm = new SheetExportContentManager(globalContent, functionSet);
 		functionSet.customFonts = customFonts;
 		functionSet.defaultFont = helveticaFont;
-		/*
-		const url = 'https://pdf-lib.js.org/assets/ubuntu/Pacifico-Regular.ttf'
-		const ubuntuBytes = await fetch(url).then(res => res.arrayBuffer())
-		const font5 = await pdf.embedFont(ubuntuBytes)
-		*/
 		// Manage the form fields
 		var i = 0;
 		fields.forEach(field => {
@@ -578,19 +540,19 @@ const ubuntuFont = await pdfDoc.embedFont(fontBytes);
 				}
 				// check if the font of the field is one of the embedded fonts
 				else if (customFonts[fieldFont]) {
-					console.log("font is embedded");
+//					console.log("font is embedded");
 					functionSet.secm.setCurrentFont(customFonts[fieldFont]);
 				}
 				else {
-					console.log("font is default helvetica");
+//					console.log("font is default helvetica");
 					functionSet.secm.setCurrentFont(helveticaFont);
 				}
 				// check if the font size is overloaded
 				if (fieldMapping.font_size) {
-					console.log("font size is overloaded");
+//					console.log("font size is overloaded");
 					functionSet.secm.setCurrentFontsize(fieldMapping.font_size)
 				} else {
-					console.log("font size is default");
+//					console.log("font size is default");
 					functionSet.secm.setCurrentFontsize(getDefaultFontSize(field.acroField));
 				}
 				//			console.log(fieldMapping.font);
@@ -616,12 +578,12 @@ const ubuntuFont = await pdfDoc.embedFont(fontBytes);
 					//				console.log(mappingValue.calculated);
 					input.innerHTML = mappingValue ? mappingValue.calculated : "";
 					field.setText(mappingValue ? (mappingValue.calculated ? mappingValue.calculated.toString() : "") : "");
-					console.log(functionSet.secm.fontSize);
+//					console.log(functionSet.secm.fontSize);
 					if (functionSet.secm.fontSize) {
 						field.setFontSize(functionSet.secm.fontSize);
 					}
 					//					console.log(fieldMapping.font);
-								console.log(functionSet.secm.font);
+//								console.log(functionSet.secm.font);
 					field.updateAppearances(functionSet.secm.font);
 					/*
 					if (fieldMapping.font) {
@@ -636,7 +598,7 @@ const ubuntuFont = await pdfDoc.embedFont(fontBytes);
 					// before check if mappingValue is defined, than since we expect a boolean we can set the value directly
 					mappingValue ? (mappingValue.calculated ? field.check() : field.uncheck()) : field.uncheck();
 					break;
-				case "PDFCheckBox":
+				case "PDFButton":
 					//			console.log(mappingValue.calculated);
 					console.log("PDFButton");
 					break;
