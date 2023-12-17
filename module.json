@@ -25,7 +25,7 @@
     "scripts/module.js"
   ],
   "scripts": [
-    "scripts/lib/pdf-lib.esm.min.js"
+    "scripts/lib/FileSaver.js"
   ],
   "styles": [
     "styles/module.css"
