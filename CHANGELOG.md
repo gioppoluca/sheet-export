@@ -1,4 +1,13 @@
 
+## [0.0.6] - 2023-12-17
+### :sparkles: New Features
+- [`3f06219`](https://github.com/gioppoluca/sheet-export/commit/3f06219e989ae1ec994ada51561d2949d71bf198) - pf2e remastered *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+### :bug: Bug Fixes
+- [`56e971b`](https://github.com/gioppoluca/sheet-export/commit/56e971b949e6fc42c0b0fa77bc8f7b07f1959178) - cleaned up some code *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+- [`9464e72`](https://github.com/gioppoluca/sheet-export/commit/9464e721ba173f153fde12d7c4978eb43f1df32e) - missing libraries *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+
 ## [0.0.5] - 2023-12-10
 ### :sparkles: New Features
 - [`5c75058`](https://github.com/gioppoluca/sheet-export/commit/5c750589376ee19b7d346b7f5c1440f50494cc2f) - added custom mapping management *(commit by [@gioppoluca](https://github.com/gioppoluca))*
@@ -37,3 +46,4 @@
 
 [0.0.4]: https://github.com/gioppoluca/sheet-export/compare/0.0.3...0.0.4
 [0.0.5]: https://github.com/gioppoluca/sheet-export/compare/0.0.4...0.0.5
+[0.0.6]: https://github.com/gioppoluca/sheet-export/compare/0.0.5...0.0.6
