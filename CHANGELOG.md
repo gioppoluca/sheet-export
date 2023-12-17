@@ -1,4 +1,12 @@
 
+## [0.0.7] - 2023-12-17
+### :sparkles: New Features
+- [`f4b5907`](https://github.com/gioppoluca/sheet-export/commit/f4b590792a7ccc429024b2c56f11197172441f0d) - externalized js external functions to mapping folder *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+### :bug: Bug Fixes
+- [`b188429`](https://github.com/gioppoluca/sheet-export/commit/b1884291b2030092322ff86329e9da183b4fc5f4) - missing libs *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+
 ## [0.0.6] - 2023-12-17
 ### :sparkles: New Features
 - [`3f06219`](https://github.com/gioppoluca/sheet-export/commit/3f06219e989ae1ec994ada51561d2949d71bf198) - pf2e remastered *(commit by [@gioppoluca](https://github.com/gioppoluca))*
@@ -47,3 +55,4 @@
 [0.0.4]: https://github.com/gioppoluca/sheet-export/compare/0.0.3...0.0.4
 [0.0.5]: https://github.com/gioppoluca/sheet-export/compare/0.0.4...0.0.5
 [0.0.6]: https://github.com/gioppoluca/sheet-export/compare/0.0.5...0.0.6
+[0.0.7]: https://github.com/gioppoluca/sheet-export/compare/0.0.6...0.0.7
