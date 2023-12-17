@@ -3,6 +3,7 @@ import fontkit from './lib/fontkit.es.js';
 import { registerSettings } from "./settings.js";
 import { getMapping, getPdf, getSheeType } from "./sheet-export-api.js";
 import { SheetExportContentManager } from "./sheet-export-content-manager.js";
+import fetchInject from "./lib/fetch-inject.min.js";
 
 //global saveAs;
 
@@ -272,7 +273,7 @@ class SheetExportconfig extends FormApplication {
 
 	/** Get values and download PDF */
 	download(buffer) {
-//		console.log(buffer);
+		//		console.log(buffer);
 		const blob = new Blob([this.filledPdf], { type: "application/pdf" });
 		console.log(blob);
 		saveAs(blob, `${this.actor.name ?? "character"}.pdf`);
@@ -405,6 +406,17 @@ class SheetExportconfig extends FormApplication {
 		// TODO export the helper functions to a file
 		let functionSet = {
 		}
+		functionSet.system = await fetchInject([
+			getRoute(`/modules/sheet-export/mappings/${game.system.id}/${mappingVersion}/${mappingRelease}/system-functions.js`)
+		]).then(() => {
+			console.log("fetched");
+			console.log(actor);
+			console.log(this);
+			return new SystemFunctions(actor, this.sheetType, null);
+			//	funcSet.getSystemFunctionsId();
+		})
+		console.log(functionSet);
+		functionSet.system.getSystemFunctionsId();
 		let helperFunctions = mapping.helperFunctions;
 		if (helperFunctions) {
 			for (const [key, value] of Object.entries(helperFunctions)) {
@@ -444,8 +456,8 @@ class SheetExportconfig extends FormApplication {
 		fields.forEach(field => {
 			const type = field.constructor.name.trim();
 			const name = field.getName().trim();
-	//		console.log(`${type}: ${name}`)
-	//		console.log(field);
+			//		console.log(`${type}: ${name}`)
+			//		console.log(field);
 			//	console.log("dafault appearance");
 			//	console.log(field.acroField.getDefaultAppearance());
 			const fontExp = /\/(?<font>.*?)\s/gm
@@ -485,25 +497,25 @@ class SheetExportconfig extends FormApplication {
 				//	console.log(customFonts);
 				// check if there is an overload of the font for the field
 				if (fieldMapping.font) {
-//					console.log("font is overloaded");
+					//					console.log("font is overloaded");
 					functionSet.secm.setCurrentFont(customFonts[fieldMapping.font])
 
 				}
 				// check if the font of the field is one of the embedded fonts
 				else if (customFonts[fieldFont]) {
-//					console.log("font is embedded");
+					//					console.log("font is embedded");
 					functionSet.secm.setCurrentFont(customFonts[fieldFont]);
 				}
 				else {
-//					console.log("font is default helvetica");
+					//					console.log("font is default helvetica");
 					functionSet.secm.setCurrentFont(helveticaFont);
 				}
 				// check if the font size is overloaded
 				if (fieldMapping.font_size) {
-//					console.log("font size is overloaded");
+					//					console.log("font size is overloaded");
 					functionSet.secm.setCurrentFontsize(fieldMapping.font_size)
 				} else {
-//					console.log("font size is default");
+					//					console.log("font size is default");
 					functionSet.secm.setCurrentFontsize(getDefaultFontSize(field.acroField));
 				}
 				//			console.log(fieldMapping.font);
@@ -517,7 +529,7 @@ class SheetExportconfig extends FormApplication {
 			try {
 				// Return as evaluated JavaScript with the actor as an argument
 				mappingValue = Function(`"use strict"; return function(actor,functionSet) { return ${contentMapping} };`)()(actor, functionSet);
-//		console.log(mappingValue);
+				//		console.log(mappingValue);
 			} catch (err) {
 				console.log(`${type}: ${name}`)
 				console.log(err);
@@ -538,7 +550,7 @@ class SheetExportconfig extends FormApplication {
 						field.setFontSize(functionSet.secm.fontSize);
 					}
 					//console.log(fieldMapping.font);
-//					console.log(functionSet.secm.font);
+					//					console.log(functionSet.secm.font);
 					if (functionSet.secm.font) {
 						field.updateAppearances(functionSet.secm.font);
 					}
