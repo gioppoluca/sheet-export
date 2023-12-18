@@ -31,7 +31,7 @@ async function getPdf(pdfUrl,buffer = null) {
 	return pdfDoc;
 }
 
-function getSheeType(actor) {
+function getSheetType(actor) {
 	let systemMappings = systemMapping();
 	let sheetType = "";
 	if (systemMappings[game.system.id] == undefined) {
@@ -48,5 +48,5 @@ function getSheeType(actor) {
 	return sheetType;
 }
 
-export { getMapping, getPdf, getSheeType };
+export { getMapping, getPdf, getSheetType };
 

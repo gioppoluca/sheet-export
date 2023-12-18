@@ -1,7 +1,7 @@
 import { PDFDocument, PDFRawStream, PDFName, StandardFonts, getDefaultFontSize } from './lib/pdf-lib.esm.js';
 import fontkit from './lib/fontkit.es.js';
 import { registerSettings } from "./settings.js";
-import { getMapping, getPdf, getSheeType } from "./sheet-export-api.js";
+import { getMapping, getPdf, getSheetType } from "./sheet-export-api.js";
 import { SheetExportContentManager } from "./sheet-export-content-manager.js";
 import fetchInject from "./lib/fetch-inject.min.js";
 
@@ -31,152 +31,8 @@ Hooks.once('init', async function () {
 // Inject editor into the settings menu
 Hooks.on("renderSettingsConfig", (app, html) => {
 	// Only if GM
+	// TODO check if this is control is placed also on the other part
 	if (game.user.isGM) {
-		/*
-				// Create a new text box
-				let editor, newTextBox;
-		
-				// Get the old text box
-				const oldTextBox = html[0].querySelector("[name='sheet-export.mapping']");
-		
-				// NPC part (just duplicate the previous fields)
-				let editorNPC, newTextBoxNPC;
-		
-				// Get the old text box
-				const oldTextBoxNPC = html[0].querySelector("[name='sheet-export.mapping-npc']");
-		
-				// Don't show the old textbox
-				oldTextBox.style.display = "none";
-		
-				// Give the editor some height
-				newTextBox.style.height = "20em";
-		
-				// Make the editor take up the full width
-				oldTextBox.parentElement.style.flex = "100%";
-		
-				// Insert the new textbox right after the old one
-				oldTextBox.after(newTextBox);
-		
-				// Don't show the old textbox NPC
-				oldTextBoxNPC.style.display = "none";
-		
-				// Give the editor some height
-				newTextBoxNPC.style.height = "20em";
-		
-				// Make the editor take up the full width
-				oldTextBoxNPC.parentElement.style.flex = "100%";
-		
-				// Insert the new textbox right after the old one
-				oldTextBoxNPC.after(newTextBoxNPC);
-		*/
-		/*
-				if (game.modules.get("acelib")?.active) {
-					// Update whenever the ace editor changes
-					editor.on("change", () => {
-						// Copy the value from the ace editor to the old textbox
-						oldTextBox.value = editor.getValue();
-					});
-					editorNPC.on("change", () => {
-						// Copy the value from the ace editor to the old textbox
-						oldTextBoxNPC.value = editorNPC.getValue();
-					});
-				} else {
-					// Update whenever the new textbox changes
-					newTextBox.addEventListener("change", () => {
-						// Copy the value from the new textbox to the old one
-						oldTextBox.value = newTextBox.value;
-					});
-					newTextBoxNPC.addEventListener("change", () => {
-						// Copy the value from the new textbox to the old one
-						oldTextBoxNPC.value = newTextBoxNPC.value;
-					});
-				}
-		
-				// Create mapping select menu
-				const mappingSelect = document.createElement("select");
-				mappingSelect.style.margin = "10px 0";
-				oldTextBox.parentNode.before(mappingSelect);
-		
-				// Browse and get list of included mapping files
-				FilePicker.browse("data", "modules/sheet-export/mappings", { extensions: [".mapping"] }).then(results => {
-					// Add the default option first
-					results.files.unshift("");
-		
-					// Add options for each included mapping
-					results.files.forEach(name => {
-						// Create the option
-						const option = document.createElement("option");
-						mappingSelect.append(option);
-		
-						// Add just the name of the system as the text
-						name = name.split("/").at(-1).replace(".mapping", "");
-						option.innerHTML = name;
-					});
-				});
-		
-				// Create mapping select menu NPC
-				const mappingSelectNPC = document.createElement("select");
-				mappingSelectNPC.style.margin = "10px 0";
-				oldTextBoxNPC.parentNode.before(mappingSelectNPC);
-		
-				// Browse and get list of included mapping files
-				FilePicker.browse("data", "modules/sheet-export/mappings", { extensions: [".mapping"] }).then(results => {
-					// Add the default option first
-					results.files.unshift("");
-		
-					// Add options for each included mapping
-					results.files.forEach(name => {
-						// Create the option
-						const option = document.createElement("option");
-						mappingSelectNPC.append(option);
-		
-						// Add just the name of the system as the text
-						name = name.split("/").at(-1).replace(".mapping", "");
-						option.innerHTML = name;
-					});
-				});
-		
-				// Resize the Settings Config App
-				app.setPosition();
-		
-				// Add an event listener
-				mappingSelect.addEventListener("change", async () => {
-					// Fetch selected mapping if not empty
-					const mapping = mappingSelect.value
-						? await fetch(getRoute(`/modules/sheet-export/mappings/${mappingSelect.value}.mapping`)).then(response =>
-							response.text()
-						)
-						: "";
-		
-					// Copy the mapping to the old text box
-					oldTextBox.value = mapping;
-					if (game.modules.get("acelib")?.active) {
-						// Copy the mapping to the ace editor
-						editor.setValue(mapping);
-					} else {
-						// Copy the mapping to the new textbox
-						newTextBox.value = mapping;
-					}
-				});
-				mappingSelectNPC.addEventListener("change", async () => {
-					// Fetch selected mapping if not empty
-					const mapping = mappingSelectNPC.value
-						? await fetch(getRoute(`/modules/sheet-export/mappings/${mappingSelectNPC.value}.mapping`)).then(response =>
-							response.text()
-						)
-						: "";
-		
-					// Copy the mapping to the old text box
-					oldTextBoxNPC.value = mapping;
-					if (game.modules.get("acelib")?.active) {
-						// Copy the mapping to the ace editor
-						editorNPC.setValue(mapping);
-					} else {
-						// Copy the mapping to the new textbox
-						newTextBoxNPC.value = mapping;
-					}
-				});
-				*/
 	}
 
 });
@@ -188,7 +44,7 @@ Hooks.on("getActorSheetHeaderButtons", (sheet, buttons) => {
 	console.log(sheet.actor)
 	// If this is not a player character sheet, return without adding the button
 	// added pc for cypher system
-	let sheetType = getSheeType(sheet.actor);
+	let sheetType = getSheetType(sheet.actor);
 	// TODO check if sheetTtype is undefined
 	console.log(sheetType);
 	console.log(sheet.actor);
@@ -200,7 +56,7 @@ Hooks.on("getActorSheetHeaderButtons", (sheet, buttons) => {
 		icon: "fas fa-file-export",
 		onclick: () => {
 			// Open Config window
-			new SheetExportconfig(sheet.actor, sheetType).render(true);
+			new SheetExportconfig(sheet.actor, sheetType, sheet).render(true);
 
 			// Bring window to top
 			Object.values(ui.windows)
@@ -211,11 +67,12 @@ Hooks.on("getActorSheetHeaderButtons", (sheet, buttons) => {
 });
 
 class SheetExportconfig extends FormApplication {
-	constructor(actor, sheetType) {
+	constructor(actor, sheetType, sheet) {
 		super();
 		this.sheetType = sheetType;
 		console.log(this.sheetType);
 		this.actor = actor;
+		this.sheet = sheet;
 		console.log(this.actor);
 		this.filledPdf = new ArrayBuffer();
 		this.currentBuffer = new ArrayBuffer();
@@ -288,13 +145,13 @@ class SheetExportconfig extends FormApplication {
 	getMapping = getMapping;
 	getPdf = getPdf;
 
-	async embedImages(pdf, images) {
+	async embedImages(pdf, images, atReplacementString) {
 		//	console.log(Jimp);
 		const actor = this.actor;
 		for (let i = 0; i < images.length; i++) {
 			let img_path = images[i].path;
 			console.log(img_path);
-			img_path = img_path.replaceAll("@", game.release.generation > 10 ? "actor." : "actor.data.");
+			img_path = img_path.replaceAll("@", atReplacementString);
 			let actual_path = "";
 			try {
 				actual_path = Function(`"use strict"; return function(actor) { return ${img_path} };`)()(actor);
@@ -360,16 +217,24 @@ class SheetExportconfig extends FormApplication {
 		console.log(actor);
 	}
 
+
+	/**
+	 * Creates the form for the PDF export.
+	 * Fetches the form mapping and PDF template. 
+	 * Populates the PDF form fields with data from the actor.
+	 */
 	async createForm(buffer) {
 		console.log("create form");
 		const inputForm = document.getElementById("fieldList");
 
-		// get the mapping
+		// get the mapping version and release for the game system set in the config
 		let mappingVersion = game.settings.get(SheetExportconfig.ID, "mapping-version");
 		let mappingRelease = game.settings.get(SheetExportconfig.ID, "mapping-release");
 		console.log(this.sheetType);
+
+		// get the mapping for the game system and the version set in the config
 		const mapping = await this.getMapping(mappingVersion, mappingRelease, this.sheetType);
-		//		console.log("got mapping");
+
 		// get the PDF
 		const pdf = await this.getPdf(mapping.pdfUrl, buffer);
 		pdf.registerFontkit(fontkit);
@@ -406,17 +271,48 @@ class SheetExportconfig extends FormApplication {
 		// TODO export the helper functions to a file
 		let functionSet = {
 		}
+
+		/**
+		 * Fetches the system-specific functions for the current system and initializes 
+		 * a SystemFunctions instance with the actor, the sheet type and the sheet.
+		 * 
+		 * Uses fetchInject to asynchronously load the system-specific functions file.
+		 * Returns the SystemFunctions instance.
+		 */
 		functionSet.system = await fetchInject([
 			getRoute(`/modules/sheet-export/mappings/${game.system.id}/${mappingVersion}/${mappingRelease}/system-functions.js`)
 		]).then(() => {
-			console.log("fetched");
-			console.log(actor);
-			console.log(this);
-			return new SystemFunctions(actor, this.sheetType, null);
-			//	funcSet.getSystemFunctionsId();
+			console.log("fetched system functions");
+			return new SystemFunctions(actor, this.sheetType, this.sheet);
 		})
 		console.log(functionSet);
-		functionSet.system.getSystemFunctionsId();
+
+		// get the replacement string for the @
+		const atReplacementString = functionSet.system.getAtReplacement(game.release.generation);
+
+		/**
+		 * Calls the system-specific preMapping function on the fields from the mapping
+		 * to allow the system to modify/preprocess the fields before rendering.
+		 * 
+		 * This allows each system to handle any system-specific logic for the field
+		 * mappings. For example, a system may want to set default values for certain
+		 * fields based on the actor data.
+		 */
+		mapping.fields = functionSet.system.preMapping(mapping.fields);
+
+		/**
+		 * Loads any helper functions defined in the mapping into the functionSet 
+		 * object. This allows reusable helper functions to be defined once in the 
+		 * mapping and used throughout the template.
+		 * 
+		 * Loops through each key/value pair in the helperFunctions mapping property, 
+		 * logs the key and value, evaluates the function definition string using 
+		 * eval(), and assigns the resulting function to the functionSet object under 
+		 * the given key.
+		 * 
+		 * This provides a way to dynamically load functions into the runtime from 
+		 * the mapping definition.
+		*/
 		let helperFunctions = mapping.helperFunctions;
 		if (helperFunctions) {
 			for (const [key, value] of Object.entries(helperFunctions)) {
@@ -425,24 +321,41 @@ class SheetExportconfig extends FormApplication {
 			}
 		}
 		console.log(functionSet);
-		// Manage the images
-		// get the images from mapping
+
+		/**
+		 * Embeds images from the mapping into the PDF.
+		 * 
+		 * Takes the images array from the mapping and calls this.embedImages() 
+		 * to asynchronously embed each image into the PDF.
+		 * 
+		 * This allows images referenced in the mapping to be embedded into 
+		 * the generated PDF output.
+		*/
 		let images = mapping.images;
 		if (images) {
-			await this.embedImages(pdf, images);
+			await this.embedImages(pdf, images, atReplacementString);
 		}
+
 		// manage global content
+		/**
+		 * Parses the globalContentMapping from the sheet mapping and evaluates each content string
+		 * to generate the globalContent object.
+		 * 
+		 * The globalContentMapping contains template strings that can reference the actor data using @.
+		 * These are replaced with actor. or actor.data. depending on the Foundry version.
+		 * 
+		 * The content string is then evaluated as a function to return the actual content value.
+		 * 
+		 * The resulting globalContent object contains the evaluated content values indexed by id.
+		 */
 		let globalContentMapping = mapping.globalContent;
 		let globalContent = {};
 		if (globalContentMapping) {
 			console.log("global content");
 			globalContentMapping.forEach(content => {
 				console.log(content);
-				let replacedContent = content.content.replaceAll("@", game.release.generation > 10 ? "actor." : "actor.data.");
-				//				console.log(replacedContent);
-				//				console.log(actor);
+				let replacedContent = content.content.replaceAll("@", atReplacementString);
 				let contentValue = Function(`"use strict"; return function(actor,functionSet) { return ${replacedContent} };`)()(actor, functionSet);
-				//				console.log(contentValue);
 				globalContent[content.id] = contentValue
 			});
 		}
@@ -521,7 +434,7 @@ class SheetExportconfig extends FormApplication {
 				//			console.log(fieldMapping.font);
 				//			console.log(fieldMapping.font_size);
 			}
-			var contentMapping = fieldMapping ? fieldMapping.content.replaceAll("@", game.release.generation > 10 ? "actor." : "actor.data.") : "\"\"";
+			var contentMapping = fieldMapping ? fieldMapping.content.replaceAll("@", atReplacementString) : "\"\"";
 			contentMapping = "{'calculated': " + contentMapping + " }";
 			var mappingValue = "";
 			//			console.log("the actor");
