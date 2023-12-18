@@ -132,6 +132,13 @@ There is the `functionSet.secm.getContentChunk('name_of_the_global_content')` to
   ]
 }
 ```
+
+#### Mapping override
+It is possible to override mapping by writing javascrit code in the `system-functions.js` file in the specific mapping folder.
+There are 2 functions that can be used to override mapping:
+- **getAtReplacement**: this function defines the string to be used to replace teh **@** that is tipically used in the mapping
+- **preMapping**: this function is called BEFORE the actual mapping is done (AND before the @ replacement takes place); the whole mapping fiedls array is passed and it is expected that it is returned, this way it will be possible for the mapping author to alter add or delete mapping fields.  It can be useful for those fields that are repetitive and could be generated dynamically and programmatically so that there is no need to edit the mapping file for all those fields (like in the spells or skills).  In the class there are already aviable the actor, the sheet and the sheetType, so it is also possible to return the content of those fields.  Just remember that the array is an array of JSON objects and thus the content need to be a string that will be subsequently parsed by the execute function. In the mapping it will be possible to reference content of the class like this: ` "content": " functionSet.system.myCustomFunctionCreatedInClass('biography')" ` or ` "content": " functionSet.system.myCustomAttributeInTheClass" `
+
 ### Settings
 
 The settings form presents the drop down list for choosing the mapping for the game system of the world for your game; after saving a refresh will be asked.
