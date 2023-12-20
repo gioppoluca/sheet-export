@@ -131,11 +131,11 @@ jobs:
             module.json                          \
             README.md                            \
             LICENSE                              \
-            templates                            \
+            templates/                           \
             scripts/                             \
             styles/                              \
             packs/                               \
-            language/                            \
+            languages/                           \
             mappings/                            \
             lang/
           # Don't forget to add a backslash at the end of the line for any
