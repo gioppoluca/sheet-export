@@ -1,4 +1,9 @@
 
+## [0.0.9] - 2023-12-20
+### :sparkles: New Features
+- [`e1707d7`](https://github.com/gioppoluca/sheet-export/commit/e1707d7f664f39315ebddb74811ee72e77f4904f) - porting to class oriented approach *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+
 ## [0.0.8] - 2023-12-18
 ### :sparkles: New Features
 - [`e886423`](https://github.com/gioppoluca/sheet-export/commit/e8864230dd2193e18f70d9b87d8e8abf50c2e1df) - added overriding capability in system-function class *(commit by [@gioppoluca](https://github.com/gioppoluca))*
@@ -62,3 +67,4 @@
 [0.0.6]: https://github.com/gioppoluca/sheet-export/compare/0.0.5...0.0.6
 [0.0.7]: https://github.com/gioppoluca/sheet-export/compare/0.0.6...0.0.7
 [0.0.8]: https://github.com/gioppoluca/sheet-export/compare/0.0.7...0.0.8
+[0.0.9]: https://github.com/gioppoluca/sheet-export/compare/0.0.8...0.0.9
