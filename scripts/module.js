@@ -272,6 +272,15 @@ class SheetExportconfig extends FormApplication {
 		let functionSet = {
 		}
 
+		console.log("-----************.............-------");
+		//let mappingClass;
+		const { default: mappingClass } = await import(getRoute(`/modules/sheet-export/mappings/${game.system.id}/${mappingVersion}/${mappingRelease}/mapping.js`));
+		console.log(mappingClass);
+		var mc = new mappingClass(actor, this.sheetType, this.sheet);
+		console.log(mc);
+		console.log(mc.getMapping("name"));
+		console.log(mc.getMapping("test1"));
+
 		/**
 		 * Fetches the system-specific functions for the current system and initializes 
 		 * a SystemFunctions instance with the actor, the sheet type and the sheet.
