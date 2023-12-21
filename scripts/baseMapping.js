@@ -1,14 +1,14 @@
 class baseMapping {
-    #fieldMappings = {};
-    #logPrefix = "Export Sheet";
-    #systemName = "test";
+    fieldMappings = {};
+    logPrefix = "Export Sheet";
+    systemName = "test";
 
     constructor(actor, sheetType, sheet) {
-        this.#sheetType = sheetType;
-        console.log("sheetType:", this.#sheetType);
-        this.#actor = actor;
-        this.#sheet = sheet;
-        console.log("actor:", this.#actor);
+        this.sheetType = sheetType;
+        console.log("sheetType:", this.sheetType);
+        this.actor = actor;
+        this.sheet = sheet;
+        console.log("actor:", this.actor);
         this.createMappings();
     }
 
@@ -17,32 +17,32 @@ class baseMapping {
         if ( typeof(ui) !== "undefined" ) {
             switch(severity) {
                 case 'error':
-                    ui.notifications.error(`${this.#logPrefix} | ${this.#systemName} | ${message}`, options);
+                    ui.notifications.error(`${this.logPrefix} | ${this.systemName} | ${message}`, options);
                     break;
                 case 'warn':
                 case 'warning':
-                    ui.notifications.warn(`${this.#logPrefix} | ${this.#systemName} | ${message}`, options);
+                    ui.notifications.warn(`${this.logPrefix} | ${this.systemName} | ${message}`, options);
                     break;
                 case 'debug':
-                    console.debug(`${this.#logPrefix} | ${this.#systemName} | ${message}`);
+                    console.debug(`${this.logPrefix} | ${this.systemName} | ${message}`);
                     break;
                 default:
-                    ui.notifications.info(`${this.#logPrefix} | ${this.#systemName} | ${message}`, options);
+                    ui.notifications.info(`${this.logPrefix} | ${this.systemName} | ${message}`, options);
             }
         } else {
             switch(severity) {
                 case 'error':
-                    console.error(`${this.#logPrefix} | ${this.#systemName} | ${message}`);
+                    console.error(`${this.logPrefix} | ${this.systemName} | ${message}`);
                     break;
                 case 'warn':
                 case 'warning':
-                    console.warn(`${this.#logPrefix} | ${this.#systemName} | ${message}`);
+                    console.warn(`${this.logPrefix} | ${this.systemName} | ${message}`);
                     break;
                 case 'debug':
-                    console.debug(`${this.#logPrefix} | ${this.#systemName} | ${message}`);
+                    console.debug(`${this.logPrefix} | ${this.systemName} | ${message}`);
                     break;
                 default:
-                    console.info(`${this.#logPrefix} | ${this.#systemName} | ${message}`);
+                    console.info(`${this.logPrefix} | ${this.systemName} | ${message}`);
             }
         }
     }
@@ -65,8 +65,8 @@ class baseMapping {
 
     getMapping(fieldName) {
         /* pdf field getter */
-        if (Object.keys(this.#fieldMappings).includes(fieldName)) {
-            return this.#fieldMappings[fieldName];
+        if (Object.keys(this.fieldMappings).includes(fieldName)) {
+            return this.fieldMappings[fieldName];
         } else {
             this.#logWarning(`${fieldName} does not exist`);
             return undefined;
@@ -75,8 +75,8 @@ class baseMapping {
 
     setMapping(fieldName, value, force) {
         /* pdf field setter */
-        if ( !Object.keys(this.#fieldMappings).includes(fieldName) || force) {
-            this.#fieldMappings[fieldName] = value;
+        if ( !Object.keys(this.fieldMappings).includes(fieldName) || force) {
+            this.fieldMappings[fieldName] = value;
         } else {
             this.#logWarning(`${fieldName} is already defined. Only using the first value`);
         }
