@@ -1,10 +1,10 @@
 class baseMapping {
     constructor(actor, sheetType, sheet) {
         this.sheetType = sheetType;
-        console.log(this.sheetType);
+        console.log("sheetType:", this.sheetType);
         this.actor = actor;
         this.sheet = sheet;
-        console.log(this.actor);
+        console.log("actor:", this.actor);
         this.createMappings();
     }
 
