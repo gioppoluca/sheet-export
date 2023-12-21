@@ -99,12 +99,12 @@ class baseMapping {
     }
     */
 
-    setCalculated(fieldName, value, force=false) {
+    setCalculated(fieldName, value) {
         fieldName = fieldName.trim();
         this.updateMapping(fieldName, {"calculated": value});
     }
 
-    setFont(fieldName, fontName=undefined, fontSize=undefined, force=false) {
+    setFont(fieldName, fontName=undefined, fontSize=undefined) {
         fieldName = fieldName.trim();
         let font = {};
         if ( fontName !== undefined ) {
