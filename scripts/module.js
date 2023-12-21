@@ -145,13 +145,14 @@ class SheetExportconfig extends FormApplication {
 	getMapping = getMapping;
 	getPdf = getPdf;
 
-	async embedImages(pdf, images, atReplacementString) {
+	async embedImages(pdf, images) {
 		//	console.log(Jimp);
 		const actor = this.actor;
 		for (let i = 0; i < images.length; i++) {
 			let img_path = images[i].path;
 			console.log(img_path);
-			img_path = img_path.replaceAll("@", atReplacementString);
+			//img_path = img_path.replaceAll("@", atReplacementString);
+			/*
 			let actual_path = "";
 			try {
 				actual_path = Function(`"use strict"; return function(actor) { return ${img_path} };`)()(actor);
@@ -160,11 +161,12 @@ class SheetExportconfig extends FormApplication {
 				ui.notifications.error(`The image: ${img_path} is not mapped correctly; got error: ${error.message}`);
 
 			}
-			console.log(actual_path);
+			*/
+			//console.log(actual_path);
 			console.log(images[i]);
-			let img_ext = actual_path.split('.').pop();
+			let img_ext = img_path.split('.').pop();
 			console.log(img_ext);
-			const arrayBuffer = await fetch(getRoute(actual_path)).then(res => res.arrayBuffer())
+			const arrayBuffer = await fetch(getRoute(img_path)).then(res => res.arrayBuffer())
 			let embedding_image = null;
 			switch (img_ext) {
 				case "png":
@@ -234,18 +236,18 @@ class SheetExportconfig extends FormApplication {
 
 		// get the mapping for the game system and the version set in the config
 //		const mapping = await this.getMapping(mappingVersion, mappingRelease, this.sheetType);
-		const { default: mappingClass } = await import(getRoute(`/modules/sheet-export/mappings/${game.system.id}/${mappingVersion}/${mappingRelease}/${this.sheetType}.js`));
+		const { default: MappingClass } = await import(getRoute(`/modules/sheet-export/mappings/${game.system.id}/${mappingVersion}/${mappingRelease}/${this.sheetType}.js`));
 		console.log(mappingClass);
-		var mc = new mappingClass(this.actor, this.sheetType, this.sheet);
-		console.log(mc);
+		var mappingClass = new MappingClass(this.actor, this.sheetType, this.sheet);
+		console.log(mappingClass);
 	//	console.log(mc.getMapping("name"));
 //		console.log(mc.getMapping("test1"));
-		const mapping = mc.fields;
+		const mapping = mappingClass.fields;
 		console.log(mapping);
 	
 
 		// get the PDF
-		const pdf = await this.getPdf(mc.pdfUrl, buffer);
+		const pdf = await this.getPdf(mappingClass.pdfUrl, buffer);
 		pdf.registerFontkit(fontkit);
 
 		//manage fonts
@@ -349,12 +351,12 @@ class SheetExportconfig extends FormApplication {
 		 * This allows images referenced in the mapping to be embedded into 
 		 * the generated PDF output.
 		*/
-		/*
-		let images = mapping.images;
+		
+		let images = mappingClass.images;
 		if (images) {
-			await this.embedImages(pdf, images, atReplacementString);
+			await this.embedImages(pdf, images);
 		}
-*/
+
 		// manage global content
 		/**
 		 * Parses the globalContentMapping from the sheet mapping and evaluates each content string

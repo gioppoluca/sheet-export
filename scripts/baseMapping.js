@@ -17,6 +17,16 @@ class baseMapping {
           font_size: int, the size of the associated font
         */
         this.fieldMappings = [];
+        /*
+        schema for imageMappings:
+        path: string, path to image
+        page: int, page number
+        pos_x: int, x position
+        pos_y: int, y position
+        width: int, width of image
+        height: int, height of image
+        */
+        this.imageMappings = [];
         this.logPrefix = "Export Sheet";
         this.systemName = "test";
         this.setPdfUrl();
@@ -121,6 +131,11 @@ class baseMapping {
         return false;
     }
 
+    setImage(path, page, pos_x, pos_y, width, height) {
+        this.logDebug("setImage");
+        this.imageMappings.push({ "path": path, "page": page, "pos_x": pos_x, "pos_y": pos_y, "width": width, "height": height });
+
+    }
     createMappings() {
         this.fieldMappings = [];
     }
@@ -132,7 +147,10 @@ class baseMapping {
     get fields() {
         return this.fieldMappings;
     }
-
+    
+    get images() {
+        return this.imageMappings;
+    }
 }
 
 export default baseMapping;
