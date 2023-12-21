@@ -4,6 +4,7 @@ import { systemMapping } from './systemMapping.js';
 
 async function getMapping(mappingChoice, mappingRelease, mappingElement) {
 	console.log("get mapping");
+	/*
 	console.log(`/modules/sheet-export/mappings/${game.system.id}/${mappingChoice}/${mappingRelease}/${mappingElement}.json`);
 	console.log(getRoute(`/modules/sheet-export/mappings/${game.system.id}/${mappingChoice}/${mappingRelease}/${mappingElement}.json`));
 	const mapping = await fetch(getRoute(`/modules/sheet-export/mappings/${game.system.id}/${mappingChoice}/${mappingRelease}/${mappingElement}.json`)).then(response => response.text()
@@ -15,6 +16,15 @@ async function getMapping(mappingChoice, mappingRelease, mappingElement) {
 		console.error('Error parsing JSON:', err);
 		return {};
 	}
+*/
+	//let mappingClass;
+	const { default: mappingClass } = await import(getRoute(`/modules/sheet-export/mappings/${game.system.id}/${mappingChoice}/${mappingRelease}/${mappingElement}.js`));
+	console.log(mappingClass);
+	var mc = new mappingClass(actor, this.sheetType, this.sheet);
+	console.log(mc);
+	console.log(mc.getMapping("name"));
+	console.log(mc.getMapping("test1"));
+	return mc;
 }
 
 async function getPdf(pdfUrl,buffer = null) {

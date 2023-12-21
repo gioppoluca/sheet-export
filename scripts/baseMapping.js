@@ -19,13 +19,14 @@ class baseMapping {
         this.fieldMappings = [];
         this.logPrefix = "Export Sheet";
         this.systemName = "test";
+        this.setPdfUrl();
         this.createMappings();
     }
 
     log(severity, message, options) {
         /* A wrapper around the foundry vtt logger or `console`, whichever is present */
-        if ( typeof(ui) !== "undefined" ) {
-            switch(severity) {
+        if (typeof (ui) !== "undefined") {
+            switch (severity) {
                 case 'error':
                     ui.notifications.error(`${this.logPrefix} | ${this.systemName} | ${message}`, options);
                     break;
@@ -40,7 +41,7 @@ class baseMapping {
                     ui.notifications.info(`${this.logPrefix} | ${this.systemName} | ${message}`, options);
             }
         } else {
-            switch(severity) {
+            switch (severity) {
                 case 'error':
                     console.error(`${this.logPrefix} | ${this.systemName} | ${message}`);
                     break;
@@ -77,7 +78,7 @@ class baseMapping {
         fieldName = fieldName.trim();
         let el = this.fieldMappings.filter(i => i.pdf === fieldName);
         if (el.length === 0) {
-            el = Object.assign({"pdf": fieldName}, data);
+            el = Object.assign({ "pdf": fieldName }, data);
         } else if (el.length > 1) {
             this.logError("More than one element was found with pdf field name ${fieldName}! What is going on?");
         } else {
@@ -101,32 +102,37 @@ class baseMapping {
 
     setCalculated(fieldName, value) {
         fieldName = fieldName.trim();
-        this.updateMapping(fieldName, {"calculated": value});
+        this.updateMapping(fieldName, { "calculated": value });
     }
 
-    setFont(fieldName, fontName=undefined, fontSize=undefined) {
+    setFont(fieldName, fontName = undefined, fontSize = undefined) {
         fieldName = fieldName.trim();
         let font = {};
-        if ( fontName !== undefined ) {
+        if (fontName !== undefined) {
             font.font = String(fontName).trim();
         }
         if (!isNaN(parseInt(fontSize))) {
             font.font_size = parseInt(fontSize);
         }
-        if ( Object.keys(font).length > 0 ) {
+        if (Object.keys(font).length > 0) {
             this.updateMapping(fieldName, font);
             return true;
         }
         return false;
     }
 
-    createMappings(){
+    createMappings() {
         this.fieldMappings = [];
+    }
+
+    setPdfUrl() {
+        this.pdfUrl = "";
     }
 
     get fields() {
         return this.fieldMappings;
     }
+
 }
 
 export default baseMapping;
