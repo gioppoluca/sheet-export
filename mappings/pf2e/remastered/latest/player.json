@@ -14,5 +14,10 @@
       "height": 50
     }
   ],
-  "fields": []
+  "fields": [
+    {
+      "content": "@name",
+      "pdf": "blah"
+    }
+  ]
 }
