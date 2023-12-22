@@ -97,3 +97,6 @@
 	box-shadow: inset 0 0 0.1em #fff, 0.2em 0.2em 0.2em rgba( 0, 0, 0, 0.3 );
 	padding: 0 0.62em;
 }
+label.pdf-title{
+    color: darkred;
+}

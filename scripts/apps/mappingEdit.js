@@ -108,6 +108,63 @@ export class MappingEdit extends FormApplication {
             console.log(error);
             return;
         }
+
+        let field_list = [];
+        fields.forEach(field => {
+            let new_field = `        this.setCalculated("${field.getName().trim()}", this.actor.SOMETHING);`
+            field_list.push(new_field);
+        });
+        let all_mapping = field_list.join("\n");
+
+        let new_mapping = `import baseMapping from "../../../../scripts/baseMapping.js";
+
+class MappingClass extends baseMapping {
+
+
+    authors = [
+        {
+            name: 'YOUR_NAME',
+            url: '',
+            github: '',
+        },
+    ];
+    // override createMappings method from base class
+    createMappings() {
+        super.createMappings();
+
+        // Set the PDF files to use - MIND that the order of the files is important!
+        this.pdfFiles.push({
+            pdfUrl: '/modules/sheet-export/mappings/${game.system.id}/YOUR_PDF_FILENAME.pdf',
+            nameDownload: \`\${this.actor.name ?? "character"}.pdf\`,
+            name: "pf2e-remastered.pdf",
+        });
+
+${all_mapping}
+
+    }
+}
+`
+        console.log(new_mapping);
+        const blob = new Blob([new_mapping], { type: "text/plain;charset=utf-8" });
+        saveAs(blob, "new_mapping.js");
+    }
+
+    async generateMapping_old(buffer) {
+        console.log("generateMapping");
+        const pdf = await getPdf("", buffer);
+        console.log(pdf);
+        let form = null;
+        let fields = null;
+        try {
+            form = pdf.getForm();
+            console.log(form);
+            fields = form.getFields()
+            console.log(fields);
+        } catch (error) {
+            ui.notifications.error("error in loading PDF form fields:" + error.message);
+            console.log(error);
+            return;
+        }
         let new_mapping = {
             "releasemin": "",
             "pdfUrl": "insert_your_pdf_url_here",
@@ -153,6 +210,8 @@ export class MappingEdit extends FormApplication {
         const blob = new Blob([JSON.stringify(new_mapping, null, 2)], { type: "application/json" });
         saveAs(blob, "new_mapping.json");
     }
+
+
     async saveMapping() {
         console.log("saveMapping");
         const inputForm = document.getElementById("fieldList");
@@ -197,7 +256,7 @@ export class MappingEdit extends FormApplication {
         const form = pdf.getForm();
         const fields = form.getFields()
         const inputForm = document.getElementById("fieldList");
-        this.saveFile ="player1";
+        this.saveFile = "player1";
         var i = 0;
         fields.forEach(field => {
             const row = document.createElement("li");

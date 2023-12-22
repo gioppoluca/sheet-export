@@ -136,7 +136,7 @@ class SheetExportconfig extends FormApplication {
 			const theFile = this.filledPdf[index];
 			const blob = new Blob([theFile.file], { type: "application/pdf" });
 			console.log(blob);
-			saveAs(blob, theFile.name);
+			saveAs(blob, theFile.nameDownload);
 		}
 
 	}
@@ -205,12 +205,6 @@ class SheetExportconfig extends FormApplication {
 		};
 	}
 
-	testFunction(actor) {
-		console.log("test");
-		console.log(actor);
-	}
-
-
 	/**
 	 * Creates the form for the PDF export.
 	 * Fetches the form mapping and PDF template. 
@@ -267,6 +261,14 @@ class SheetExportconfig extends FormApplication {
 				await this.embedImages(pdf, images);
 			}
 
+			const rowPdfTitle = document.createElement("li");
+
+			const pdfTitle = document.createElement("label");
+			pdfTitle.innerText = `${pdfFile.name} - ${fields.length} fields`;
+			pdfTitle.setAttribute("class", "pdf-title");
+			rowPdfTitle.prepend(pdfTitle);
+
+			inputForm.appendChild(rowPdfTitle);
 
 			var i = 0;
 			fields.forEach(field => {
