@@ -222,7 +222,7 @@ class SheetExportconfig extends FormApplication {
 
 	/**
 	 * Creates the form for the PDF export.
-	 * Fetches the form mapping and PDF template. 
+	 * Fetches the form mapping and PDF template.
 	 * Populates the PDF form fields with data from the actor.
 	 */
 	async createForm(buffer) {
@@ -244,7 +244,7 @@ class SheetExportconfig extends FormApplication {
 //		console.log(mc.getMapping("test1"));
 		const mapping = mappingClass.fields;
 		console.log(mapping);
-	
+
 
 		// get the PDF
 		const pdf = await this.getPdf(mappingClass.pdfUrl, buffer);
@@ -287,12 +287,12 @@ class SheetExportconfig extends FormApplication {
 		}
 
 		console.log("-----************.............-------");
-		
- 
+
+
 		/**
-		 * Fetches the system-specific functions for the current system and initializes 
+		 * Fetches the system-specific functions for the current system and initializes
 		 * a SystemFunctions instance with the actor, the sheet type and the sheet.
-		 * 
+		 *
 		 * Uses fetchInject to asynchronously load the system-specific functions file.
 		 * Returns the SystemFunctions instance.
 		 */
@@ -311,7 +311,7 @@ class SheetExportconfig extends FormApplication {
 		/**
 		 * Calls the system-specific preMapping function on the fields from the mapping
 		 * to allow the system to modify/preprocess the fields before rendering.
-		 * 
+		 *
 		 * This allows each system to handle any system-specific logic for the field
 		 * mappings. For example, a system may want to set default values for certain
 		 * fields based on the actor data.
@@ -319,16 +319,16 @@ class SheetExportconfig extends FormApplication {
 	//	mapping.fields = functionSet.system.preMapping(mapping.fields);
 
 		/**
-		 * Loads any helper functions defined in the mapping into the functionSet 
-		 * object. This allows reusable helper functions to be defined once in the 
+		 * Loads any helper functions defined in the mapping into the functionSet
+		 * object. This allows reusable helper functions to be defined once in the
 		 * mapping and used throughout the template.
-		 * 
-		 * Loops through each key/value pair in the helperFunctions mapping property, 
-		 * logs the key and value, evaluates the function definition string using 
-		 * eval(), and assigns the resulting function to the functionSet object under 
+		 *
+		 * Loops through each key/value pair in the helperFunctions mapping property,
+		 * logs the key and value, evaluates the function definition string using
+		 * eval(), and assigns the resulting function to the functionSet object under
 		 * the given key.
-		 * 
-		 * This provides a way to dynamically load functions into the runtime from 
+		 *
+		 * This provides a way to dynamically load functions into the runtime from
 		 * the mapping definition.
 		*/
 		/*
@@ -344,14 +344,14 @@ class SheetExportconfig extends FormApplication {
 
 		/**
 		 * Embeds images from the mapping into the PDF.
-		 * 
-		 * Takes the images array from the mapping and calls this.embedImages() 
+		 *
+		 * Takes the images array from the mapping and calls this.embedImages()
 		 * to asynchronously embed each image into the PDF.
-		 * 
-		 * This allows images referenced in the mapping to be embedded into 
+		 *
+		 * This allows images referenced in the mapping to be embedded into
 		 * the generated PDF output.
 		*/
-		
+
 		let images = mappingClass.images;
 		if (images) {
 			await this.embedImages(pdf, images);
@@ -361,15 +361,15 @@ class SheetExportconfig extends FormApplication {
 		/**
 		 * Parses the globalContentMapping from the sheet mapping and evaluates each content string
 		 * to generate the globalContent object.
-		 * 
+		 *
 		 * The globalContentMapping contains template strings that can reference the actor data using @.
 		 * These are replaced with actor. or actor.data. depending on the Foundry version.
-		 * 
+		 *
 		 * The content string is then evaluated as a function to return the actual content value.
-		 * 
+		 *
 		 * The resulting globalContent object contains the evaluated content values indexed by id.
 		 */
-		
+
 		//let globalContentMapping = mapping.globalContent;
 		let globalContent = {};
 		/*
@@ -418,7 +418,7 @@ class SheetExportconfig extends FormApplication {
 			row.prepend(label);
 			inputForm.appendChild(row);
 			// Create an input
-			const input = document.createElement("textarea");
+			const input = document.createElement("input");
 			input.disabled = true;
 			input.setAttribute("data-idx", i);
 			input.setAttribute("data-key", name);
@@ -481,12 +481,12 @@ class SheetExportconfig extends FormApplication {
 				ui.notifications.error(`The field: ${name} is not mapped correctly using: ${contentMapping}; got error: ${err.message}`, { permanent: true });
 			}
 			*/
-			
+
 			switch (type) {
 				case "PDFTextField":
-					//					input.setAttribute("type", "string");
+					input.setAttribute("type", "text");
 					//				console.log(mappingValue.calculated);
-					input.innerHTML = fieldMapping ? fieldMapping.calculated : "";
+					input.value = fieldMapping ? fieldMapping.calculated : "";
 					field.setText(fieldMapping ? (fieldMapping.calculated ? fieldMapping.calculated.toString() : "") : "");
 					//					console.log(functionSet.secm.fontSize);
 					/*
