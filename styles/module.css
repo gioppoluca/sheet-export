@@ -75,6 +75,7 @@
     margin: auto;
 }
 
+#fieldList >li >input[type="text"],
 #fieldList>li>textarea {
     resize: vertical;
     flex: 2;
