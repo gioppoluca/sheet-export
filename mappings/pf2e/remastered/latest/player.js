@@ -3,6 +3,16 @@ import baseMapping from "../../../../scripts/baseMapping.js";
 
 class MappingClass extends baseMapping {
 
+
+    authors = [
+        {
+            name: 'bushvin',
+            url: 'https://blog.elaba.net',
+            lemmy: 'https://lemmy.world/u/bushvin',
+            github: 'https://github.com/bushvin',
+        },
+    ];
+
     formatModifier(mod) {
         /* Format the modifier correctly with a + sign if needed */
         if (typeof (mod) === "undefined") {
@@ -14,14 +24,15 @@ class MappingClass extends baseMapping {
         }
     }
 
-    // Override setPdfUrl method from base class
-    setPdfUrl() {
-        this.pdfUrl = "/modules/sheet-export/mappings/pf2e/remastered/latest/pf2e-remastered.pdf";
-    }
-
     // override createMappings method from base class
     createMappings() {
         super.createMappings();
+
+        // Set the PDF files to use - MIND that the order of the files is important!
+        this.pdfFiles.push({
+            pdfUrl: '/modules/sheet-export/mappings/pf2e/remastered/latest/pf2e-remastered.pdf',
+            name: `${this.actor.name ?? "character"}.pdf`
+        });
 
         /* Ancestry Section*/
         this.setCalculated("ancestry", this.actor.ancestry.name);
@@ -94,8 +105,8 @@ class MappingClass extends baseMapping {
             }
         );
 
-        // Set test image
-        this.setImage(this.actor.img, 2, 30, 600, 100, 200);
+        // Set Player image
+        this.setImage(this.actor.img, 2, 40, 500, 120, 200);
 
     }
 

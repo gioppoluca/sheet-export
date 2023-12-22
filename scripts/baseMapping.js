@@ -17,19 +17,20 @@ class baseMapping {
           font_size: int, the size of the associated font
         */
         this.fieldMappings = [];
+
         /*
         schema for imageMappings:
-        path: string, path to image
-        page: int, page number
-        pos_x: int, x position
-        pos_y: int, y position
-        width: int, width of image
-        height: int, height of image
+          path: string, path to image
+          page: int, page number
+          pos_x: int, x position
+          pos_y: int, y position
+          width: int, width of image
+          height: int, height of image
         */
         this.imageMappings = [];
+        this.pdfFiles = [];
         this.logPrefix = "Export Sheet";
         this.systemName = "test";
-        this.setPdfUrl();
         this.createMappings();
     }
 
@@ -84,9 +85,12 @@ class baseMapping {
         this.log("warning", message, options);
     }
 
-    updateMapping(fieldName, data) {
+    updateMapping(fieldName, data, pdfId) {
         fieldName = fieldName.trim();
-        let el = this.fieldMappings.filter(i => i.pdf === fieldName);
+        if (this.fieldMappings[pdfId] === undefined) {
+            this.fieldMappings[pdfId] = [];
+        }
+        let el = this.fieldMappings[pdfId].filter(i => i.pdf === fieldName);
         if (el.length === 0) {
             el = Object.assign({ "pdf": fieldName }, data);
         } else if (el.length > 1) {
@@ -94,8 +98,8 @@ class baseMapping {
         } else {
             el = Object.assign(el[0], data);
         }
-        this.fieldMappings = this.fieldMappings.filter(i => i.pdf !== fieldName);
-        this.fieldMappings.push(el);
+        this.fieldMappings[pdfId] = this.fieldMappings[pdfId].filter(i => i.pdf !== fieldName);
+        this.fieldMappings[pdfId].push(el);
     }
 
     /* duplicate method name
@@ -110,9 +114,9 @@ class baseMapping {
     }
     */
 
-    setCalculated(fieldName, value) {
+    setCalculated(fieldName, value, pdfId = 0) {
         fieldName = fieldName.trim();
-        this.updateMapping(fieldName, { "calculated": value });
+        this.updateMapping(fieldName, { "calculated": value }, pdfId);
     }
 
     setFont(fieldName, fontName = undefined, fontSize = undefined) {
@@ -131,25 +135,24 @@ class baseMapping {
         return false;
     }
 
-    setImage(path, page, pos_x, pos_y, width, height) {
+    setImage(path, page, pos_x, pos_y, width, height, pdfId = 0) {
         this.logDebug("setImage");
-        this.imageMappings.push({ "path": path, "page": page, "pos_x": pos_x, "pos_y": pos_y, "width": width, "height": height });
+        if (this.imageMappings[pdfId] === undefined) {
+            this.imageMappings[pdfId] = [];
+        }
+        this.imageMappings[pdfId].push({ "path": path, "page": page, "pos_x": pos_x, "pos_y": pos_y, "width": width, "height": height });
 
     }
     createMappings() {
         this.fieldMappings = [];
     }
 
-    setPdfUrl() {
-        this.pdfUrl = "";
+    getFields(pdfId) {
+        return this.fieldMappings[pdfId];
     }
 
-    get fields() {
-        return this.fieldMappings;
-    }
-    
-    get images() {
-        return this.imageMappings;
+    getImages(pdfId) {
+        return this.imageMappings[pdfId];
     }
 }
 

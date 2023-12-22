@@ -82,6 +82,13 @@
     height: 2em;
 }
 
+#fieldList>li>input {
+    resize: vertical;
+    flex: 2;
+    min-height: 2em;
+    height: 2em;
+    text-align: right;
+}
 
 .sheet-export-btn {
 	margin: auto;

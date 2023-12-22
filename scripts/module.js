@@ -74,7 +74,8 @@ class SheetExportconfig extends FormApplication {
 		this.actor = actor;
 		this.sheet = sheet;
 		console.log(this.actor);
-		this.filledPdf = new ArrayBuffer();
+		//this.filledPdf = new ArrayBuffer();
+		this.filledPdf = [];
 		this.currentBuffer = new ArrayBuffer();
 	}
 
@@ -131,9 +132,13 @@ class SheetExportconfig extends FormApplication {
 	/** Get values and download PDF */
 	download(buffer) {
 		//		console.log(buffer);
-		const blob = new Blob([this.filledPdf], { type: "application/pdf" });
-		console.log(blob);
-		saveAs(blob, `${this.actor.name ?? "character"}.pdf`);
+		for (let index = 0; index < this.filledPdf.length; index++) {
+			const theFile = this.filledPdf[index];
+			const blob = new Blob([theFile.file], { type: "application/pdf" });
+			console.log(blob);
+			saveAs(blob, theFile.name);
+		}
+
 	}
 
 	/** Manage new PDF upload */
@@ -146,23 +151,9 @@ class SheetExportconfig extends FormApplication {
 	getPdf = getPdf;
 
 	async embedImages(pdf, images) {
-		//	console.log(Jimp);
-		const actor = this.actor;
 		for (let i = 0; i < images.length; i++) {
 			let img_path = images[i].path;
 			console.log(img_path);
-			//img_path = img_path.replaceAll("@", atReplacementString);
-			/*
-			let actual_path = "";
-			try {
-				actual_path = Function(`"use strict"; return function(actor) { return ${img_path} };`)()(actor);
-
-			} catch (error) {
-				ui.notifications.error(`The image: ${img_path} is not mapped correctly; got error: ${error.message}`);
-
-			}
-			*/
-			//console.log(actual_path);
 			console.log(images[i]);
 			let img_ext = img_path.split('.').pop();
 			console.log(img_ext);
@@ -235,37 +226,152 @@ class SheetExportconfig extends FormApplication {
 		console.log(this.sheetType);
 
 		// get the mapping for the game system and the version set in the config
-//		const mapping = await this.getMapping(mappingVersion, mappingRelease, this.sheetType);
+		//		const mapping = await this.getMapping(mappingVersion, mappingRelease, this.sheetType);
 		const { default: MappingClass } = await import(getRoute(`/modules/sheet-export/mappings/${game.system.id}/${mappingVersion}/${mappingRelease}/${this.sheetType}.js`));
 		console.log(mappingClass);
 		var mappingClass = new MappingClass(this.actor, this.sheetType, this.sheet);
 		console.log(mappingClass);
-	//	console.log(mc.getMapping("name"));
-//		console.log(mc.getMapping("test1"));
-		const mapping = mappingClass.fields;
-		console.log(mapping);
-	
+		//	console.log(mc.getMapping("name"));
+		//		console.log(mc.getMapping("test1"));
 
-		// get the PDF
-		const pdf = await this.getPdf(mappingClass.pdfUrl, buffer);
-		pdf.registerFontkit(fontkit);
 
-		//manage fonts
-		// Embed the Helvetica font
-		// TODO remove for now untill refactored
-		/*
-		const helveticaFont = await pdf.embedFont(StandardFonts.Helvetica)
-		const fonts = mapping.fonts;
-		let customFonts = [];
-		for (let i = 0; i < fonts.length; i++) {
-			let fontBytes = await fetch(getRoute(fonts[i].path)).then((res) => res.arrayBuffer());
-			let theFont = await pdf.embedFont(fontBytes);
-			//			console.log(theFont);
-			customFonts[fonts[i].id] = theFont;
+		for (let pfdFileIndex = 0; pfdFileIndex < mappingClass.pdfFiles.length; pfdFileIndex++) {
+			const mapping = mappingClass.getFields(pfdFileIndex);
+			console.log(mapping);
+			const pdfFile = mappingClass.pdfFiles[pfdFileIndex];
+			// get the PDF
+			let pdf = null
+			if (pfdFileIndex > 0) {
+				pdf = await this.getPdf(pdfFile.pdfUrl);
+			} else {
+				pdf = await this.getPdf(pdfFile.pdfUrl, buffer);
+			}
+			pdf.registerFontkit(fontkit);
+			console.log(pdf);
+			let form = null;
+			let fields = null;
+			try {
+				form = pdf.getForm();
+				console.log(form);
+				fields = form.getFields()
+				console.log(fields);
+			} catch (error) {
+				ui.notifications.error("error in loading PDF form fields:" + error.message);
+				console.log(error);
+				return;
+			}
+			const actor = this.actor;
+
+			let images = mappingClass.getImages(pfdFileIndex);
+			if (images) {
+				await this.embedImages(pdf, images);
+			}
+
+
+			var i = 0;
+			fields.forEach(field => {
+				const type = field.constructor.name.trim();
+				const name = field.getName().trim();
+				//				console.log(`${type}: ${name}`)
+				//				console.log(field);
+				//	console.log("dafault appearance");
+				console.log(field.acroField.getDefaultAppearance());
+				const fontExp = /\/(?<font>.*?)\s/gm
+				var fieldFont = fontExp.exec(field.acroField.getDefaultAppearance())?.groups?.font;
+				var defApp = field.acroField.getDefaultAppearance().split(" ");
+				var fieldFont = defApp[0].slice(1);
+				//			console.log(fieldFont);
+				//			console.log(field.acroField.DA());
+				var widg = field.acroField.getWidgets()
+				//			console.log("widgets");
+				//			console.log(widg);
+				// Create row
+				const row = document.createElement("li");
+
+				// Create label
+				const label = document.createElement("label");
+				label.innerText = `${name}: `;
+				label.htmlFor = name;
+
+				// Insert label
+				row.prepend(label);
+				inputForm.appendChild(row);
+				// Create an input
+				let input = null;
+				if ((typeof field.isMultiline === 'function') && field.isMultiline()) {
+					input = document.createElement("textarea");
+				} else {
+					input = document.createElement("input");
+					input.setAttribute("text-align", "right");
+				}
+				input.disabled = true;
+				input.setAttribute("data-idx", i);
+				input.setAttribute("data-key", name);
+				input.id = name;
+
+				var fieldMapping = mapping.find(f => f.pdf === name)
+				//		console.log(fieldMapping)
+				//				functionSet.secm.setCurrentField(field);
+				//				functionSet.secm.setCurrentFontsize(getDefaultFontSize(field.acroField));
+
+				switch (type) {
+					case "PDFTextField":
+						if (field.isMultiline()) {
+							input.innerHTML = fieldMapping ? fieldMapping.calculated : "";
+						} else {
+							input.setAttribute("type", "text");
+							input.value = fieldMapping ? fieldMapping.calculated : "";
+						}
+						field.setText(fieldMapping ? (fieldMapping.calculated ? fieldMapping.calculated.toString() : "") : "");
+						field.markAsClean();
+						break;
+					case "PDFCheckBox":
+						input.setAttribute("type", "checkbox");
+						input.checked = fieldMapping ? fieldMapping.calculated : "";
+						fieldMapping ? (fieldMapping.calculated ? field.check() : field.uncheck()) : field.uncheck();
+						break;
+					case "PDFButton":
+						console.log("PDFButton");
+						break;
+					case "PDFRadioGroup":
+						console.log("PDFRadioGroup");
+						break;
+
+					default:
+						//				console.log("nothing in switch");
+						break;
+				}
+				row.appendChild(input); // Add to DOM
+
+				i++;
+			})
+			// TODO this has to be an array
+			this.filledPdf.push({ file: await pdf.save(), name: pdfFile.name });
+
 		}
-
-		console.log(customFonts);
-		*/
+		/*
+		
+				// get the PDF
+				const pdf = await this.getPdf(mappingClass.pdfUrl, buffer);
+				pdf.registerFontkit(fontkit);
+		
+				//manage fonts
+				// Embed the Helvetica font
+				// TODO remove for now untill refactored
+				/*
+				const helveticaFont = await pdf.embedFont(StandardFonts.Helvetica)
+				const fonts = mapping.fonts;
+				let customFonts = [];
+				for (let i = 0; i < fonts.length; i++) {
+					let fontBytes = await fetch(getRoute(fonts[i].path)).then((res) => res.arrayBuffer());
+					let theFont = await pdf.embedFont(fontBytes);
+					//			console.log(theFont);
+					customFonts[fonts[i].id] = theFont;
+				}
+		
+				console.log(customFonts);
+				*/
+		/*
 		console.log(pdf);
 		let form = null;
 		let fields = null;
@@ -287,8 +393,8 @@ class SheetExportconfig extends FormApplication {
 		}
 
 		console.log("-----************.............-------");
-		
- 
+
+
 		/**
 		 * Fetches the system-specific functions for the current system and initializes 
 		 * a SystemFunctions instance with the actor, the sheet type and the sheet.
@@ -306,7 +412,7 @@ class SheetExportconfig extends FormApplication {
 		console.log(functionSet);
 */
 		// get the replacement string for the @
-	//	const atReplacementString = functionSet.system.getAtReplacement(game.release.generation);
+		//	const atReplacementString = functionSet.system.getAtReplacement(game.release.generation);
 
 		/**
 		 * Calls the system-specific preMapping function on the fields from the mapping
@@ -316,7 +422,7 @@ class SheetExportconfig extends FormApplication {
 		 * mappings. For example, a system may want to set default values for certain
 		 * fields based on the actor data.
 		 */
-	//	mapping.fields = functionSet.system.preMapping(mapping.fields);
+		//	mapping.fields = functionSet.system.preMapping(mapping.fields);
 
 		/**
 		 * Loads any helper functions defined in the mapping into the functionSet 
@@ -340,6 +446,7 @@ class SheetExportconfig extends FormApplication {
 			}
 		}
 		*/
+		/*
 		console.log(functionSet);
 
 		/**
@@ -351,27 +458,27 @@ class SheetExportconfig extends FormApplication {
 		 * This allows images referenced in the mapping to be embedded into 
 		 * the generated PDF output.
 		*/
+		/*
+				let images = mappingClass.images;
+				if (images) {
+					await this.embedImages(pdf, images);
+				}
 		
-		let images = mappingClass.images;
-		if (images) {
-			await this.embedImages(pdf, images);
-		}
+				// manage global content
+				/**
+				 * Parses the globalContentMapping from the sheet mapping and evaluates each content string
+				 * to generate the globalContent object.
+				 * 
+				 * The globalContentMapping contains template strings that can reference the actor data using @.
+				 * These are replaced with actor. or actor.data. depending on the Foundry version.
+				 * 
+				 * The content string is then evaluated as a function to return the actual content value.
+				 * 
+				 * The resulting globalContent object contains the evaluated content values indexed by id.
+				 */
 
-		// manage global content
-		/**
-		 * Parses the globalContentMapping from the sheet mapping and evaluates each content string
-		 * to generate the globalContent object.
-		 * 
-		 * The globalContentMapping contains template strings that can reference the actor data using @.
-		 * These are replaced with actor. or actor.data. depending on the Foundry version.
-		 * 
-		 * The content string is then evaluated as a function to return the actual content value.
-		 * 
-		 * The resulting globalContent object contains the evaluated content values indexed by id.
-		 */
-		
 		//let globalContentMapping = mapping.globalContent;
-		let globalContent = {};
+		//		let globalContent = {};
 		/*
 		if (globalContentMapping) {
 			console.log("global content");
@@ -385,10 +492,11 @@ class SheetExportconfig extends FormApplication {
 		console.log(globalContent);
 		*/
 		// Add global content to OverloadManager
-		functionSet.secm = new SheetExportContentManager(globalContent, functionSet);
-	//	functionSet.customFonts = customFonts;
-	//	functionSet.defaultFont = helveticaFont;
+		//		functionSet.secm = new SheetExportContentManager(globalContent, functionSet);
+		//	functionSet.customFonts = customFonts;
+		//	functionSet.defaultFont = helveticaFont;
 		// Manage the form fields
+		/*
 		var i = 0;
 		fields.forEach(field => {
 			const type = field.constructor.name.trim();
@@ -396,16 +504,16 @@ class SheetExportconfig extends FormApplication {
 			//		console.log(`${type}: ${name}`)
 			//		console.log(field);
 			//	console.log("dafault appearance");
-				console.log(field.acroField.getDefaultAppearance());
+			console.log(field.acroField.getDefaultAppearance());
 			const fontExp = /\/(?<font>.*?)\s/gm
 			var fieldFont = fontExp.exec(field.acroField.getDefaultAppearance())?.groups?.font;
-						var defApp = field.acroField.getDefaultAppearance().split(" ");
-						var fieldFont = defApp[0].slice(1);
-					console.log(fieldFont);
-					console.log(field.acroField.DA());
+			var defApp = field.acroField.getDefaultAppearance().split(" ");
+			var fieldFont = defApp[0].slice(1);
+			console.log(fieldFont);
+			console.log(field.acroField.DA());
 			var widg = field.acroField.getWidgets()
-					console.log("widgets");
-					console.log(widg);
+			console.log("widgets");
+			console.log(widg);
 			// Create row
 			const row = document.createElement("li");
 
@@ -445,93 +553,96 @@ class SheetExportconfig extends FormApplication {
 					functionSet.secm.setCurrentFont(customFonts[fieldFont]);
 				}
 				*/
-				else {
-					//					console.log("font is default helvetica");
+		/*
+		else {
+			//					console.log("font is default helvetica");
 			//		functionSet.secm.setCurrentFont(helveticaFont);
-				}
-				// check if the font size is overloaded
-				if (fieldMapping.font_size) {
-					//					console.log("font size is overloaded");
-					functionSet.secm.setCurrentFontsize(fieldMapping.font_size)
-				} else {
-					//					console.log("font size is default");
-					functionSet.secm.setCurrentFontsize(getDefaultFontSize(field.acroField));
-				}
-				//			console.log(fieldMapping.font);
-				//			console.log(fieldMapping.font_size);
-			}
-			// TODO the content mapping is already done in the js class so this part is useless
-			/*
-			var contentMapping = fieldMapping ? fieldMapping.content.replaceAll("@", atReplacementString) : "\"\"";
-			contentMapping = "{'calculated': " + contentMapping + " }";
-			var mappingValue = "";
-			//			console.log("the actor");
-			//			console.log(actor);
-			try {
-				// Return as evaluated JavaScript with the actor as an argument
-				mappingValue = Function(`"use strict"; return function(actor,functionSet) { return ${contentMapping} };`)()(actor, functionSet);
-				//		console.log(mappingValue);
-			} catch (err) {
-				console.log(`${type}: ${name}`)
-				console.log(err);
-				console.log("The function to execute");
-				console.log(contentMapping);
-				console.log("The actor");
-				console.log(actor);
-				ui.notifications.error(`The field: ${name} is not mapped correctly using: ${contentMapping}; got error: ${err.message}`, { permanent: true });
-			}
-			*/
-			
-			switch (type) {
-				case "PDFTextField":
-					//					input.setAttribute("type", "string");
-					//				console.log(mappingValue.calculated);
-					input.innerHTML = fieldMapping ? fieldMapping.calculated : "";
-					field.setText(fieldMapping ? (fieldMapping.calculated ? fieldMapping.calculated.toString() : "") : "");
-					//					console.log(functionSet.secm.fontSize);
-					/*
-					if (functionSet.secm.fontSize) {
-						field.setFontSize(functionSet.secm.fontSize);
-					}
-					//console.log(fieldMapping.font);
-					//					console.log(functionSet.secm.font);
-					if (functionSet.secm.font) {
-						field.updateAppearances(functionSet.secm.font);
-					}
-					/*
-					if (fieldMapping.font) {
-						field.updateAppearances(functionSet.defaultFont);
-					}
-					*/
-					field.markAsClean();
-					break;
-				case "PDFCheckBox":
-					//			console.log(mappingValue.calculated);
-					input.setAttribute("type", "checkbox");
-					input.checked = fieldMapping ? fieldMapping.calculated : "";
-					// before check if mappingValue is defined, than since we expect a boolean we can set the value directly
-					fieldMapping ? (fieldMapping.calculated ? field.check() : field.uncheck()) : field.uncheck();
-					break;
-				case "PDFButton":
-					//			console.log(mappingValue.calculated);
-					console.log("PDFButton");
-					break;
-				case "PDFRadioGroup":
-					//			console.log(mappingValue.calculated);
-					console.log("PDFRadioGroup");
-					break;
+		}
+		// check if the font size is overloaded
+		if (fieldMapping.font_size) {
+			//					console.log("font size is overloaded");
+			functionSet.secm.setCurrentFontsize(fieldMapping.font_size)
+		} else {
+			//					console.log("font size is default");
+			functionSet.secm.setCurrentFontsize(getDefaultFontSize(field.acroField));
+		}
+		//			console.log(fieldMapping.font);
+		//			console.log(fieldMapping.font_size);
+	}
+	// TODO the content mapping is already done in the js class so this part is useless
+	/*
+	var contentMapping = fieldMapping ? fieldMapping.content.replaceAll("@", atReplacementString) : "\"\"";
+	contentMapping = "{'calculated': " + contentMapping + " }";
+	var mappingValue = "";
+	//			console.log("the actor");
+	//			console.log(actor);
+	try {
+		// Return as evaluated JavaScript with the actor as an argument
+		mappingValue = Function(`"use strict"; return function(actor,functionSet) { return ${contentMapping} };`)()(actor, functionSet);
+		//		console.log(mappingValue);
+	} catch (err) {
+		console.log(`${type}: ${name}`)
+		console.log(err);
+		console.log("The function to execute");
+		console.log(contentMapping);
+		console.log("The actor");
+		console.log(actor);
+		ui.notifications.error(`The field: ${name} is not mapped correctly using: ${contentMapping}; got error: ${err.message}`, { permanent: true });
+	}
+	*/
+		/*
+					switch (type) {
+						case "PDFTextField":
+							//					input.setAttribute("type", "string");
+							//				console.log(mappingValue.calculated);
+							input.innerHTML = fieldMapping ? fieldMapping.calculated : "";
+							field.setText(fieldMapping ? (fieldMapping.calculated ? fieldMapping.calculated.toString() : "") : "");
+							//					console.log(functionSet.secm.fontSize);
+							/*
+							if (functionSet.secm.fontSize) {
+								field.setFontSize(functionSet.secm.fontSize);
+							}
+							//console.log(fieldMapping.font);
+							//					console.log(functionSet.secm.font);
+							if (functionSet.secm.font) {
+								field.updateAppearances(functionSet.secm.font);
+							}
+							/*
+							if (fieldMapping.font) {
+								field.updateAppearances(functionSet.defaultFont);
+							}
+							*/
+		/*
+		field.markAsClean();
+		break;
+	case "PDFCheckBox":
+		//			console.log(mappingValue.calculated);
+		input.setAttribute("type", "checkbox");
+		input.checked = fieldMapping ? fieldMapping.calculated : "";
+		// before check if mappingValue is defined, than since we expect a boolean we can set the value directly
+		fieldMapping ? (fieldMapping.calculated ? field.check() : field.uncheck()) : field.uncheck();
+		break;
+	case "PDFButton":
+		//			console.log(mappingValue.calculated);
+		console.log("PDFButton");
+		break;
+	case "PDFRadioGroup":
+		//			console.log(mappingValue.calculated);
+		console.log("PDFRadioGroup");
+		break;
 
-				default:
-					//				console.log("nothing in switch");
-					break;
-			}
-			row.appendChild(input); // Add to DOM
+	default:
+		//				console.log("nothing in switch");
+		break;
+}
+row.appendChild(input); // Add to DOM
 
-			i++;
-		})
-		// elaborated all the fields, now we can download the pdf
-		//form.flatten();
-		this.filledPdf = await pdf.save();
+i++;
+})
+// elaborated all the fields, now we can download the pdf
+//form.flatten();
+this.filledPdf = await pdf.save();
+*/
 		document.getElementById("sheet-export-header").setAttribute("style", "display: none");
 		document.getElementById("sheet-export-final").style.display = "block";
 	}

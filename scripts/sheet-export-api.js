@@ -27,7 +27,7 @@ async function getMapping(mappingChoice, mappingRelease, mappingElement) {
 	return mc;
 }
 
-async function getPdf(pdfUrl,buffer = null) {
+async function getPdf(pdfUrl, buffer = null) {
 	console.log(pdfUrl);
 	let pdfBytes = null
 	if (buffer == null) {
@@ -35,7 +35,7 @@ async function getPdf(pdfUrl,buffer = null) {
 	} else {
 		pdfBytes = buffer;
 	}
-//	const formBytes = await fetch(getRoute(pdfUrl)).then((res) => res.arrayBuffer());
+	//	const formBytes = await fetch(getRoute(pdfUrl)).then((res) => res.arrayBuffer());
 
 	const pdfDoc = await PDFDocument.load(pdfBytes);
 	return pdfDoc;
