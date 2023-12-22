@@ -154,6 +154,23 @@ class baseMapping {
     getImages(pdfId) {
         return this.imageMappings[pdfId];
     }
+
+    localizedItemName(theItem) {
+        return theItem ? game.i18n.localize(theItem?.name) : '';
+    }
+
+    htmlToText(html) {
+        return !html ? '' : html.replaceAll("\n", "")
+            .replaceAll(/<h1[>\s]([^<]*)<\/h1>/gms, "# $1\n")
+            .replaceAll(/<h2[>\s]([^<]*)<\/h2>/gms, "## $1\n")
+            .replaceAll(/<h3[>\s]([^<]*)<\/h3>/gms, "### $1\n")
+            .replaceAll(/<p[^>]*>/gms, "")
+            .replaceAll(/<\/p>/gms, "\n")
+            .replaceAll(/<li[^>]*>/gms, "• ")
+            .replaceAll(/<\/li>/gms, "\n")
+            .replaceAll(/<[^>]*>/gms, "")
+            .replaceAll(/\u00a0/g, "");
+    }
 }
 
 export default baseMapping;
