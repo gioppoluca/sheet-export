@@ -25,7 +25,7 @@
     "scripts/module.js"
   ],
   "scripts": [
-    "scripts/lib/FileSaver.js"
+    "scripts/lib/FileSaver.min.js"
   ],
   "styles": [
     "styles/module.css"
