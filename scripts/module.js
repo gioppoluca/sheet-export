@@ -277,7 +277,7 @@ class SheetExportconfig extends FormApplication {
 				//				console.log(`${type}: ${name}`)
 				//				console.log(field);
 				//	console.log("dafault appearance");
-				console.log(field.acroField.getDefaultAppearance());
+		//		console.log(field.acroField.getDefaultAppearance());
 				const fontExp = /\/(?<font>.*?)\s/gm
 				var fieldFont = fontExp.exec(field.acroField.getDefaultAppearance())?.groups?.font;
 //				var defApp = field.acroField.getDefaultAppearance().split(" ");

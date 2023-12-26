@@ -29,6 +29,7 @@ class baseMapping {
         */
         this.imageMappings = [];
         this.pdfFiles = [];
+        this.globalValues = [];
         this.logPrefix = "Export Sheet";
         this.systemName = "test";
         this.createMappings();
@@ -171,6 +172,24 @@ class baseMapping {
             .replaceAll(/<[^>]*>/gms, "")
             .replaceAll(/\u00a0/g, "");
     }
+
+    getValueByDottedKeys(obj, strKey) {
+        let keys = strKey.split(".")
+        let value = obj[keys[0]];
+        for (let i = 1; i < keys.length; i++) {
+            value = value[keys[i]]
+        }
+        return value
+    }
+
+    setGlobalValue(key, value) {
+        this.globalValues[key] = value;
+    }
+
+    getGlobalValue(key,char_start = 0, char_end = 0) {
+        return this.globalValues[key].substring(char_start, char_end);
+    }
+
 }
 
 export default baseMapping;
