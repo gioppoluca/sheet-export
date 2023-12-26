@@ -1,4 +1,28 @@
 
+## [0.0.10] - 2023-12-26
+### :sparkles: New Features
+- [`79d2271`](https://github.com/gioppoluca/sheet-export/commit/79d2271ed2693433d825466d740801eabfdd8f34) - update class *(commit by [@bushvin](https://github.com/bushvin))*
+- [`dd13705`](https://github.com/gioppoluca/sheet-export/commit/dd13705f893b58ade6237d0118bbd85f8573bf64) - refactored to use new class, still many TODOs *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+- [`7a2239c`](https://github.com/gioppoluca/sheet-export/commit/7a2239c8b72ab583a58407d0e8bc17cdf7a6229d) - restored images with new approach *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+- [`d500f54`](https://github.com/gioppoluca/sheet-export/commit/d500f542176e8c098a0473fbf3443018f61d39f6) - multi PDF, cleaned list *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+- [`6c4bb98`](https://github.com/gioppoluca/sheet-export/commit/6c4bb9863383804b941e45e393fa75553bd5d70b) - generate mapping.js from PDF *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+- [`a408301`](https://github.com/gioppoluca/sheet-export/commit/a408301473f2b64bb2c861ce6dc861154873d69a) - dnd5e extended working again *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+### :bug: Bug Fixes
+- [`9c5f4d0`](https://github.com/gioppoluca/sheet-export/commit/9c5f4d089697d0215fcef5394a40c62a0d2b6c6c) - remove old/bad mappings *(commit by [@bushvin](https://github.com/bushvin))*
+- [`af485b6`](https://github.com/gioppoluca/sheet-export/commit/af485b6524fd47d43f75475c1b66f2b768adc25a) - make values private *(commit by [@bushvin](https://github.com/bushvin))*
+- [`e8d1948`](https://github.com/gioppoluca/sheet-export/commit/e8d19483aed4e7e5c6ee655b248bb11edd1b8fdd) - private properties doen't seem to work with child classes :( *(commit by [@bushvin](https://github.com/bushvin))*
+- [`538bbfa`](https://github.com/gioppoluca/sheet-export/commit/538bbfa4acf1498736f93f994f719ecaad610617) - latest pdf *(commit by [@bushvin](https://github.com/bushvin))*
+- [`87b5890`](https://github.com/gioppoluca/sheet-export/commit/87b5890d4b747192789458e643405ff34606c820) - update methods *(commit by [@bushvin](https://github.com/bushvin))*
+- [`9155f44`](https://github.com/gioppoluca/sheet-export/commit/9155f4436bb65113668a1cb2b7b270e488cef223) - remove force *(commit by [@bushvin](https://github.com/bushvin))*
+- [`8bc28de`](https://github.com/gioppoluca/sheet-export/commit/8bc28deb2809f0acdde446f46040d33c8827bbe4) - display attribute of fields not used at the time *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+### :wrench: Chores
+- [`eb67680`](https://github.com/gioppoluca/sheet-export/commit/eb6768045232ceb704ed0f1eefcf6b17a73117a2) - improve baseMapping logging *(commit by [@bushvin](https://github.com/bushvin))*
+- [`83d0d97`](https://github.com/gioppoluca/sheet-export/commit/83d0d97964c5e9f620355c79938d0aeb6c1b28ea) - initial content *(commit by [@bushvin](https://github.com/bushvin))*
+- [`0398691`](https://github.com/gioppoluca/sheet-export/commit/0398691a8eedd34b4b27f2dbc8b058ccf1d1ce37) - add field to test *(commit by [@bushvin](https://github.com/bushvin))*
+
+
 ## [0.0.9] - 2023-12-20
 ### :sparkles: New Features
 - [`e1707d7`](https://github.com/gioppoluca/sheet-export/commit/e1707d7f664f39315ebddb74811ee72e77f4904f) - porting to class oriented approach *(commit by [@gioppoluca](https://github.com/gioppoluca))*
@@ -68,3 +92,4 @@
 [0.0.7]: https://github.com/gioppoluca/sheet-export/compare/0.0.6...0.0.7
 [0.0.8]: https://github.com/gioppoluca/sheet-export/compare/0.0.7...0.0.8
 [0.0.9]: https://github.com/gioppoluca/sheet-export/compare/0.0.8...0.0.9
+[0.0.10]: https://github.com/gioppoluca/sheet-export/compare/0.0.9...0.0.10
