@@ -41,16 +41,33 @@ async function getPdf(pdfUrl, buffer = null) {
 	return pdfDoc;
 }
 
-function getSheetType(actor) {
+function getSheetType(actor, mappingChoice = "", mappingRelease = "") {
 	let systemMappings = systemMapping();
 	let sheetType = "";
+
 	if (systemMappings[game.system.id] == undefined) {
 		console.log("game system not yet supported by sheet-export");
 		return;
 	} else if (systemMappings[game.system.id].player.includes(actor.type ?? actor.data.type)) {
-		sheetType = "player";
+		const request = new XMLHttpRequest();
+		request.open("HEAD", getRoute(`/modules/sheet-export/mappings/${game.system.id}/${mappingChoice}/${mappingRelease}/player.js`), false); // `false` makes the request synchronous
+		request.send(null);
+		if (request.status === 200) {
+			sheetType = "player";
+		} else {
+			console.log("the sheet for PC Type should be supported but mapping is not present for this release");
+			return;
+		}
 	} else if (systemMappings[game.system.id].npc.includes(actor.type ?? actor.data.type)) {
-		sheetType = "npc";
+		const request = new XMLHttpRequest();
+		request.open("HEAD", getRoute(`/modules/sheet-export/mappings/${game.system.id}/${mappingChoice}/${mappingRelease}/npc.js`), false); // `false` makes the request synchronous
+		request.send(null);
+		if (request.status === 200) {
+			sheetType = "npc";
+		} else {
+			console.log("the sheet for NPC Type should be supported but mapping is not present for this release");
+			return;
+		}
 	} else {
 		console.log("the sheet for this Document Type is not supported by sheet-export");
 		return;

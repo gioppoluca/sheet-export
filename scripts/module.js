@@ -44,36 +44,40 @@ Hooks.on("getActorSheetHeaderButtons", (sheet, buttons) => {
 	console.log(sheet.actor)
 	// If this is not a player character sheet, return without adding the button
 	// added pc for cypher system
-	let sheetType = getSheetType(sheet.actor);
-	// TODO check if sheetTtype is undefined
-	console.log(sheetType);
-	console.log(sheet.actor);
-	//	if (!["character", "PC", "Player", "npc", "pc"].includes(sheet.actor.type ?? sheet.actor.data.type)) return;
+	let mappingVersion = game.settings.get(SheetExportconfig.ID, "mapping-version");
+	let mappingRelease = game.settings.get(SheetExportconfig.ID, "mapping-release");
+	let sheetType = getSheetType(sheet.actor, mappingVersion, mappingRelease);
+	if (sheetType) {
+		buttons.unshift({
+			label: "Export to PDF",
+			class: "export-pdf",
+			icon: "fas fa-file-export",
+			onclick: () => {
+				// Open Config window
+				new SheetExportconfig(sheet.actor, sheetType, sheet).render(true);
 
-	buttons.unshift({
-		label: "Export to PDF",
-		class: "export-pdf",
-		icon: "fas fa-file-export",
-		onclick: () => {
-			// Open Config window
-			new SheetExportconfig(sheet.actor, sheetType, sheet).render(true);
-
-			// Bring window to top
-			Object.values(ui.windows)
-				.filter(window => window instanceof SheetExportconfig)[0]
-				?.bringToTop();
-		},
-	});
+				// Bring window to top
+				Object.values(ui.windows)
+					.filter(window => window instanceof SheetExportconfig)[0]
+					?.bringToTop();
+			},
+		});
+	}
 });
 
 class SheetExportconfig extends FormApplication {
 	constructor(actor, sheetType, sheet) {
 		super();
 		this.sheetType = sheetType;
+		console.group("SheetExportconfig");
 		console.log(this.sheetType);
 		this.actor = actor;
 		this.sheet = sheet;
+		this.mappingVersion = game.settings.get(SheetExportconfig.ID, "mapping-version");
+		this.mappingRelease = game.settings.get(SheetExportconfig.ID, "mapping-release");
 		console.log(this.actor);
+		console.log(this.mappingVersion);
+		console.groupEnd();
 		//this.filledPdf = new ArrayBuffer();
 		this.filledPdf = [];
 		this.currentBuffer = new ArrayBuffer();
@@ -147,8 +151,8 @@ class SheetExportconfig extends FormApplication {
 		this.createForm(this.currentBuffer);
 	}
 
-	getMapping = getMapping;
-	getPdf = getPdf;
+	//	getMapping = getMapping;
+	//	getPdf = getPdf;
 
 	async embedImages(pdf, images) {
 		for (let i = 0; i < images.length; i++) {
@@ -215,13 +219,13 @@ class SheetExportconfig extends FormApplication {
 		const inputForm = document.getElementById("fieldList");
 
 		// get the mapping version and release for the game system set in the config
-		let mappingVersion = game.settings.get(SheetExportconfig.ID, "mapping-version");
-		let mappingRelease = game.settings.get(SheetExportconfig.ID, "mapping-release");
+		//	let mappingVersion = game.settings.get(SheetExportconfig.ID, "mapping-version");
+		//	let mappingRelease = game.settings.get(SheetExportconfig.ID, "mapping-release");
 		console.log(this.sheetType);
 
 		// get the mapping for the game system and the version set in the config
 		//		const mapping = await this.getMapping(mappingVersion, mappingRelease, this.sheetType);
-		const { default: MappingClass } = await import(getRoute(`/modules/sheet-export/mappings/${game.system.id}/${mappingVersion}/${mappingRelease}/${this.sheetType}.js`));
+		const { default: MappingClass } = await import(getRoute(`/modules/sheet-export/mappings/${game.system.id}/${this.mappingVersion}/${this.mappingRelease}/${this.sheetType}.js`));
 		console.log(mappingClass);
 		var mappingClass = new MappingClass(this.actor, this.sheetType, this.sheet);
 		console.log(mappingClass);
@@ -236,9 +240,9 @@ class SheetExportconfig extends FormApplication {
 			// get the PDF
 			let pdf = null
 			if (pfdFileIndex > 0) {
-				pdf = await this.getPdf(pdfFile.pdfUrl);
+				pdf = await getPdf(pdfFile.pdfUrl);
 			} else {
-				pdf = await this.getPdf(pdfFile.pdfUrl, buffer);
+				pdf = await getPdf(pdfFile.pdfUrl, buffer);
 			}
 			pdf.registerFontkit(fontkit);
 			console.log(pdf);
@@ -277,14 +281,14 @@ class SheetExportconfig extends FormApplication {
 				//				console.log(`${type}: ${name}`)
 				//				console.log(field);
 				//	console.log("dafault appearance");
-		//		console.log(field.acroField.getDefaultAppearance());
+				//		console.log(field.acroField.getDefaultAppearance());
 				const fontExp = /\/(?<font>.*?)\s/gm
 				var fieldFont = fontExp.exec(field.acroField.getDefaultAppearance())?.groups?.font;
-//				var defApp = field.acroField.getDefaultAppearance().split(" ");
-//				var fieldFont = defApp[0].slice(1);
+				//				var defApp = field.acroField.getDefaultAppearance().split(" ");
+				//				var fieldFont = defApp[0].slice(1);
 				//			console.log(fieldFont);
 				//			console.log(field.acroField.DA());
-//				var widg = field.acroField.getWidgets()
+				//				var widg = field.acroField.getWidgets()
 				//			console.log("widgets");
 				//			console.log(widg);
 				// Create row
