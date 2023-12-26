@@ -280,11 +280,11 @@ class SheetExportconfig extends FormApplication {
 				console.log(field.acroField.getDefaultAppearance());
 				const fontExp = /\/(?<font>.*?)\s/gm
 				var fieldFont = fontExp.exec(field.acroField.getDefaultAppearance())?.groups?.font;
-				var defApp = field.acroField.getDefaultAppearance().split(" ");
-				var fieldFont = defApp[0].slice(1);
+//				var defApp = field.acroField.getDefaultAppearance().split(" ");
+//				var fieldFont = defApp[0].slice(1);
 				//			console.log(fieldFont);
 				//			console.log(field.acroField.DA());
-				var widg = field.acroField.getWidgets()
+//				var widg = field.acroField.getWidgets()
 				//			console.log("widgets");
 				//			console.log(widg);
 				// Create row
