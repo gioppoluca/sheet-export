@@ -27,7 +27,9 @@ class MappingClass extends baseMapping {
         // Set Player image
         this.setImage(this.actor.img, 2, 40, 500, 120, 200);
 
-        this.setCalculated("ClassLevel", this.actor.items.filter(i => i.type === 'class').map(i => `${i.name} ${i.system.levels}`).join(' / '));
+        //        this.setCalculated("ClassLevel", this.actor.items.filter(i => i.type === 'class').map(i => `${i.name} ${i.system.levels}`).join(' / '));
+        this.setCalculated("ClassLevel", this.getLocalizedClassAndSubclassAndLevel(this.getPrimaryClassObj()));
+
         this.setCalculated("Background", (this.actor.system.details.background ? this.actor.system.details.background : (this.actor.items.find((item) => item.type === 'background')?.name ? this.actor.items.find((item) => item.type === 'background')?.name : "")));
         this.setCalculated("PlayerName", Object.entries(this.actor.ownership).filter(entry => entry[1] === 3).map(entry => entry[0]).map(id => !game.users.get(id)?.isGM ? game.users.get(id)?.name : null).filter(x => x).join(", "));
         this.setCalculated("CharacterName", this.actor.name);
@@ -99,10 +101,11 @@ class MappingClass extends baseMapping {
         this.setCalculated("Athletics", this.actor.system.skills.ath.total);
         this.setCalculated("Deception", this.actor.system.skills.dec.total);
         this.setCalculated("History", this.actor.system.skills.his.total);
-        this.setCalculated("Wpn Name", this.actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[0]?.name || "");
+        this.setCalculated("Wpn Name", this.localizedItemName(this.actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[0]) || "");
         this.setCalculated("Wpn1 AtkBonus", (function (actor) {
             const theWeapon = actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[0];
             theWeapon?.prepareFinalAttributes();
+            console.log(theWeapon?.labels?.toHit?.replace(/^\+ $/, "0") || "");
             return theWeapon?.labels?.toHit?.replace(/^\+ $/, "0") || ""
         })(this.actor)
         );
@@ -183,31 +186,12 @@ class MappingClass extends baseMapping {
         this.setCalculated("AttacksSpellcasting", "");
         this.setCalculated("Passive", this.actor.system.skills.prc.passive);
         this.setCalculated("CP", this.actor.system.currency.cp || "");
-        this.setCalculated("ProficienciesLang", (function (actor) {
-            let s = "";
-            let a = actor.system.traits.weaponProf.value.map(x => game.dnd5e.config.weaponProficiencies[x]
-                || game.packs.get("dnd5e.items").index.get(game.dnd5e.config.weaponIds[x])?.name).first();
-            let b = actor.system.traits.weaponProf.custom.split(";").filter(x => String(x) && x?.length);
-
-            if (a?.length > 0) { s = `${s}Weapons: ${a} ${b.join(', ')}\n`; }
-            a = actor.system.traits.armorProf.value.map(x => game.dnd5e.config.armorProficiencies[x]
-                || game.packs.get("dnd5e.items").index.get(game.dnd5e.config.armorIds[x])?.name).first();
-            b = actor.system.traits.armorProf.custom.split(";").filter(x => String(x) && x?.length);
-            if (a?.length > 0) { s = `${s}Armor: ${a} ${b.join(', ')}\n`; }
-            a = Object.keys(actor.system.tools).map(x => game.dnd5e.config.toolProficiencies[x]
-                || game.packs.get("dnd5e.items").index.get(game.dnd5e.config.toolIds[x])?.name).join(",");
-            console.log(a);
-            if (a?.length > 0) { s = `${s}Tools: ${a} \n`; }
-            a = actor.system.traits.languages.value.map(x => game.dnd5e.config.languages[x]).first();
-            b = actor.system.traits.languages.custom.split(";").filter(x => String(x) && x?.length);
-            if (a?.length > 0) { s = `${s}Languages: ${a} ${b.join(', ')}\n`; }
-            return s;
-        })(this.actor)
-        );
+        this.setCalculated("ProficienciesLang", this.traitsLangs());
         this.setCalculated("SP", this.actor.system.currency.sp || "");
         this.setCalculated("EP", this.actor.system.currency.ep || "");
         this.setCalculated("GP", this.actor.system.currency.gp || "");
         this.setCalculated("PP", this.actor.system.currency.pp || "");
+        /*
         this.setCalculated("Equipment", this.actor.items.filter(i => ['weapon', 'equipment', 'tool'].includes(i.type)).map(i => (i.system.quantity <= 1) ? i.name : `${i.name} (${i.system.quantity})`).join(', '));
         this.setCalculated("Features and Traits", this.actor.items.filter(i => ["feat", "trait"].includes(i.type)).slice(0, 16).map(i => `${i.name} - ${i.system.source}: \n${((h) => {
             const d = document.createElement("div");
@@ -215,6 +199,8 @@ class MappingClass extends baseMapping {
             return d.textContent || d.innerText || "";
         })(i.system.description.value.substring(0, 299))}${(i.system.description.value.length > 300) ? '...' : ''}\n`).join("\n")
         );
+        */
+        this.setCalculated("Features and Traits", this.getFeatsAndTraits());
         this.setCalculated("CharacterName 2", this.actor.name || "");
         this.setCalculated("Age", this.actor.flags["tidy5e-sheet"]?.age || "");
         this.setCalculated("Height", this.actor.flags["tidy5e-sheet"]?.height || "");
@@ -447,6 +433,7 @@ class MappingClass extends baseMapping {
         this.setCalculated("Check Box 3081", this.actor.items.filter(i => i.type === 'spell' && i.system.level === 9)[4]?.system.preparation.prepared || "");
         this.setCalculated("Check Box 3082", this.actor.items.filter(i => i.type === 'spell' && i.system.level === 9)[5]?.system.preparation.prepared || "");
         this.setCalculated("Check Box 3083", this.actor.items.filter(i => i.type === 'spell' && i.system.level === 9)[6]?.system.preparation.prepared || "");
+        /*
         this.setCalculated("equipment_extended1", this.actor.items.filter(i => ['weapon', 'equipment', 'tool', 'consumable', 'loot'].includes(i.type)).slice(0, 7).map(i => `${i.name} (${i.system.quantity}): \n${((h) => {
             const d = document.createElement("div");
             d.innerHTML = h;
@@ -467,1289 +454,135 @@ class MappingClass extends baseMapping {
             d.innerHTML = h;
             return d.textContent || d.innerText || "";
         })(i.system.description.value.substring(0, 1499))}${(i.system.description.value.length > 1500) ? '...' : ''}\n`).join("\n"));
-        this.setCalculated("spell_name_01", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[0] || "");
-        this.setCalculated("spell_school_01", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[0] || "");
-        this.setCalculated("spell_level_01", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[0] || 0);
-        this.setCalculated("spell_description_01", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[0] || ""));
-        this.setCalculated("spell_verbal_01", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[0] || 0);
-        this.setCalculated("spell_somatic_01", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[0] || 0);
-        this.setCalculated("spell_material_01", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[0] || 0);
-        this.setCalculated("spell_ritual_01", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[0] || 0);
-        this.setCalculated("spell_concentration_01", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[0] || 0);
-        this.setCalculated("spell_range_01", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[0] || "");
-        this.setCalculated("spell_casting_01", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[0] || "");
-        this.setCalculated("spell_duration_01", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[0] || "");
-        this.setCalculated("spell_name_02", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[1] || "");
-        this.setCalculated("spell_school_02", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[1] || "");
-        this.setCalculated("spell_level_02", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[1] || 0);
-        this.setCalculated("spell_description_02", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[1] || ""));
-        this.setCalculated("spell_verbal_02", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[1] || 0);
-        this.setCalculated("spell_somatic_02", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[1] || 0);
-        this.setCalculated("spell_material_02", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[1] || 0);
-        this.setCalculated("spell_ritual_02", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[1] || 0);
-        this.setCalculated("spell_concentration_02", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[1] || 0);
-        this.setCalculated("spell_range_02", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[1] || "");
-        this.setCalculated("spell_casting_02", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[1] || "");
-        this.setCalculated("spell_duration_02", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[1] || "");
-        this.setCalculated("spell_name_03", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[2] || "");
-        this.setCalculated("spell_school_03", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[2] || "");
-        this.setCalculated("spell_level_03", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[2] || 0);
-        this.setCalculated("spell_description_03", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[2] || ""));
-        this.setCalculated("spell_verbal_03", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[2] || 0);
-        this.setCalculated("spell_somatic_03", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[2] || 0);
-        this.setCalculated("spell_material_03", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[2] || 0);
-        this.setCalculated("spell_ritual_03", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[2] || 0);
-        this.setCalculated("spell_concentration_03", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[2] || 0);
-        this.setCalculated("spell_range_03", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[2] || "");
-        this.setCalculated("spell_casting_03", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[2] || "");
-        this.setCalculated("spell_duration_03", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[2] || "");
-        this.setCalculated("spell_name_04", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[3] || "");
-        this.setCalculated("spell_school_04", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[3] || "");
-        this.setCalculated("spell_level_04", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[3] || 0);
-        this.setCalculated("spell_description_04", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[3] || ""));
-        this.setCalculated("spell_verbal_04", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[3] || 0);
-        this.setCalculated("spell_somatic_04", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[3] || 0);
-        this.setCalculated("spell_material_04", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[3] || 0);
-        this.setCalculated("spell_ritual_04", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[3] || 0);
-        this.setCalculated("spell_concentration_04", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[3] || 0);
-        this.setCalculated("spell_range_04", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[3] || "");
-        this.setCalculated("spell_casting_04", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[3] || "");
-        this.setCalculated("spell_duration_04", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[3] || "");
-        this.setCalculated("spell_name_05", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[4] || "");
-        this.setCalculated("spell_school_05", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[4] || "");
-        this.setCalculated("spell_level_05", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[4] || 0);
-        this.setCalculated("spell_description_05", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[4] || ""));
-        this.setCalculated("spell_verbal_05", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[4] || 0);
-        this.setCalculated("spell_somatic_05", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[4] || 0);
-        this.setCalculated("spell_material_05", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[4] || 0);
-        this.setCalculated("spell_ritual_05", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[4] || 0);
-        this.setCalculated("spell_concentration_05", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[4] || 0);
-        this.setCalculated("spell_range_05", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[4] || "");
-        this.setCalculated("spell_casting_05", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[4] || "");
-        this.setCalculated("spell_duration_05", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[4] || "");
-        this.setCalculated("spell_name_06", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[5] || "");
-        this.setCalculated("spell_school_06", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[5] || "");
-        this.setCalculated("spell_level_06", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[5] || 0);
-        this.setCalculated("spell_description_06", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[5] || ""));
-        this.setCalculated("spell_verbal_06", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[5] || 0);
-        this.setCalculated("spell_somatic_06", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[5] || 0);
-        this.setCalculated("spell_material_06", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[5] || 0);
-        this.setCalculated("spell_ritual_06", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[5] || 0);
-        this.setCalculated("spell_concentration_06", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[5] || 0);
-        this.setCalculated("spell_range_06", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[5] || "");
-        this.setCalculated("spell_casting_06", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[5] || "");
-        this.setCalculated("spell_duration_06", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[5] || "");
-        this.setCalculated("spell_name_07", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[6] || "");
-        this.setCalculated("spell_school_07", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[6] || "");
-        this.setCalculated("spell_level_07", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[6] || 0);
-        this.setCalculated("spell_description_07", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[6] || ""));
-        this.setCalculated("spell_verbal_07", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[6] || 0);
-        this.setCalculated("spell_somatic_07", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[6] || 0);
-        this.setCalculated("spell_material_07", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[6] || 0);
-        this.setCalculated("spell_ritual_07", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[6] || 0);
-        this.setCalculated("spell_concentration_07", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[6] || 0);
-        this.setCalculated("spell_range_07", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[6] || "");
-        this.setCalculated("spell_casting_07", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[6] || "");
-        this.setCalculated("spell_duration_07", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[6] || "");
-        this.setCalculated("spell_name_08", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[7] || "");
-        this.setCalculated("spell_school_08", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[7] || "");
-        this.setCalculated("spell_level_08", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[7] || 0);
-        this.setCalculated("spell_description_08", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[7] || ""));
-        this.setCalculated("spell_verbal_08", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[7] || 0);
-        this.setCalculated("spell_somatic_08", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[7] || 0);
-        this.setCalculated("spell_material_08", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[7] || 0);
-        this.setCalculated("spell_ritual_08", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[7] || 0);
-        this.setCalculated("spell_concentration_08", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[7] || 0);
-        this.setCalculated("spell_range_08", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[7] || "");
-        this.setCalculated("spell_casting_08", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[7] || "");
-        this.setCalculated("spell_duration_08", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[7] || "");
-        this.setCalculated("spell_name_09", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[8] || "");
-        this.setCalculated("spell_school_09", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[8] || "");
-        this.setCalculated("spell_level_09", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[8] || 0);
-        this.setCalculated("spell_description_09", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[8] || ""));
-        this.setCalculated("spell_verbal_09", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[8] || 0);
-        this.setCalculated("spell_somatic_09", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[8] || 0);
-        this.setCalculated("spell_material_09", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[8] || 0);
-        this.setCalculated("spell_ritual_09", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[8] || 0);
-        this.setCalculated("spell_concentration_09", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[8] || 0);
-        this.setCalculated("spell_range_09", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[8] || "");
-        this.setCalculated("spell_casting_09", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[8] || "");
-        this.setCalculated("spell_duration_09", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[8] || "");
-        this.setCalculated("spell_name_10", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[9] || "");
-        this.setCalculated("spell_school_10", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[9] || "");
-        this.setCalculated("spell_level_10", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[9] || 0);
-        this.setCalculated("spell_description_10", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[9] || ""));
-        this.setCalculated("spell_verbal_10", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[9] || 0);
-        this.setCalculated("spell_somatic_10", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[9] || 0);
-        this.setCalculated("spell_material_10", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[9] || 0);
-        this.setCalculated("spell_ritual_10", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[9] || 0);
-        this.setCalculated("spell_concentration_10", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[9] || 0);
-        this.setCalculated("spell_range_10", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[9] || "");
-        this.setCalculated("spell_casting_10", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[9] || "");
-        this.setCalculated("spell_duration_10", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[9] || "");
-        this.setCalculated("spell_name_11", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[10] || "");
-        this.setCalculated("spell_school_11", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[10] || "");
-        this.setCalculated("spell_level_11", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[10] || 0);
-        this.setCalculated("spell_description_11", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[10] || ""));
-        this.setCalculated("spell_verbal_11", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[10] || 0);
-        this.setCalculated("spell_somatic_11", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[10] || 0);
-        this.setCalculated("spell_material_11", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[10] || 0);
-        this.setCalculated("spell_ritual_11", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[10] || 0);
-        this.setCalculated("spell_concentration_11", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[10] || 0);
-        this.setCalculated("spell_range_11", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[10] || "");
-        this.setCalculated("spell_casting_11", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[10] || "");
-        this.setCalculated("spell_duration_11", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[10] || "");
-        this.setCalculated("spell_name_12", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[11] || "");
-        this.setCalculated("spell_school_12", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[11] || "");
-        this.setCalculated("spell_level_12", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[11] || 0);
-        this.setCalculated("spell_description_12", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[11] || ""));
-        this.setCalculated("spell_verbal_12", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[11] || 0);
-        this.setCalculated("spell_somatic_12", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[11] || 0);
-        this.setCalculated("spell_material_12", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[11] || 0);
-        this.setCalculated("spell_ritual_12", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[11] || 0);
-        this.setCalculated("spell_concentration_12", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[11] || 0);
-        this.setCalculated("spell_range_12", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[11] || "");
-        this.setCalculated("spell_casting_12", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[11] || "");
-        this.setCalculated("spell_duration_12", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[11] || "");
-        this.setCalculated("spell_name_13", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[12] || "");
-        this.setCalculated("spell_school_13", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[12] || "");
-        this.setCalculated("spell_level_13", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[12] || 0);
-        this.setCalculated("spell_description_13", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[12] || ""));
-        this.setCalculated("spell_verbal_13", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[12] || 0);
-        this.setCalculated("spell_somatic_13", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[12] || 0);
-        this.setCalculated("spell_material_13", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[12] || 0);
-        this.setCalculated("spell_ritual_13", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[12] || 0);
-        this.setCalculated("spell_concentration_13", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[12] || 0);
-        this.setCalculated("spell_range_13", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[12] || "");
-        this.setCalculated("spell_casting_13", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[12] || "");
-        this.setCalculated("spell_duration_13", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[12] || "");
-        this.setCalculated("spell_name_14", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[13] || "");
-        this.setCalculated("spell_school_14", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[13] || "");
-        this.setCalculated("spell_level_14", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[13] || 0);
-        this.setCalculated("spell_description_14", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[13] || ""));
-        this.setCalculated("spell_verbal_14", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[13] || 0);
-        this.setCalculated("spell_somatic_14", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[13] || 0);
-        this.setCalculated("spell_material_14", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[13] || 0);
-        this.setCalculated("spell_ritual_14", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[13] || 0);
-        this.setCalculated("spell_concentration_14", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[13] || 0);
-        this.setCalculated("spell_range_14", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[13] || "");
-        this.setCalculated("spell_casting_14", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[13] || "");
-        this.setCalculated("spell_duration_14", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[13] || "");
-        this.setCalculated("spell_name_15", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[14] || "");
-        this.setCalculated("spell_school_15", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[14] || "");
-        this.setCalculated("spell_level_15", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[14] || 0);
-        this.setCalculated("spell_description_15", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[14] || ""));
-        this.setCalculated("spell_verbal_15", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[14] || 0);
-        this.setCalculated("spell_somatic_15", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[14] || 0);
-        this.setCalculated("spell_material_15", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[14] || 0);
-        this.setCalculated("spell_ritual_15", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[14] || 0);
-        this.setCalculated("spell_concentration_15", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[14] || 0);
-        this.setCalculated("spell_range_15", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[14] || "");
-        this.setCalculated("spell_casting_15", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[14] || "");
-        this.setCalculated("spell_duration_15", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[14] || "");
-        this.setCalculated("spell_name_16", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[15] || "");
-        this.setCalculated("spell_school_16", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[15] || "");
-        this.setCalculated("spell_level_16", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[15] || 0);
-        this.setCalculated("spell_description_16", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[15] || ""));
-        this.setCalculated("spell_verbal_16", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[15] || 0);
-        this.setCalculated("spell_somatic_16", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[15] || 0);
-        this.setCalculated("spell_material_16", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[15] || 0);
-        this.setCalculated("spell_ritual_16", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[15] || 0);
-        this.setCalculated("spell_concentration_16", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[15] || 0);
-        this.setCalculated("spell_range_16", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[15] || "");
-        this.setCalculated("spell_casting_16", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[15] || "");
-        this.setCalculated("spell_duration_16", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[15] || "");
-        this.setCalculated("spell_name_17", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[16] || "");
-        this.setCalculated("spell_school_17", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[16] || "");
-        this.setCalculated("spell_level_17", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[16] || 0);
-        this.setCalculated("spell_description_17", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[16] || ""));
-        this.setCalculated("spell_verbal_17", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[16] || 0);
-        this.setCalculated("spell_somatic_17", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[16] || 0);
-        this.setCalculated("spell_material_17", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[16] || 0);
-        this.setCalculated("spell_ritual_17", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[16] || 0);
-        this.setCalculated("spell_concentration_17", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[16] || 0);
-        this.setCalculated("spell_range_17", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[16] || "");
-        this.setCalculated("spell_casting_17", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[16] || "");
-        this.setCalculated("spell_duration_17", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[16] || "");
-        this.setCalculated("spell_name_18", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[17] || "");
-        this.setCalculated("spell_school_18", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[17] || "");
-        this.setCalculated("spell_level_18", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[17] || 0);
-        this.setCalculated("spell_description_18", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[17] || ""));
-        this.setCalculated("spell_verbal_18", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[17] || 0);
-        this.setCalculated("spell_somatic_18", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[17] || 0);
-        this.setCalculated("spell_material_18", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[17] || 0);
-        this.setCalculated("spell_ritual_18", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[17] || 0);
-        this.setCalculated("spell_concentration_18", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[17] || 0);
-        this.setCalculated("spell_range_18", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[17] || "");
-        this.setCalculated("spell_casting_18", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[17] || "");
-        this.setCalculated("spell_duration_18", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[17] || "");
-        this.setCalculated("spell_name_19", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[18] || "");
-        this.setCalculated("spell_school_19", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[18] || "");
-        this.setCalculated("spell_level_19", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[18] || 0);
-        this.setCalculated("spell_description_19", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[18] || ""));
-        this.setCalculated("spell_verbal_19", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[18] || 0);
-        this.setCalculated("spell_somatic_19", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[18] || 0);
-        this.setCalculated("spell_material_19", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[18] || 0);
-        this.setCalculated("spell_ritual_19", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[18] || 0);
-        this.setCalculated("spell_concentration_19", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[18] || 0);
-        this.setCalculated("spell_range_19", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[18] || "");
-        this.setCalculated("spell_casting_19", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[18] || "");
-        this.setCalculated("spell_duration_19", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[18] || "");
-        this.setCalculated("spell_name_20", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[19] || "");
-        this.setCalculated("spell_school_20", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[19] || "");
-        this.setCalculated("spell_level_20", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[19] || 0);
-        this.setCalculated("spell_description_20", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[19] || ""));
-        this.setCalculated("spell_verbal_20", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[19] || 0);
-        this.setCalculated("spell_somatic_20", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[19] || 0);
-        this.setCalculated("spell_material_20", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[19] || 0);
-        this.setCalculated("spell_ritual_20", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[19] || 0);
-        this.setCalculated("spell_concentration_20", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[19] || 0);
-        this.setCalculated("spell_range_20", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[19] || "");
-        this.setCalculated("spell_casting_20", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[19] || "");
-        this.setCalculated("spell_duration_20", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[19] || "");
-        this.setCalculated("spell_name_21", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[20] || "");
-        this.setCalculated("spell_school_21", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[20] || "");
-        this.setCalculated("spell_level_21", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[20] || 0);
-        this.setCalculated("spell_description_21", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[20] || ""));
-        this.setCalculated("spell_verbal_21", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[20] || 0);
-        this.setCalculated("spell_somatic_21", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[20] || 0);
-        this.setCalculated("spell_material_21", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[20] || 0);
-        this.setCalculated("spell_ritual_21", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[20] || 0);
-        this.setCalculated("spell_concentration_21", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[20] || 0);
-        this.setCalculated("spell_range_21", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[20] || "");
-        this.setCalculated("spell_casting_21", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[20] || "");
-        this.setCalculated("spell_duration_21", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[20] || "");
-        this.setCalculated("spell_name_22", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[21] || "");
-        this.setCalculated("spell_school_22", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[21] || "");
-        this.setCalculated("spell_level_22", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[21] || 0);
-        this.setCalculated("spell_description_22", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[21] || ""));
-        this.setCalculated("spell_verbal_22", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[21] || 0);
-        this.setCalculated("spell_somatic_22", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[21] || 0);
-        this.setCalculated("spell_material_22", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[21] || 0);
-        this.setCalculated("spell_ritual_22", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[21] || 0);
-        this.setCalculated("spell_concentration_22", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[21] || 0);
-        this.setCalculated("spell_range_22", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[21] || "");
-        this.setCalculated("spell_casting_22", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[21] || "");
-        this.setCalculated("spell_duration_22", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[21] || "");
-        this.setCalculated("spell_name_23", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[22] || "");
-        this.setCalculated("spell_school_23", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[22] || "");
-        this.setCalculated("spell_level_23", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[22] || 0);
-        this.setCalculated("spell_description_23", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[22] || ""));
-        this.setCalculated("spell_verbal_23", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[22] || 0);
-        this.setCalculated("spell_somatic_23", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[22] || 0);
-        this.setCalculated("spell_material_23", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[22] || 0);
-        this.setCalculated("spell_ritual_23", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[22] || 0);
-        this.setCalculated("spell_concentration_23", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[22] || 0);
-        this.setCalculated("spell_range_23", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[22] || "");
-        this.setCalculated("spell_casting_23", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[22] || "");
-        this.setCalculated("spell_duration_23", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[22] || "");
-        this.setCalculated("spell_name_24", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[23] || "");
-        this.setCalculated("spell_school_24", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[23] || "");
-        this.setCalculated("spell_level_24", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[23] || 0);
-        this.setCalculated("spell_description_24", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[23] || ""));
-        this.setCalculated("spell_verbal_24", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[23] || 0);
-        this.setCalculated("spell_somatic_24", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[23] || 0);
-        this.setCalculated("spell_material_24", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[23] || 0);
-        this.setCalculated("spell_ritual_24", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[23] || 0);
-        this.setCalculated("spell_concentration_24", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[23] || 0);
-        this.setCalculated("spell_range_24", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[23] || "");
-        this.setCalculated("spell_casting_24", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[23] || "");
-        this.setCalculated("spell_duration_24", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[23] || "");
-        this.setCalculated("spell_name_25", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[24] || "");
-        this.setCalculated("spell_school_25", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[24] || "");
-        this.setCalculated("spell_level_25", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[24] || 0);
-        this.setCalculated("spell_description_25", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[24] || ""));
-        this.setCalculated("spell_verbal_25", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[24] || 0);
-        this.setCalculated("spell_somatic_25", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[24] || 0);
-        this.setCalculated("spell_material_25", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[24] || 0);
-        this.setCalculated("spell_ritual_25", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[24] || 0);
-        this.setCalculated("spell_concentration_25", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[24] || 0);
-        this.setCalculated("spell_range_25", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[24] || "");
-        this.setCalculated("spell_casting_25", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[24] || "");
-        this.setCalculated("spell_duration_25", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[24] || "");
-        this.setCalculated("spell_name_26", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[25] || "");
-        this.setCalculated("spell_school_26", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[25] || "");
-        this.setCalculated("spell_level_26", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[25] || 0);
-        this.setCalculated("spell_description_26", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[25] || ""));
-        this.setCalculated("spell_verbal_26", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[25] || 0);
-        this.setCalculated("spell_somatic_26", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[25] || 0);
-        this.setCalculated("spell_material_26", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[25] || 0);
-        this.setCalculated("spell_ritual_26", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[25] || 0);
-        this.setCalculated("spell_concentration_26", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[25] || 0);
-        this.setCalculated("spell_range_26", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[25] || "");
-        this.setCalculated("spell_casting_26", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[25] || "");
-        this.setCalculated("spell_duration_26", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[25] || "");
-        this.setCalculated("spell_name_27", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[26] || "");
-        this.setCalculated("spell_school_27", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[26] || "");
-        this.setCalculated("spell_level_27", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[26] || 0);
-        this.setCalculated("spell_description_27", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[26] || ""));
-        this.setCalculated("spell_verbal_27", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[26] || 0);
-        this.setCalculated("spell_somatic_27", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[26] || 0);
-        this.setCalculated("spell_material_27", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[26] || 0);
-        this.setCalculated("spell_ritual_27", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[26] || 0);
-        this.setCalculated("spell_concentration_27", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[26] || 0);
-        this.setCalculated("spell_range_27", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[26] || "");
-        this.setCalculated("spell_casting_27", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[26] || "");
-        this.setCalculated("spell_duration_27", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[26] || "");
-        this.setCalculated("spell_name_28", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[27] || "");
-        this.setCalculated("spell_school_28", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[27] || "");
-        this.setCalculated("spell_level_28", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[27] || 0);
-        this.setCalculated("spell_description_28", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[27] || ""));
-        this.setCalculated("spell_verbal_28", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[27] || 0);
-        this.setCalculated("spell_somatic_28", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[27] || 0);
-        this.setCalculated("spell_material_28", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[27] || 0);
-        this.setCalculated("spell_ritual_28", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[27] || 0);
-        this.setCalculated("spell_concentration_28", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[27] || 0);
-        this.setCalculated("spell_range_28", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[27] || "");
-        this.setCalculated("spell_casting_28", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[27] || "");
-        this.setCalculated("spell_duration_28", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[27] || "");
-        this.setCalculated("spell_name_29", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[28] || "");
-        this.setCalculated("spell_school_29", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[28] || "");
-        this.setCalculated("spell_level_29", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[28] || 0);
-        this.setCalculated("spell_description_29", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[28] || ""));
-        this.setCalculated("spell_verbal_29", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[28] || 0);
-        this.setCalculated("spell_somatic_29", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[28] || 0);
-        this.setCalculated("spell_material_29", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[28] || 0);
-        this.setCalculated("spell_ritual_29", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[28] || 0);
-        this.setCalculated("spell_concentration_29", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[28] || 0);
-        this.setCalculated("spell_range_29", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[28] || "");
-        this.setCalculated("spell_casting_29", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[28] || "");
-        this.setCalculated("spell_duration_29", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[28] || "");
-        this.setCalculated("spell_name_30", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[29] || "");
-        this.setCalculated("spell_school_30", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[29] || "");
-        this.setCalculated("spell_level_30", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[29] || 0);
-        this.setCalculated("spell_description_30", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[29] || ""));
-        this.setCalculated("spell_verbal_30", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[29] || 0);
-        this.setCalculated("spell_somatic_30", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[29] || 0);
-        this.setCalculated("spell_material_30", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[29] || 0);
-        this.setCalculated("spell_ritual_30", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[29] || 0);
-        this.setCalculated("spell_concentration_30", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[29] || 0);
-        this.setCalculated("spell_range_30", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[29] || "");
-        this.setCalculated("spell_casting_30", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[29] || "");
-        this.setCalculated("spell_duration_30", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[29] || "");
-        this.setCalculated("spell_name_31", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[30] || "");
-        this.setCalculated("spell_school_31", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[30] || "");
-        this.setCalculated("spell_level_31", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[30] || 0);
-        this.setCalculated("spell_description_31", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[30] || ""));
-        this.setCalculated("spell_verbal_31", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[30] || 0);
-        this.setCalculated("spell_somatic_31", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[30] || 0);
-        this.setCalculated("spell_material_31", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[30] || 0);
-        this.setCalculated("spell_ritual_31", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[30] || 0);
-        this.setCalculated("spell_concentration_31", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[30] || 0);
-        this.setCalculated("spell_range_31", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[30] || "");
-        this.setCalculated("spell_casting_31", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[30] || "");
-        this.setCalculated("spell_duration_31", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[30] || "");
-        this.setCalculated("spell_name_32", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[31] || "");
-        this.setCalculated("spell_school_32", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[31] || "");
-        this.setCalculated("spell_level_32", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[31] || 0);
-        this.setCalculated("spell_description_32", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[31] || ""));
-        this.setCalculated("spell_verbal_32", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[31] || 0);
-        this.setCalculated("spell_somatic_32", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[31] || 0);
-        this.setCalculated("spell_material_32", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[31] || 0);
-        this.setCalculated("spell_ritual_32", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[31] || 0);
-        this.setCalculated("spell_concentration_32", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[31] || 0);
-        this.setCalculated("spell_range_32", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[31] || "");
-        this.setCalculated("spell_casting_32", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[31] || "");
-        this.setCalculated("spell_duration_32", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[31] || "");
-        this.setCalculated("spell_name_33", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[32] || "");
-        this.setCalculated("spell_school_33", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[32] || "");
-        this.setCalculated("spell_level_33", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[32] || 0);
-        this.setCalculated("spell_description_33", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[32] || ""));
-        this.setCalculated("spell_verbal_33", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[32] || 0);
-        this.setCalculated("spell_somatic_33", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[32] || 0);
-        this.setCalculated("spell_material_33", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[32] || 0);
-        this.setCalculated("spell_ritual_33", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[32] || 0);
-        this.setCalculated("spell_concentration_33", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[32] || 0);
-        this.setCalculated("spell_range_33", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[32] || "");
-        this.setCalculated("spell_casting_33", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[32] || "");
-        this.setCalculated("spell_duration_33", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[32] || "");
-        this.setCalculated("spell_name_34", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[33] || "");
-        this.setCalculated("spell_school_34", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[33] || "");
-        this.setCalculated("spell_level_34", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[33] || 0);
-        this.setCalculated("spell_description_34", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[33] || ""));
-        this.setCalculated("spell_verbal_34", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[33] || 0);
-        this.setCalculated("spell_somatic_34", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[33] || 0);
-        this.setCalculated("spell_material_34", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[33] || 0);
-        this.setCalculated("spell_ritual_34", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[33] || 0);
-        this.setCalculated("spell_concentration_34", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[33] || 0);
-        this.setCalculated("spell_range_34", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[33] || "");
-        this.setCalculated("spell_casting_34", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[33] || "");
-        this.setCalculated("spell_duration_34", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[33] || "");
-        this.setCalculated("spell_name_35", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[34] || "");
-        this.setCalculated("spell_school_35", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[34] || "");
-        this.setCalculated("spell_level_35", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[34] || 0);
-        this.setCalculated("spell_description_35", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[34] || ""));
-        this.setCalculated("spell_verbal_35", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[34] || 0);
-        this.setCalculated("spell_somatic_35", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[34] || 0);
-        this.setCalculated("spell_material_35", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[34] || 0);
-        this.setCalculated("spell_ritual_35", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[34] || 0);
-        this.setCalculated("spell_concentration_35", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[34] || 0);
-        this.setCalculated("spell_range_35", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[34] || "");
-        this.setCalculated("spell_casting_35", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[34] || "");
-        this.setCalculated("spell_duration_35", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[34] || "");
-        this.setCalculated("spell_name_36", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[35] || "");
-        this.setCalculated("spell_school_36", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[35] || "");
-        this.setCalculated("spell_level_36", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[35] || 0);
-        this.setCalculated("spell_description_36", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[35] || ""));
-        this.setCalculated("spell_verbal_36", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[35] || 0);
-        this.setCalculated("spell_somatic_36", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[35] || 0);
-        this.setCalculated("spell_material_36", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[35] || 0);
-        this.setCalculated("spell_ritual_36", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[35] || 0);
-        this.setCalculated("spell_concentration_36", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[35] || 0);
-        this.setCalculated("spell_range_36", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[35] || "");
-        this.setCalculated("spell_casting_36", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[35] || "");
-        this.setCalculated("spell_duration_36", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[35] || "");
-        this.setCalculated("spell_name_37", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[36] || "");
-        this.setCalculated("spell_school_37", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[36] || "");
-        this.setCalculated("spell_level_37", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[36] || 0);
-        this.setCalculated("spell_description_37", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[36] || ""));
-        this.setCalculated("spell_verbal_37", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[36] || 0);
-        this.setCalculated("spell_somatic_37", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[36] || 0);
-        this.setCalculated("spell_material_37", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[36] || 0);
-        this.setCalculated("spell_ritual_37", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[36] || 0);
-        this.setCalculated("spell_concentration_37", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[36] || 0);
-        this.setCalculated("spell_range_37", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[36] || "");
-        this.setCalculated("spell_casting_37", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[36] || "");
-        this.setCalculated("spell_duration_37", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[36] || "");
-        this.setCalculated("spell_name_38", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[37] || "");
-        this.setCalculated("spell_school_38", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[37] || "");
-        this.setCalculated("spell_level_38", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[37] || 0);
-        this.setCalculated("spell_description_38", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[37] || ""));
-        this.setCalculated("spell_verbal_38", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[37] || 0);
-        this.setCalculated("spell_somatic_38", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[37] || 0);
-        this.setCalculated("spell_material_38", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[37] || 0);
-        this.setCalculated("spell_ritual_38", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[37] || 0);
-        this.setCalculated("spell_concentration_38", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[37] || 0);
-        this.setCalculated("spell_range_38", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[37] || "");
-        this.setCalculated("spell_casting_38", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[37] || "");
-        this.setCalculated("spell_duration_38", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[37] || "");
-        this.setCalculated("spell_name_39", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[38] || "");
-        this.setCalculated("spell_school_39", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[38] || "");
-        this.setCalculated("spell_level_39", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[38] || 0);
-        this.setCalculated("spell_description_39", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[38] || ""));
-        this.setCalculated("spell_verbal_39", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[38] || 0);
-        this.setCalculated("spell_somatic_39", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[38] || 0);
-        this.setCalculated("spell_material_39", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[38] || 0);
-        this.setCalculated("spell_ritual_39", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[38] || 0);
-        this.setCalculated("spell_concentration_39", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[38] || 0);
-        this.setCalculated("spell_range_39", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[38] || "");
-        this.setCalculated("spell_casting_39", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[38] || "");
-        this.setCalculated("spell_duration_39", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[38] || "");
-        this.setCalculated("spell_name_40", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[39] || "");
-        this.setCalculated("spell_school_40", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[39] || "");
-        this.setCalculated("spell_level_40", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[39] || 0);
-        this.setCalculated("spell_description_40", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[39] || ""));
-        this.setCalculated("spell_verbal_40", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[39] || 0);
-        this.setCalculated("spell_somatic_40", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[39] || 0);
-        this.setCalculated("spell_material_40", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[39] || 0);
-        this.setCalculated("spell_ritual_40", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[39] || 0);
-        this.setCalculated("spell_concentration_40", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[39] || 0);
-        this.setCalculated("spell_range_40", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[39] || "");
-        this.setCalculated("spell_casting_40", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[39] || "");
-        this.setCalculated("spell_duration_40", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[39] || "");
-        this.setCalculated("spell_name_41", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[40] || "");
-        this.setCalculated("spell_school_41", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[40] || "");
-        this.setCalculated("spell_level_41", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[40] || 0);
-        this.setCalculated("spell_description_41", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[40] || ""));
-        this.setCalculated("spell_verbal_41", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[40] || 0);
-        this.setCalculated("spell_somatic_41", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[40] || 0);
-        this.setCalculated("spell_material_41", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[40] || 0);
-        this.setCalculated("spell_ritual_41", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[40] || 0);
-        this.setCalculated("spell_concentration_41", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[40] || 0);
-        this.setCalculated("spell_range_41", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[40] || "");
-        this.setCalculated("spell_casting_41", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[40] || "");
-        this.setCalculated("spell_duration_41", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[40] || "");
-        this.setCalculated("spell_name_42", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[41] || "");
-        this.setCalculated("spell_school_42", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[41] || "");
-        this.setCalculated("spell_level_42", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[41] || 0);
-        this.setCalculated("spell_description_42", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[41] || ""));
-        this.setCalculated("spell_verbal_42", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[41] || 0);
-        this.setCalculated("spell_somatic_42", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[41] || 0);
-        this.setCalculated("spell_material_42", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[41] || 0);
-        this.setCalculated("spell_ritual_42", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[41] || 0);
-        this.setCalculated("spell_concentration_42", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[41] || 0);
-        this.setCalculated("spell_range_42", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[41] || "");
-        this.setCalculated("spell_casting_42", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[41] || "");
-        this.setCalculated("spell_duration_42", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[41] || "");
-        this.setCalculated("spell_name_43", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[42] || "");
-        this.setCalculated("spell_school_43", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[42] || "");
-        this.setCalculated("spell_level_43", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[42] || 0);
-        this.setCalculated("spell_description_43", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[42] || ""));
-        this.setCalculated("spell_verbal_43", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[42] || 0);
-        this.setCalculated("spell_somatic_43", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[42] || 0);
-        this.setCalculated("spell_material_43", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[42] || 0);
-        this.setCalculated("spell_ritual_43", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[42] || 0);
-        this.setCalculated("spell_concentration_43", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[42] || 0);
-        this.setCalculated("spell_range_43", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[42] || "");
-        this.setCalculated("spell_casting_43", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[42] || "");
-        this.setCalculated("spell_duration_43", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[42] || "");
-        this.setCalculated("spell_name_44", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[43] || "");
-        this.setCalculated("spell_school_44", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[43] || "");
-        this.setCalculated("spell_level_44", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[43] || 0);
-        this.setCalculated("spell_description_44", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[43] || ""));
-        this.setCalculated("spell_verbal_44", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[43] || 0);
-        this.setCalculated("spell_somatic_44", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[43] || 0);
-        this.setCalculated("spell_material_44", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[43] || 0);
-        this.setCalculated("spell_ritual_44", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[43] || 0);
-        this.setCalculated("spell_concentration_44", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[43] || 0);
-        this.setCalculated("spell_range_44", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[43] || "");
-        this.setCalculated("spell_casting_44", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[43] || "");
-        this.setCalculated("spell_duration_44", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[43] || "");
-        this.setCalculated("spell_name_45", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[44] || "");
-        this.setCalculated("spell_school_45", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[44] || "");
-        this.setCalculated("spell_level_45", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[44] || 0);
-        this.setCalculated("spell_description_45", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[44] || ""));
-        this.setCalculated("spell_verbal_45", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[44] || 0);
-        this.setCalculated("spell_somatic_45", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[44] || 0);
-        this.setCalculated("spell_material_45", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[44] || 0);
-        this.setCalculated("spell_ritual_45", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[44] || 0);
-        this.setCalculated("spell_concentration_45", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[44] || 0);
-        this.setCalculated("spell_range_45", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[44] || "");
-        this.setCalculated("spell_casting_45", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[44] || "");
-        this.setCalculated("spell_duration_45", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[44] || "");
-        this.setCalculated("spell_name_46", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[45] || "");
-        this.setCalculated("spell_school_46", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[45] || "");
-        this.setCalculated("spell_level_46", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[45] || 0);
-        this.setCalculated("spell_description_46", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[45] || ""));
-        this.setCalculated("spell_verbal_46", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[45] || 0);
-        this.setCalculated("spell_somatic_46", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[45] || 0);
-        this.setCalculated("spell_material_46", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[45] || 0);
-        this.setCalculated("spell_ritual_46", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[45] || 0);
-        this.setCalculated("spell_concentration_46", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[45] || 0);
-        this.setCalculated("spell_range_46", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[45] || "");
-        this.setCalculated("spell_casting_46", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[45] || "");
-        this.setCalculated("spell_duration_46", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[45] || "");
-        this.setCalculated("spell_name_47", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[46] || "");
-        this.setCalculated("spell_school_47", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[46] || "");
-        this.setCalculated("spell_level_47", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[46] || 0);
-        this.setCalculated("spell_description_47", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[46] || ""));
-        this.setCalculated("spell_verbal_47", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[46] || 0);
-        this.setCalculated("spell_somatic_47", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[46] || 0);
-        this.setCalculated("spell_material_47", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[46] || 0);
-        this.setCalculated("spell_ritual_47", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[46] || 0);
-        this.setCalculated("spell_concentration_47", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[46] || 0);
-        this.setCalculated("spell_range_47", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[46] || "");
-        this.setCalculated("spell_casting_47", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[46] || "");
-        this.setCalculated("spell_duration_47", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[46] || "");
-        this.setCalculated("spell_name_48", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[47] || "");
-        this.setCalculated("spell_school_48", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[47] || "");
-        this.setCalculated("spell_level_48", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[47] || 0);
-        this.setCalculated("spell_description_48", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[47] || ""));
-        this.setCalculated("spell_verbal_48", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[47] || 0);
-        this.setCalculated("spell_somatic_48", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[47] || 0);
-        this.setCalculated("spell_material_48", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[47] || 0);
-        this.setCalculated("spell_ritual_48", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[47] || 0);
-        this.setCalculated("spell_concentration_48", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[47] || 0);
-        this.setCalculated("spell_range_48", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[47] || "");
-        this.setCalculated("spell_casting_48", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[47] || "");
-        this.setCalculated("spell_duration_48", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[47] || "");
-        this.setCalculated("spell_name_49", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[48] || "");
-        this.setCalculated("spell_school_49", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[48] || "");
-        this.setCalculated("spell_level_49", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[48] || 0);
-        this.setCalculated("spell_description_49", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[48] || ""));
-        this.setCalculated("spell_verbal_49", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[48] || 0);
-        this.setCalculated("spell_somatic_49", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[48] || 0);
-        this.setCalculated("spell_material_49", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[48] || 0);
-        this.setCalculated("spell_ritual_49", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[48] || 0);
-        this.setCalculated("spell_concentration_49", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[48] || 0);
-        this.setCalculated("spell_range_49", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[48] || "");
-        this.setCalculated("spell_casting_49", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[48] || "");
-        this.setCalculated("spell_duration_49", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[48] || "");
-        this.setCalculated("spell_name_50", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[49] || "");
-        this.setCalculated("spell_school_50", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[49] || "");
-        this.setCalculated("spell_level_50", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[49] || 0);
-        this.setCalculated("spell_description_50", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[49] || ""));
-        this.setCalculated("spell_verbal_50", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[49] || 0);
-        this.setCalculated("spell_somatic_50", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[49] || 0);
-        this.setCalculated("spell_material_50", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[49] || 0);
-        this.setCalculated("spell_ritual_50", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[49] || 0);
-        this.setCalculated("spell_concentration_50", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[49] || 0);
-        this.setCalculated("spell_range_50", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[49] || "");
-        this.setCalculated("spell_casting_50", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[49] || "");
-        this.setCalculated("spell_duration_50", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[49] || "");
-        this.setCalculated("spell_name_51", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[50] || "");
-        this.setCalculated("spell_school_51", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[50] || "");
-        this.setCalculated("spell_level_51", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[50] || 0);
-        this.setCalculated("spell_description_51", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[50] || ""));
-        this.setCalculated("spell_verbal_51", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[50] || 0);
-        this.setCalculated("spell_somatic_51", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[50] || 0);
-        this.setCalculated("spell_material_51", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[50] || 0);
-        this.setCalculated("spell_ritual_51", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[50] || 0);
-        this.setCalculated("spell_concentration_51", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[50] || 0);
-        this.setCalculated("spell_range_51", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[50] || "");
-        this.setCalculated("spell_casting_51", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[50] || "");
-        this.setCalculated("spell_duration_51", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[50] || "");
-        this.setCalculated("spell_name_52", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[51] || "");
-        this.setCalculated("spell_school_52", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[51] || "");
-        this.setCalculated("spell_level_52", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[51] || 0);
-        this.setCalculated("spell_description_52", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[51] || ""));
-        this.setCalculated("spell_verbal_52", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[51] || 0);
-        this.setCalculated("spell_somatic_52", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[51] || 0);
-        this.setCalculated("spell_material_52", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[51] || 0);
-        this.setCalculated("spell_ritual_52", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[51] || 0);
-        this.setCalculated("spell_concentration_52", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[51] || 0);
-        this.setCalculated("spell_range_52", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[51] || "");
-        this.setCalculated("spell_casting_52", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[51] || "");
-        this.setCalculated("spell_duration_52", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[51] || "");
-        this.setCalculated("spell_name_53", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[52] || "");
-        this.setCalculated("spell_school_53", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[52] || "");
-        this.setCalculated("spell_level_53", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[52] || 0);
-        this.setCalculated("spell_description_53", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[52] || ""));
-        this.setCalculated("spell_verbal_53", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[52] || 0);
-        this.setCalculated("spell_somatic_53", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[52] || 0);
-        this.setCalculated("spell_material_53", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[52] || 0);
-        this.setCalculated("spell_ritual_53", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[52] || 0);
-        this.setCalculated("spell_concentration_53", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[52] || 0);
-        this.setCalculated("spell_range_53", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[52] || "");
-        this.setCalculated("spell_casting_53", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[52] || "");
-        this.setCalculated("spell_duration_53", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[52] || "");
-        this.setCalculated("spell_name_54", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[53] || "");
-        this.setCalculated("spell_school_54", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[53] || "");
-        this.setCalculated("spell_level_54", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[53] || 0);
-        this.setCalculated("spell_description_54", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[53] || ""));
-        this.setCalculated("spell_verbal_54", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[53] || 0);
-        this.setCalculated("spell_somatic_54", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[53] || 0);
-        this.setCalculated("spell_material_54", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[53] || 0);
-        this.setCalculated("spell_ritual_54", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[53] || 0);
-        this.setCalculated("spell_concentration_54", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[53] || 0);
-        this.setCalculated("spell_range_54", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[53] || "");
-        this.setCalculated("spell_casting_54", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[53] || "");
-        this.setCalculated("spell_duration_54", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[53] || "");
-        this.setCalculated("spell_name_55", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[54] || "");
-        this.setCalculated("spell_school_55", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[54] || "");
-        this.setCalculated("spell_level_55", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[54] || 0);
-        this.setCalculated("spell_description_55", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[54] || ""));
-        this.setCalculated("spell_verbal_55", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[54] || 0);
-        this.setCalculated("spell_somatic_55", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[54] || 0);
-        this.setCalculated("spell_material_55", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[54] || 0);
-        this.setCalculated("spell_ritual_55", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[54] || 0);
-        this.setCalculated("spell_concentration_55", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[54] || 0);
-        this.setCalculated("spell_range_55", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[54] || "");
-        this.setCalculated("spell_casting_55", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[54] || "");
-        this.setCalculated("spell_duration_55", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[54] || "");
-        this.setCalculated("spell_name_56", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[55] || "");
-        this.setCalculated("spell_school_56", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[55] || "");
-        this.setCalculated("spell_level_56", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[55] || 0);
-        this.setCalculated("spell_description_56", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[55] || ""));
-        this.setCalculated("spell_verbal_56", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[55] || 0);
-        this.setCalculated("spell_somatic_56", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[55] || 0);
-        this.setCalculated("spell_material_56", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[55] || 0);
-        this.setCalculated("spell_ritual_56", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[55] || 0);
-        this.setCalculated("spell_concentration_56", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[55] || 0);
-        this.setCalculated("spell_range_56", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[55] || "");
-        this.setCalculated("spell_casting_56", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[55] || "");
-        this.setCalculated("spell_duration_56", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[55] || "");
-        this.setCalculated("spell_name_57", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[56] || "");
-        this.setCalculated("spell_school_57", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[56] || "");
-        this.setCalculated("spell_level_57", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[56] || 0);
-        this.setCalculated("spell_description_57", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[56] || ""));
-        this.setCalculated("spell_verbal_57", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[56] || 0);
-        this.setCalculated("spell_somatic_57", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[56] || 0);
-        this.setCalculated("spell_material_57", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[56] || 0);
-        this.setCalculated("spell_ritual_57", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[56] || 0);
-        this.setCalculated("spell_concentration_57", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[56] || 0);
-        this.setCalculated("spell_range_57", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[56] || "");
-        this.setCalculated("spell_casting_57", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[56] || "");
-        this.setCalculated("spell_duration_57", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[56] || "");
-        this.setCalculated("spell_name_58", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[57] || "");
-        this.setCalculated("spell_school_58", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[57] || "");
-        this.setCalculated("spell_level_58", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[57] || 0);
-        this.setCalculated("spell_description_58", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[57] || ""));
-        this.setCalculated("spell_verbal_58", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[57] || 0);
-        this.setCalculated("spell_somatic_58", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[57] || 0);
-        this.setCalculated("spell_material_58", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[57] || 0);
-        this.setCalculated("spell_ritual_58", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[57] || 0);
-        this.setCalculated("spell_concentration_58", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[57] || 0);
-        this.setCalculated("spell_range_58", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[57] || "");
-        this.setCalculated("spell_casting_58", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[57] || "");
-        this.setCalculated("spell_duration_58", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[57] || "");
-        this.setCalculated("spell_name_59", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[58] || "");
-        this.setCalculated("spell_school_59", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[58] || "");
-        this.setCalculated("spell_level_59", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[58] || 0);
-        this.setCalculated("spell_description_59", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[58] || ""));
-        this.setCalculated("spell_verbal_59", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[58] || 0);
-        this.setCalculated("spell_somatic_59", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[58] || 0);
-        this.setCalculated("spell_material_59", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[58] || 0);
-        this.setCalculated("spell_ritual_59", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[58] || 0);
-        this.setCalculated("spell_concentration_59", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[58] || 0);
-        this.setCalculated("spell_range_59", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[58] || "");
-        this.setCalculated("spell_casting_59", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[58] || "");
-        this.setCalculated("spell_duration_59", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[58] || "");
-        this.setCalculated("spell_name_60", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[59] || "");
-        this.setCalculated("spell_school_60", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[59] || "");
-        this.setCalculated("spell_level_60", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[59] || 0);
-        this.setCalculated("spell_description_60", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[59] || ""));
-        this.setCalculated("spell_verbal_60", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[59] || 0);
-        this.setCalculated("spell_somatic_60", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[59] || 0);
-        this.setCalculated("spell_material_60", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[59] || 0);
-        this.setCalculated("spell_ritual_60", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[59] || 0);
-        this.setCalculated("spell_concentration_60", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[59] || 0);
-        this.setCalculated("spell_range_60", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[59] || "");
-        this.setCalculated("spell_casting_60", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[59] || "");
-        this.setCalculated("spell_duration_60", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[59] || "");
-        this.setCalculated("spell_name_61", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[60] || "");
-        this.setCalculated("spell_school_61", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[60] || "");
-        this.setCalculated("spell_level_61", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[60] || 0);
-        this.setCalculated("spell_description_61", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[60] || ""));
-        this.setCalculated("spell_verbal_61", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[60] || 0);
-        this.setCalculated("spell_somatic_61", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[60] || 0);
-        this.setCalculated("spell_material_61", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[60] || 0);
-        this.setCalculated("spell_ritual_61", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[60] || 0);
-        this.setCalculated("spell_concentration_61", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[60] || 0);
-        this.setCalculated("spell_range_61", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[60] || "");
-        this.setCalculated("spell_casting_61", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[60] || "");
-        this.setCalculated("spell_duration_61", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[60] || "");
-        this.setCalculated("spell_name_62", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[61] || "");
-        this.setCalculated("spell_school_62", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[61] || "");
-        this.setCalculated("spell_level_62", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[61] || 0);
-        this.setCalculated("spell_description_62", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[61] || ""));
-        this.setCalculated("spell_verbal_62", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[61] || 0);
-        this.setCalculated("spell_somatic_62", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[61] || 0);
-        this.setCalculated("spell_material_62", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[61] || 0);
-        this.setCalculated("spell_ritual_62", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[61] || 0);
-        this.setCalculated("spell_concentration_62", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[61] || 0);
-        this.setCalculated("spell_range_62", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[61] || "");
-        this.setCalculated("spell_casting_62", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[61] || "");
-        this.setCalculated("spell_duration_62", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[61] || "");
-        this.setCalculated("spell_name_63", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[62] || "");
-        this.setCalculated("spell_school_63", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[62] || "");
-        this.setCalculated("spell_level_63", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[62] || 0);
-        this.setCalculated("spell_description_63", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[62] || ""));
-        this.setCalculated("spell_verbal_63", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[62] || 0);
-        this.setCalculated("spell_somatic_63", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[62] || 0);
-        this.setCalculated("spell_material_63", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[62] || 0);
-        this.setCalculated("spell_ritual_63", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[62] || 0);
-        this.setCalculated("spell_concentration_63", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[62] || 0);
-        this.setCalculated("spell_range_63", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[62] || "");
-        this.setCalculated("spell_casting_63", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[62] || "");
-        this.setCalculated("spell_duration_63", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[62] || "");
-        this.setCalculated("spell_name_64", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[63] || "");
-        this.setCalculated("spell_school_64", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[63] || "");
-        this.setCalculated("spell_level_64", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[63] || 0);
-        this.setCalculated("spell_description_64", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[63] || ""));
-        this.setCalculated("spell_verbal_64", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[63] || 0);
-        this.setCalculated("spell_somatic_64", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[63] || 0);
-        this.setCalculated("spell_material_64", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[63] || 0);
-        this.setCalculated("spell_ritual_64", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[63] || 0);
-        this.setCalculated("spell_concentration_64", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[63] || 0);
-        this.setCalculated("spell_range_64", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[63] || "");
-        this.setCalculated("spell_casting_64", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[63] || "");
-        this.setCalculated("spell_duration_64", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[63] || "");
-        this.setCalculated("spell_name_65", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[64] || "");
-        this.setCalculated("spell_school_65", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[64] || "");
-        this.setCalculated("spell_level_65", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[64] || 0);
-        this.setCalculated("spell_description_65", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[64] || ""));
-        this.setCalculated("spell_verbal_65", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[64] || 0);
-        this.setCalculated("spell_somatic_65", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[64] || 0);
-        this.setCalculated("spell_material_65", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[64] || 0);
-        this.setCalculated("spell_ritual_65", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[64] || 0);
-        this.setCalculated("spell_concentration_65", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[64] || 0);
-        this.setCalculated("spell_range_65", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[64] || "");
-        this.setCalculated("spell_casting_65", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[64] || "");
-        this.setCalculated("spell_duration_65", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[64] || "");
-        this.setCalculated("spell_name_66", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[65] || "");
-        this.setCalculated("spell_school_66", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[65] || "");
-        this.setCalculated("spell_level_66", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[65] || 0);
-        this.setCalculated("spell_description_66", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[65] || ""));
-        this.setCalculated("spell_verbal_66", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[65] || 0);
-        this.setCalculated("spell_somatic_66", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[65] || 0);
-        this.setCalculated("spell_material_66", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[65] || 0);
-        this.setCalculated("spell_ritual_66", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[65] || 0);
-        this.setCalculated("spell_concentration_66", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[65] || 0);
-        this.setCalculated("spell_range_66", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[65] || "");
-        this.setCalculated("spell_casting_66", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[65] || "");
-        this.setCalculated("spell_duration_66", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[65] || "");
-        this.setCalculated("spell_name_67", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[66] || "");
-        this.setCalculated("spell_school_67", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[66] || "");
-        this.setCalculated("spell_level_67", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[66] || 0);
-        this.setCalculated("spell_description_67", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[66] || ""));
-        this.setCalculated("spell_verbal_67", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[66] || 0);
-        this.setCalculated("spell_somatic_67", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[66] || 0);
-        this.setCalculated("spell_material_67", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[66] || 0);
-        this.setCalculated("spell_ritual_67", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[66] || 0);
-        this.setCalculated("spell_concentration_67", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[66] || 0);
-        this.setCalculated("spell_range_67", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[66] || "");
-        this.setCalculated("spell_casting_67", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[66] || "");
-        this.setCalculated("spell_duration_67", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[66] || "");
-        this.setCalculated("spell_name_68", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[67] || "");
-        this.setCalculated("spell_school_68", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[67] || "");
-        this.setCalculated("spell_level_68", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[67] || 0);
-        this.setCalculated("spell_description_68", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[67] || ""));
-        this.setCalculated("spell_verbal_68", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[67] || 0);
-        this.setCalculated("spell_somatic_68", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[67] || 0);
-        this.setCalculated("spell_material_68", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[67] || 0);
-        this.setCalculated("spell_ritual_68", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[67] || 0);
-        this.setCalculated("spell_concentration_68", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[67] || 0);
-        this.setCalculated("spell_range_68", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[67] || "");
-        this.setCalculated("spell_casting_68", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[67] || "");
-        this.setCalculated("spell_duration_68", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[67] || "");
-        this.setCalculated("spell_name_69", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[68] || "");
-        this.setCalculated("spell_school_69", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[68] || "");
-        this.setCalculated("spell_level_69", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[68] || 0);
-        this.setCalculated("spell_description_69", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[68] || ""));
-        this.setCalculated("spell_verbal_69", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[68] || 0);
-        this.setCalculated("spell_somatic_69", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[68] || 0);
-        this.setCalculated("spell_material_69", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[68] || 0);
-        this.setCalculated("spell_ritual_69", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[68] || 0);
-        this.setCalculated("spell_concentration_69", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[68] || 0);
-        this.setCalculated("spell_range_69", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[68] || "");
-        this.setCalculated("spell_casting_69", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[68] || "");
-        this.setCalculated("spell_duration_69", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[68] || "");
-        this.setCalculated("spell_name_70", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[69] || "");
-        this.setCalculated("spell_school_70", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[69] || "");
-        this.setCalculated("spell_level_70", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[69] || 0);
-        this.setCalculated("spell_description_70", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[69] || ""));
-        this.setCalculated("spell_verbal_70", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[69] || 0);
-        this.setCalculated("spell_somatic_70", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[69] || 0);
-        this.setCalculated("spell_material_70", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[69] || 0);
-        this.setCalculated("spell_ritual_70", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[69] || 0);
-        this.setCalculated("spell_concentration_70", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[69] || 0);
-        this.setCalculated("spell_range_70", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[69] || "");
-        this.setCalculated("spell_casting_70", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[69] || "");
-        this.setCalculated("spell_duration_70", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[69] || "");
-        this.setCalculated("spell_name_71", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[70] || "");
-        this.setCalculated("spell_school_71", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[70] || "");
-        this.setCalculated("spell_level_71", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[70] || 0);
-        this.setCalculated("spell_description_71", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[70] || ""));
-        this.setCalculated("spell_verbal_71", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[70] || 0);
-        this.setCalculated("spell_somatic_71", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[70] || 0);
-        this.setCalculated("spell_material_71", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[70] || 0);
-        this.setCalculated("spell_ritual_71", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[70] || 0);
-        this.setCalculated("spell_concentration_71", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[70] || 0);
-        this.setCalculated("spell_range_71", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[70] || "");
-        this.setCalculated("spell_casting_71", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[70] || "");
-        this.setCalculated("spell_duration_71", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[70] || "");
-        this.setCalculated("spell_name_72", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[71] || "");
-        this.setCalculated("spell_school_72", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[71] || "");
-        this.setCalculated("spell_level_72", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[71] || 0);
-        this.setCalculated("spell_description_72", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[71] || ""));
-        this.setCalculated("spell_verbal_72", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[71] || 0);
-        this.setCalculated("spell_somatic_72", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[71] || 0);
-        this.setCalculated("spell_material_72", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[71] || 0);
-        this.setCalculated("spell_ritual_72", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[71] || 0);
-        this.setCalculated("spell_concentration_72", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[71] || 0);
-        this.setCalculated("spell_range_72", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[71] || "");
-        this.setCalculated("spell_casting_72", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[71] || "");
-        this.setCalculated("spell_duration_72", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[71] || "");
-        this.setCalculated("spell_name_73", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[72] || "");
-        this.setCalculated("spell_school_73", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[72] || "");
-        this.setCalculated("spell_level_73", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[72] || 0);
-        this.setCalculated("spell_description_73", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[72] || ""));
-        this.setCalculated("spell_verbal_73", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[72] || 0);
-        this.setCalculated("spell_somatic_73", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[72] || 0);
-        this.setCalculated("spell_material_73", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[72] || 0);
-        this.setCalculated("spell_ritual_73", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[72] || 0);
-        this.setCalculated("spell_concentration_73", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[72] || 0);
-        this.setCalculated("spell_range_73", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[72] || "");
-        this.setCalculated("spell_casting_73", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[72] || "");
-        this.setCalculated("spell_duration_73", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[72] || "");
-        this.setCalculated("spell_name_74", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[73] || "");
-        this.setCalculated("spell_school_74", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[73] || "");
-        this.setCalculated("spell_level_74", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[73] || 0);
-        this.setCalculated("spell_description_74", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[73] || ""));
-        this.setCalculated("spell_verbal_74", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[73] || 0);
-        this.setCalculated("spell_somatic_74", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[73] || 0);
-        this.setCalculated("spell_material_74", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[73] || 0);
-        this.setCalculated("spell_ritual_74", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[73] || 0);
-        this.setCalculated("spell_concentration_74", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[73] || 0);
-        this.setCalculated("spell_range_74", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[73] || "");
-        this.setCalculated("spell_casting_74", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[73] || "");
-        this.setCalculated("spell_duration_74", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[73] || "");
-        this.setCalculated("spell_name_75", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[74] || "");
-        this.setCalculated("spell_school_75", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[74] || "");
-        this.setCalculated("spell_level_75", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[74] || 0);
-        this.setCalculated("spell_description_75", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[74] || ""));
-        this.setCalculated("spell_verbal_75", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[74] || 0);
-        this.setCalculated("spell_somatic_75", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[74] || 0);
-        this.setCalculated("spell_material_75", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[74] || 0);
-        this.setCalculated("spell_ritual_75", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[74] || 0);
-        this.setCalculated("spell_concentration_75", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[74] || 0);
-        this.setCalculated("spell_range_75", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[74] || "");
-        this.setCalculated("spell_casting_75", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[74] || "");
-        this.setCalculated("spell_duration_75", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[74] || "");
-        this.setCalculated("spell_name_76", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[75] || "");
-        this.setCalculated("spell_school_76", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[75] || "");
-        this.setCalculated("spell_level_76", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[75] || 0);
-        this.setCalculated("spell_description_76", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[75] || ""));
-        this.setCalculated("spell_verbal_76", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[75] || 0);
-        this.setCalculated("spell_somatic_76", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[75] || 0);
-        this.setCalculated("spell_material_76", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[75] || 0);
-        this.setCalculated("spell_ritual_76", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[75] || 0);
-        this.setCalculated("spell_concentration_76", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[75] || 0);
-        this.setCalculated("spell_range_76", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[75] || "");
-        this.setCalculated("spell_casting_76", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[75] || "");
-        this.setCalculated("spell_duration_76", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[75] || "");
-        this.setCalculated("spell_name_77", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[76] || "");
-        this.setCalculated("spell_school_77", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[76] || "");
-        this.setCalculated("spell_level_77", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[76] || 0);
-        this.setCalculated("spell_description_77", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[76] || ""));
-        this.setCalculated("spell_verbal_77", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[76] || 0);
-        this.setCalculated("spell_somatic_77", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[76] || 0);
-        this.setCalculated("spell_material_77", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[76] || 0);
-        this.setCalculated("spell_ritual_77", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[76] || 0);
-        this.setCalculated("spell_concentration_77", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[76] || 0);
-        this.setCalculated("spell_range_77", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[76] || "");
-        this.setCalculated("spell_casting_77", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[76] || "");
-        this.setCalculated("spell_duration_77", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[76] || "");
-        this.setCalculated("spell_name_78", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[77] || "");
-        this.setCalculated("spell_school_78", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[77] || "");
-        this.setCalculated("spell_level_78", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[77] || 0);
-        this.setCalculated("spell_description_78", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[77] || ""));
-        this.setCalculated("spell_verbal_78", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[77] || 0);
-        this.setCalculated("spell_somatic_78", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[77] || 0);
-        this.setCalculated("spell_material_78", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[77] || 0);
-        this.setCalculated("spell_ritual_78", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[77] || 0);
-        this.setCalculated("spell_concentration_78", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[77] || 0);
-        this.setCalculated("spell_range_78", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[77] || "");
-        this.setCalculated("spell_casting_78", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[77] || "");
-        this.setCalculated("spell_duration_78", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[77] || "");
-        this.setCalculated("spell_name_79", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[78] || "");
-        this.setCalculated("spell_school_79", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[78] || "");
-        this.setCalculated("spell_level_79", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[78] || 0);
-        this.setCalculated("spell_description_79", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[78] || ""));
-        this.setCalculated("spell_verbal_79", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[78] || 0);
-        this.setCalculated("spell_somatic_79", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[78] || 0);
-        this.setCalculated("spell_material_79", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[78] || 0);
-        this.setCalculated("spell_ritual_79", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[78] || 0);
-        this.setCalculated("spell_concentration_79", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[78] || 0);
-        this.setCalculated("spell_range_79", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[78] || "");
-        this.setCalculated("spell_casting_79", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[78] || "");
-        this.setCalculated("spell_duration_79", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[78] || "");
-        this.setCalculated("spell_name_80", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.name + ((typeof x.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(x.flags['items-with-spells-5e']['parent-item']).name + ']' : ''))[79] || "");
-        this.setCalculated("spell_school_80", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.school)[79] || "");
-        this.setCalculated("spell_level_80", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.level)[79] || 0);
-        this.setCalculated("spell_description_80", (function (h) {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.description.value)[79] || ""));
-        this.setCalculated("spell_verbal_80", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.vocal)[79] || 0);
-        this.setCalculated("spell_somatic_80", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.somatic)[79] || 0);
-        this.setCalculated("spell_material_80", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.material)[79] || 0);
-        this.setCalculated("spell_ritual_80", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.ritual)[79] || 0);
-        this.setCalculated("spell_concentration_80", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.components.concentration)[79] || 0);
-        this.setCalculated("spell_range_80", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.range.value + " " + x.system.range.units)[79] || "");
-        this.setCalculated("spell_casting_80", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.activation.cost + " " + x.system.activation.type)[79] || "");
-        this.setCalculated("spell_duration_80", this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(x => x.system.duration.value + " " + x.system.duration.units)[79] || "");
-
+*/
+        this.mapCompleteSpells();
+        this.mapEquipment();
     }
 
+
+    mapCompleteSpells() {
+        let orderedSpells = this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) })
+        console.log(orderedSpells);
+        this.logDebug(orderedSpells);
+        const maxSpells = orderedSpells.length < 80 ? orderedSpells.length : 80;
+        for (let index = 0; index < maxSpells; index++) {
+            const theSpell = orderedSpells[index];
+            const spellIndex = (index + 1).toLocaleString('en-US', { minimumIntegerDigits: 2, useGrouping: false });
+            console.log(spellIndex);
+            console.log(theSpell.name + ((typeof theSpell.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(theSpell.flags['items-with-spells-5e']['parent-item']).name + ']' : ''));
+            this.setCalculated(`spell_name_${spellIndex}`, theSpell.name + ((typeof theSpell.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(theSpell.flags['items-with-spells-5e']['parent-item']).name + ']' : '') || "");
+            this.setCalculated(`spell_school_${spellIndex}`, theSpell.system.school || "");
+            this.setCalculated(`spell_level_${spellIndex}`, theSpell.system.level || 0);
+            this.setCalculated(`spell_description_${spellIndex}`, (function (h) {
+                const d = document.createElement("div");
+                d.innerHTML = h;
+                return d.textContent || d.innerText || "";
+            })(theSpell.system.description.value || ""));
+            this.setCalculated(`spell_verbal_${spellIndex}`, theSpell.system.components.vocal || 0);
+            this.setCalculated(`spell_somatic_${spellIndex}`, theSpell.system.components.somatic || 0);
+            this.setCalculated(`spell_material_${spellIndex}`, theSpell.system.components.material || 0);
+            this.setCalculated(`spell_ritual_${spellIndex}`, theSpell.system.components.ritual || 0);
+            this.setCalculated(`spell_concentration_${spellIndex}`, theSpell.system.components.concentration || 0);
+            this.setCalculated(`spell_range_${spellIndex}`, theSpell.system.range.value + " " + theSpell.system.range.units || "");
+            this.setCalculated(`spell_casting_${spellIndex}`, theSpell.system.activation.cost + " " + theSpell.system.activation.type || "");
+            this.setCalculated(`spell_duration_${spellIndex}`, theSpell.system.duration.value + " " + theSpell.system.duration.units || "");
+        }
+    }
+
+    mapEquipment(){
+        this.setGlobalValue("equipment_extended",this.actor.items.filter(i => ['weapon', 'equipment', 'tool', 'consumable', 'loot'].includes(i.type)).slice(0, 7).map(i => `${i.name} (${i.system.quantity}): \n${((h) => {
+            const d = document.createElement("div");
+            d.innerHTML = h;
+            return d.textContent || d.innerText || "";
+        })(i.system.description.value)}\n`).join("\n"));
+
+        this.setCalculated("equipment_extended1", this.getGlobalValue("equipment_extended",0,2000));
+        this.setCalculated("equipment_extended2", this.getGlobalValue("equipment_extended",2000,4000));
+        this.setCalculated("equipment_extended3", this.getGlobalValue("equipment_extended",4000,6000));
+        this.setCalculated("equipment_extended4", this.getGlobalValue("equipment_extended",6000,8000));
+        
+    }
+
+    getPrimaryClassObj() {
+        const allClasses = this.actor.items.filter(i => i.type === 'class').map(i => i);
+        if (allClasses.length > 1) {
+            const primary = allClasses.filter(i => i.flags?.srd5e?.isPrimaryClass);
+            if (primary.length >= 1) {
+                return primary[0];
+            }
+        }
+        return allClasses[0];
+    }
+
+    getLocalizedClassAndSubclass(classItem) {
+        const sc = classItem.system.subclass;
+        return sc ? game.i18n.localize(classItem.name) + "/" + game.i18n.localize(sc) : game.i18n.localize(classItem.name);
+    }
+
+    getLocalizedClassAndSubclassAndLevel(classItem) {
+        return `${this.getLocalizedClassAndSubclass(classItem)} ${classItem.system.levels}`;
+    }
+
+    getFeatsAndTraits() {
+        let featsAndTraits = '';
+        this.actor.items.filter(i => ['feat', 'trait'].includes(i.type)).map(i => i).forEach(i => {
+            featsAndTraits += ("### " + i.name);
+            if (i.system?.source?.label) {
+                featsAndTraits += (" (" + i.system.source?.label + ")");
+            }
+            featsAndTraits += " ###\n";
+            if (i.system?.description?.value) {
+                featsAndTraits += this.htmlToText(i.system.description.value);
+                featsAndTraits += "\n";
+            }
+        });
+        return featsAndTraits;
+    }
+
+    localizedItemName(item) {
+        console.log(item);
+        return item ? game.i18n.localize(item?.name) : '';
+    }
+
+    traitsLangs() {
+        let s = "";
+        let a = this.actor.system.traits.weaponProf.value.map(x => game.dnd5e.config.weaponProficiencies[x]
+            || game.packs.get("dnd5e.items").index.get(game.dnd5e.config.weaponIds[x])?.name).first();
+        let b = this.actor.system.traits.weaponProf.custom.split(";").filter(x => String(x) && x?.length);
+
+        if (a?.length > 0) { s = `${s}Weapons: ${a} ${b.join(', ')}\n`; }
+        a = this.actor.system.traits.armorProf.value.map(x => game.dnd5e.config.armorProficiencies[x]
+            || game.packs.get("dnd5e.items").index.get(game.dnd5e.config.armorIds[x])?.name).first();
+        b = this.actor.system.traits.armorProf.custom.split(";").filter(x => String(x) && x?.length);
+        if (a?.length > 0) { s = `${s}Armor: ${a} ${b.join(', ')}\n`; }
+        a = Object.keys(this.actor.system.tools).map(x => game.dnd5e.config.toolProficiencies[x]
+            || game.packs.get("dnd5e.items").index.get(game.dnd5e.config.toolIds[x])?.name).join(",");
+        console.log(a);
+        if (a?.length > 0) { s = `${s}Tools: ${a} \n`; }
+        let traitLang = Array.from(this.actor.system.traits.languages.value);
+        let confLang = Object.keys(flattenObject(game.dnd5e.config.languages))
+        let actorLang = [];
+        confLang.forEach(function myfunc(element) {
+            //       console.log(this);
+            if (traitLang.some(function (v) { return element.indexOf(v) >= 0; })) {
+                console.log(this);
+                console.log(element);
+                console.log(this.getValueByDottedKeys(game.dnd5e.config.languages, element));
+                actorLang.push(game.i18n.localize(this.getValueByDottedKeys(game.dnd5e.config.languages, element)));
+            }
+        }, this);
+        console.log(actorLang);
+        console.log(Array.from(this.actor.system.traits.languages.value));
+
+        console.log(game.dnd5e.config.languages);
+        console.log(Object.keys(flattenObject(game.dnd5e.config.languages)));
+
+        //            a = Array.from(actor.system.traits.languages.value).map(x => game.dnd5e.config.languages[x]).join(",");
+        a = actorLang.join(",");
+        b = this.actor.system.traits.languages.custom.split(";").filter(x => String(x) && x?.length);
+        if (a?.length > 0) { s = `${s}Languages: ${a} ${b.join(', ')}\n`; }
+        return s;
+    }
 
 }
 
