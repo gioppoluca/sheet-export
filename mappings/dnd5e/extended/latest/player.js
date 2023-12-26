@@ -16,7 +16,7 @@ class MappingClass extends baseMapping {
 
     // override createMappings method from base class
     createMappings() {
-
+        this.systemName = "dnd5e";
         // Set the PDF files to use - MIND that the order of the files is important!
         this.pdfFiles.push({
             pdfUrl: '/modules/sheet-export/mappings/dnd5e/Extended character sheet 5e.pdf',
@@ -25,7 +25,7 @@ class MappingClass extends baseMapping {
         });
 
         // Set Player image
-        this.setImage(this.actor.img, 2, 40, 500, 120, 200);
+        this.setImage(this.actor.img, 1, 60, 460, 100, 100);
 
         //        this.setCalculated("ClassLevel", this.actor.items.filter(i => i.type === 'class').map(i => `${i.name} ${i.system.levels}`).join(' / '));
         this.setCalculated("ClassLevel", this.getLocalizedClassAndSubclassAndLevel(this.getPrimaryClassObj()));
@@ -105,7 +105,6 @@ class MappingClass extends baseMapping {
         this.setCalculated("Wpn1 AtkBonus", (function (actor) {
             const theWeapon = actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[0];
             theWeapon?.prepareFinalAttributes();
-            console.log(theWeapon?.labels?.toHit?.replace(/^\+ $/, "0") || "");
             return theWeapon?.labels?.toHit?.replace(/^\+ $/, "0") || ""
         })(this.actor)
         );
@@ -191,15 +190,8 @@ class MappingClass extends baseMapping {
         this.setCalculated("EP", this.actor.system.currency.ep || "");
         this.setCalculated("GP", this.actor.system.currency.gp || "");
         this.setCalculated("PP", this.actor.system.currency.pp || "");
-        /*
+        
         this.setCalculated("Equipment", this.actor.items.filter(i => ['weapon', 'equipment', 'tool'].includes(i.type)).map(i => (i.system.quantity <= 1) ? i.name : `${i.name} (${i.system.quantity})`).join(', '));
-        this.setCalculated("Features and Traits", this.actor.items.filter(i => ["feat", "trait"].includes(i.type)).slice(0, 16).map(i => `${i.name} - ${i.system.source}: \n${((h) => {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(i.system.description.value.substring(0, 299))}${(i.system.description.value.length > 300) ? '...' : ''}\n`).join("\n")
-        );
-        */
         this.setCalculated("Features and Traits", this.getFeatsAndTraits());
         this.setCalculated("CharacterName 2", this.actor.name || "");
         this.setCalculated("Age", this.actor.flags["tidy5e-sheet"]?.age || "");
@@ -433,28 +425,6 @@ class MappingClass extends baseMapping {
         this.setCalculated("Check Box 3081", this.actor.items.filter(i => i.type === 'spell' && i.system.level === 9)[4]?.system.preparation.prepared || "");
         this.setCalculated("Check Box 3082", this.actor.items.filter(i => i.type === 'spell' && i.system.level === 9)[5]?.system.preparation.prepared || "");
         this.setCalculated("Check Box 3083", this.actor.items.filter(i => i.type === 'spell' && i.system.level === 9)[6]?.system.preparation.prepared || "");
-        /*
-        this.setCalculated("equipment_extended1", this.actor.items.filter(i => ['weapon', 'equipment', 'tool', 'consumable', 'loot'].includes(i.type)).slice(0, 7).map(i => `${i.name} (${i.system.quantity}): \n${((h) => {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(i.system.description.value.substring(0, 1499))}${(i.system.description.value.length > 1500) ? '...' : ''}\n`).join("\n"));
-        this.setCalculated("equipment_extended2", this.actor.items.filter(i => ['weapon', 'equipment', 'tool', 'consumable', 'loot'].includes(i.type)).slice(8, 16).map(i => `${i.name} (${i.system.quantity}): \n${((h) => {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(i.system.description.value.substring(0, 1499))}${(i.system.description.value.length > 1500) ? '...' : ''}\n`).join("\n"));
-        this.setCalculated("equipment_extended3", this.actor.items.filter(i => ['weapon', 'equipment', 'tool', 'consumable', 'loot'].includes(i.type)).slice(17, 24).map(i => `${i.name} (${i.system.quantity}): \n${((h) => {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(i.system.description.value.substring(0, 1499))}${(i.system.description.value.length > 1500) ? '...' : ''}\n`).join("\n"));
-        this.setCalculated("equipment_extended4", this.actor.items.filter(i => ['weapon', 'equipment', 'tool', 'consumable', 'loot'].includes(i.type)).slice(25, 32).map(i => `${i.name} (${i.system.quantity}): \n${((h) => {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(i.system.description.value.substring(0, 1499))}${(i.system.description.value.length > 1500) ? '...' : ''}\n`).join("\n"));
-*/
         this.mapCompleteSpells();
         this.mapEquipment();
     }
@@ -462,14 +432,10 @@ class MappingClass extends baseMapping {
 
     mapCompleteSpells() {
         let orderedSpells = this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) })
-        console.log(orderedSpells);
-        this.logDebug(orderedSpells);
         const maxSpells = orderedSpells.length < 80 ? orderedSpells.length : 80;
         for (let index = 0; index < maxSpells; index++) {
             const theSpell = orderedSpells[index];
             const spellIndex = (index + 1).toLocaleString('en-US', { minimumIntegerDigits: 2, useGrouping: false });
-            console.log(spellIndex);
-            console.log(theSpell.name + ((typeof theSpell.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(theSpell.flags['items-with-spells-5e']['parent-item']).name + ']' : ''));
             this.setCalculated(`spell_name_${spellIndex}`, theSpell.name + ((typeof theSpell.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(theSpell.flags['items-with-spells-5e']['parent-item']).name + ']' : '') || "");
             this.setCalculated(`spell_school_${spellIndex}`, theSpell.system.school || "");
             this.setCalculated(`spell_level_${spellIndex}`, theSpell.system.level || 0);
@@ -490,16 +456,16 @@ class MappingClass extends baseMapping {
     }
 
     mapEquipment(){
-        this.setGlobalValue("equipment_extended",this.actor.items.filter(i => ['weapon', 'equipment', 'tool', 'consumable', 'loot'].includes(i.type)).slice(0, 7).map(i => `${i.name} (${i.system.quantity}): \n${((h) => {
+        this.setGlobalValue("equipment_extended",this.actor.items.filter(i => ['weapon', 'equipment', 'tool', 'consumable', 'loot','backpack'].includes(i.type)).map(i => `${i.name} (${i.system.quantity}): \n${((h) => {
             const d = document.createElement("div");
             d.innerHTML = h;
             return d.textContent || d.innerText || "";
         })(i.system.description.value)}\n`).join("\n"));
 
-        this.setCalculated("equipment_extended1", this.getGlobalValue("equipment_extended",0,2000));
-        this.setCalculated("equipment_extended2", this.getGlobalValue("equipment_extended",2000,4000));
-        this.setCalculated("equipment_extended3", this.getGlobalValue("equipment_extended",4000,6000));
-        this.setCalculated("equipment_extended4", this.getGlobalValue("equipment_extended",6000,8000));
+        this.setCalculated("equipment_extended1", this.getGlobalValue("equipment_extended",0,2500));
+        this.setCalculated("equipment_extended2", this.getGlobalValue("equipment_extended",2500,5000));
+        this.setCalculated("equipment_extended3", this.getGlobalValue("equipment_extended",5000,7500));
+        this.setCalculated("equipment_extended4", this.getGlobalValue("equipment_extended",7500,10000));
         
     }
 
@@ -540,7 +506,6 @@ class MappingClass extends baseMapping {
     }
 
     localizedItemName(item) {
-        console.log(item);
         return item ? game.i18n.localize(item?.name) : '';
     }
 
@@ -557,7 +522,6 @@ class MappingClass extends baseMapping {
         if (a?.length > 0) { s = `${s}Armor: ${a} ${b.join(', ')}\n`; }
         a = Object.keys(this.actor.system.tools).map(x => game.dnd5e.config.toolProficiencies[x]
             || game.packs.get("dnd5e.items").index.get(game.dnd5e.config.toolIds[x])?.name).join(",");
-        console.log(a);
         if (a?.length > 0) { s = `${s}Tools: ${a} \n`; }
         let traitLang = Array.from(this.actor.system.traits.languages.value);
         let confLang = Object.keys(flattenObject(game.dnd5e.config.languages))
@@ -565,17 +529,9 @@ class MappingClass extends baseMapping {
         confLang.forEach(function myfunc(element) {
             //       console.log(this);
             if (traitLang.some(function (v) { return element.indexOf(v) >= 0; })) {
-                console.log(this);
-                console.log(element);
-                console.log(this.getValueByDottedKeys(game.dnd5e.config.languages, element));
                 actorLang.push(game.i18n.localize(this.getValueByDottedKeys(game.dnd5e.config.languages, element)));
             }
         }, this);
-        console.log(actorLang);
-        console.log(Array.from(this.actor.system.traits.languages.value));
-
-        console.log(game.dnd5e.config.languages);
-        console.log(Object.keys(flattenObject(game.dnd5e.config.languages)));
 
         //            a = Array.from(actor.system.traits.languages.value).map(x => game.dnd5e.config.languages[x]).join(",");
         a = actorLang.join(",");
