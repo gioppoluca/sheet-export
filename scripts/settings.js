@@ -72,6 +72,7 @@ export const registerSettings = function () {
 		type: MappingEdit,
 	});
 
+	/*
 	game.settings.registerMenu(modulename, 'setCustomMapping', {
 		name: game.i18n.localize(`${modulename}.settings.setCustomMapping.Name`),
 		label: game.i18n.localize(`${modulename}.settings.setCustomMapping.Name`),
@@ -80,7 +81,7 @@ export const registerSettings = function () {
 		restricted: true,
 		type: CustomMapping,
 	});
-
+*/
 }
 /*
 import { ResetPosition } from "./apps/resetposition.js";

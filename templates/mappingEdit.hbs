@@ -3,14 +3,8 @@
     <header id="sheet-export-mappingedit-header">
         <label for="sheet-export-mappingedit-upload" class="sheet-export-btn">{{ localize 'sheet-export.mappingEdit.upload' }}</label>
         <input id="sheet-export-mappingedit-upload" type="file" name="generate" accept="application/pdf" style="visibility:hidden;" />
-        <button id="sheet-export-mappingedit-pc" type="button" name="PC" {{#if disabledPc}}disabled="true"{{/if}}>{{ localize 'sheet-export.mappingEdit.PC' }}</button>
-        <button id="sheet-export-mappingedit-npc" type="button" {{#if disabledNpc}}disabled="true"{{/if}}>{{ localize 'sheet-export.mappingEdit.NPC' }}</button>
     </header>
 
     <ul id="fieldList"></ul>
-
-    <button id="sheet-export-mappingedit-save" name="save">
-        <i class="fas fa-floppy-disk"></i>
-    </button>
 
 </form>

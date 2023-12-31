@@ -136,7 +136,7 @@ class MappingClass extends baseMapping {
         this.pdfFiles.push({
             pdfUrl: '/modules/sheet-export/mappings/${game.system.id}/YOUR_PDF_FILENAME.pdf',
             nameDownload: \`\${this.actor.name ?? "character"}.pdf\`,
-            name: "pf2e-remastered.pdf",
+            name: "YOUR_PDF_FILENAME.pdf",
         });
 
 ${all_mapping}
@@ -145,7 +145,7 @@ ${all_mapping}
 }
 `
         console.log(new_mapping);
-        const blob = new Blob([new_mapping], { type: "text/plain;charset=utf-8" });
+        const blob = new Blob([new_mapping], { type: "text/javascript;charset=utf-8" });
         saveAs(blob, "new_mapping.js");
     }
 

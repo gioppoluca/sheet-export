@@ -17,15 +17,15 @@ export class CustomMapping extends FormApplication {
     }
     activateListeners(html) {
         super.activateListeners(html);
-        document.getElementById("sheet-export-customMapping-upload-player-json").addEventListener("change", event => {
+        document.getElementById("sheet-export-customMapping-upload-player-js").addEventListener("change", event => {
             const file = event.target.files[0];
             console.log(file);
-            if (file.type != "application/json") {
-                ui.notifications.error("Please upload a JSON file");
+            if ((file.type != "text/javascript") && (file.type != "application/x-javascript")) {
+                ui.notifications.error("Please upload a JS file");
                 return;
             }
-            var blob = file.slice(0, file.size, file.type);
-            var newFile = new File([blob], 'player.json', { type: file.type });
+            var blob = file.slice(0, file.size, "text/javascript");
+            var newFile = new File([blob], 'player.js', { type: "text/javascript" });
             this.saveFile(newFile);
         });
 
@@ -39,15 +39,15 @@ export class CustomMapping extends FormApplication {
             this.saveFile(file);
         });
 
-        document.getElementById("sheet-export-customMapping-upload-npc-json").addEventListener("change", event => {
+        document.getElementById("sheet-export-customMapping-upload-npc-js").addEventListener("change", event => {
             const file = event.target.files[0];
             console.log(file);
-            if (file.type != "application/json") {
-                ui.notifications.error("Please upload a JSON file");
+            if ((file.type != "text/javascript") && (file.type != "application/x-javascript")) {
+                ui.notifications.error("Please upload a JS file");
                 return;
             }
             var blob = file.slice(0, file.size, file.type);
-            var newFile = new File([blob], 'npc.json', { type: file.type });
+            var newFile = new File([blob], 'npc.js', { type: file.type });
             this.saveFile(newFile);
         });
 
@@ -71,13 +71,13 @@ export class CustomMapping extends FormApplication {
         }
     */
     async saveFile(file) {
-        console.log("saveJsonBuffer");
+        console.log("saveJsBuffer");
         console.log(file);
         let response = await FilePicker.upload("data", `modules/sheet-export/mappings/${game.system.id}/custom/latest`, file, {});
         console.log(response);
         const reader = new FileReader();
-        reader.onload = ev => this.onFileUpload(ev.target.result);
-        reader.readAsArrayBuffer(file);
+//        reader.onload = ev => this.onFileUpload(ev.target.result);
+//        reader.readAsArrayBuffer(file);
     }
 
     async onFileUpload(buffer) {
