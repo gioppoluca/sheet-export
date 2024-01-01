@@ -1,9 +1,7 @@
 import { PDFDocument, PDFRawStream, PDFName, StandardFonts, getDefaultFontSize } from './lib/pdf-lib.esm.js';
 import fontkit from './lib/fontkit.es.js';
 import { registerSettings } from "./settings.js";
-import { getMapping, getPdf, getSheetType } from "./sheet-export-api.js";
-import { SheetExportContentManager } from "./sheet-export-content-manager.js";
-import fetchInject from "./lib/fetch-inject.min.js";
+import { getPdf, getSheetType } from "./sheet-export-api.js";
 
 //global saveAs;
 
@@ -151,8 +149,6 @@ class SheetExportconfig extends FormApplication {
 		this.createForm(this.currentBuffer);
 	}
 
-	//	getMapping = getMapping;
-	//	getPdf = getPdf;
 
 	async embedImages(pdf, images) {
 		for (let i = 0; i < images.length; i++) {
@@ -219,18 +215,13 @@ class SheetExportconfig extends FormApplication {
 		const inputForm = document.getElementById("fieldList");
 
 		// get the mapping version and release for the game system set in the config
-		//	let mappingVersion = game.settings.get(SheetExportconfig.ID, "mapping-version");
-		//	let mappingRelease = game.settings.get(SheetExportconfig.ID, "mapping-release");
 		console.log(this.sheetType);
 
 		// get the mapping for the game system and the version set in the config
-		//		const mapping = await this.getMapping(mappingVersion, mappingRelease, this.sheetType);
 		const { default: MappingClass } = await import(getRoute(`/modules/sheet-export/mappings/${game.system.id}/${this.mappingVersion}/${this.mappingRelease}/${this.sheetType}.js`));
 		console.log(mappingClass);
 		var mappingClass = new MappingClass(this.actor, this.sheetType, this.sheet);
 		console.log(mappingClass);
-		//	console.log(mc.getMapping("name"));
-		//		console.log(mc.getMapping("test1"));
 
 
 		for (let pfdFileIndex = 0; pfdFileIndex < mappingClass.pdfFiles.length; pfdFileIndex++) {
@@ -401,57 +392,9 @@ class SheetExportconfig extends FormApplication {
 		console.log("-----************.............-------");
 
 
-		/**
-		 * Fetches the system-specific functions for the current system and initializes 
-		 * a SystemFunctions instance with the actor, the sheet type and the sheet.
-		 * 
-		 * Uses fetchInject to asynchronously load the system-specific functions file.
-		 * Returns the SystemFunctions instance.
-		 */
-		/*
-		functionSet.system = await fetchInject([
-			getRoute(`/modules/sheet-export/mappings/${game.system.id}/${mappingVersion}/${mappingRelease}/system-functions.js`)
-		]).then(() => {
-			console.log("fetched system functions");
-			return new SystemFunctions(actor, this.sheetType, this.sheet);
-		})
-		console.log(functionSet);
-*/
 		// get the replacement string for the @
 		//	const atReplacementString = functionSet.system.getAtReplacement(game.release.generation);
 
-		/**
-		 * Calls the system-specific preMapping function on the fields from the mapping
-		 * to allow the system to modify/preprocess the fields before rendering.
-		 * 
-		 * This allows each system to handle any system-specific logic for the field
-		 * mappings. For example, a system may want to set default values for certain
-		 * fields based on the actor data.
-		 */
-		//	mapping.fields = functionSet.system.preMapping(mapping.fields);
-
-		/**
-		 * Loads any helper functions defined in the mapping into the functionSet 
-		 * object. This allows reusable helper functions to be defined once in the 
-		 * mapping and used throughout the template.
-		 * 
-		 * Loops through each key/value pair in the helperFunctions mapping property, 
-		 * logs the key and value, evaluates the function definition string using 
-		 * eval(), and assigns the resulting function to the functionSet object under 
-		 * the given key.
-		 * 
-		 * This provides a way to dynamically load functions into the runtime from 
-		 * the mapping definition.
-		*/
-		/*
-		let helperFunctions = mapping.helperFunctions;
-		if (helperFunctions) {
-			for (const [key, value] of Object.entries(helperFunctions)) {
-				console.log(`${key}: ${value}`);
-				functionSet[key] = eval("(" + value + ")");;
-			}
-		}
-		*/
 		/*
 		console.log(functionSet);
 
