@@ -161,7 +161,7 @@ jobs:
         uses: Varriount/fvtt-autopublish@v2.0.1
         with:
           username: ${{ secrets.FOUNDRY_ADMIN_USER }}
-          password: ${{ secrets.FOUNDRY_ADMIN_PW }}
+          password-source: ${{ secrets.FOUNDRY_ADMIN_PW }}
           module-id: ${{ secrets.FOUNDRY_ADMIN_ID }}
           manifest-url: https://github.com/${{ github.repository }}/releases/download/${{ github.event.release.tag_name }}/module.json
           manifest-file: ./module.json
