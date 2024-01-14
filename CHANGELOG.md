@@ -1,4 +1,9 @@
 
+## [0.0.13] - 2024-01-14
+### :bug: Bug Fixes
+- [`7e3fea9`](https://github.com/gioppoluca/sheet-export/commit/7e3fea95c8c124dccd3c5e799bc46fa216c43839) - ci testing *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+
 ## [0.0.11] - 2024-01-14
 ### :sparkles: New Features
 - [`03b8a78`](https://github.com/gioppoluca/sheet-export/commit/03b8a780895cdda06e4a6c8ca371c657c46b9875) - added global values to get chunk in values *(commit by [@gioppoluca](https://github.com/gioppoluca))*
@@ -107,3 +112,4 @@
 [0.0.9]: https://github.com/gioppoluca/sheet-export/compare/0.0.8...0.0.9
 [0.0.10]: https://github.com/gioppoluca/sheet-export/compare/0.0.9...0.0.10
 [0.0.11]: https://github.com/gioppoluca/sheet-export/compare/0.0.10...0.0.11
+[0.0.13]: https://github.com/gioppoluca/sheet-export/compare/0.0.12...0.0.13
