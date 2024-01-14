@@ -1,4 +1,17 @@
 
+## [0.0.11] - 2024-01-14
+### :sparkles: New Features
+- [`03b8a78`](https://github.com/gioppoluca/sheet-export/commit/03b8a780895cdda06e4a6c8ca371c657c46b9875) - added global values to get chunk in values *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+- [`2725dc8`](https://github.com/gioppoluca/sheet-export/commit/2725dc84a925f3fcb88fd9b5c6be4a1378c227fd) - properly manage languages and cleaned up *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+- [`65192df`](https://github.com/gioppoluca/sheet-export/commit/65192dffae68ffad231dcea70d7f72bdd7239f1f) - do not add button if no mapping for the sheet exists *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+- [`ac49e33`](https://github.com/gioppoluca/sheet-export/commit/ac49e339468b9a1e92888cf5b8ae1e25ad6ffb7c) - removed old management of settings, cleaned up old files *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+### :bug: Bug Fixes
+- [`e4b2987`](https://github.com/gioppoluca/sheet-export/commit/e4b2987754d9d07ba077dbd5cfcf03f5e52cb356) - cleanup *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+- [`c82e769`](https://github.com/gioppoluca/sheet-export/commit/c82e7697bfda7a96fffa7d7529e791d3260e92c0) - using minimized lib *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+- [`8e1c355`](https://github.com/gioppoluca/sheet-export/commit/8e1c3555e9c1cdac793a438eb12a9b27ebf9e198) - cleanup *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+
 ## [0.0.10] - 2023-12-26
 ### :sparkles: New Features
 - [`79d2271`](https://github.com/gioppoluca/sheet-export/commit/79d2271ed2693433d825466d740801eabfdd8f34) - update class *(commit by [@bushvin](https://github.com/bushvin))*
@@ -93,3 +106,4 @@
 [0.0.8]: https://github.com/gioppoluca/sheet-export/compare/0.0.7...0.0.8
 [0.0.9]: https://github.com/gioppoluca/sheet-export/compare/0.0.8...0.0.9
 [0.0.10]: https://github.com/gioppoluca/sheet-export/compare/0.0.9...0.0.10
+[0.0.11]: https://github.com/gioppoluca/sheet-export/compare/0.0.10...0.0.11
