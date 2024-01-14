@@ -18,7 +18,6 @@ At the moment the module manages:
 |             | extended   | latest  | PC     |                                       | A union of the classical WotC with extended pages for equipment and spells            |
 |             |            |         | NPC    |                                       | a custom PDF for NPC                                                                  |
 |             | BR         | latest  | PC     |                                       | The Brazilian version of the classical PC PDF from WotC for the PC for latest release |
-| CoC7        | standard   | latest  | PC     |                                       | The classical PC PDF for Call Of Cthulhu                                              |
 | pfe2        | remastered | latest  | PC     | [bushvin](https://github.com/bushvin) | The remastered PC PDF for Pathfinder 2° Edition                                      |
 
 ## Features
@@ -50,7 +49,7 @@ By pressing the round printer button the PDF is generated and downloaded to your
 
 ### Mapping file
 
-The mapping file is a JS file that has to be names "player.js" or "npc.js" and contain a class named **MappingClass** that inherits from the base class
+The mapping file is a JS file that has to be named "player.js" or "npc.js" and contains a class named **MappingClass** that inherits from the base class **baseMapping**
 
 ```javascript
 import baseMapping from "../../../../scripts/baseMapping.js";
