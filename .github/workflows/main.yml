@@ -157,11 +157,47 @@ jobs:
           body: ${{ github.event.release.body }}
 
       # Autopublish to the Foundry Admin panel
-      - name: FoundryVTT AutoPublish
-        uses: Varriount/fvtt-autopublish@v2.0.1
+      # - name: FoundryVTT AutoPublish
+      #   uses: Varriount/fvtt-autopublish@v2.0.1
+      #   with:
+      #     username: ${{ secrets.FOUNDRY_ADMIN_USER }}
+      #     password-source: ${{ secrets.FOUNDRY_ADMIN_PW }}
+      #     module-id: ${{ secrets.FOUNDRY_ADMIN_ID }}
+      #     manifest-url: https://github.com/${{ github.repository }}/releases/download/${{ github.event.release.tag_name }}/module.json
+      #     manifest-file: ./module.json
+
+
+      - name: "FoundryVTT API publish"
+        uses: indiesdev/curl@v1.1
+        id: foundry-api
         with:
-          username: ${{ secrets.FOUNDRY_ADMIN_USER }}
-          password-source: ${{ secrets.FOUNDRY_ADMIN_PW }}
-          module-id: ${{ secrets.FOUNDRY_ADMIN_ID }}
-          manifest-url: https://github.com/${{ github.repository }}/releases/download/${{ github.event.release.tag_name }}/module.json
-          manifest-file: ./module.json
+          url: https://api.foundryvtt.com/_api/packages/release_version/
+          method: "POST"
+          headers: '{ "Content-Type": "application/json", "Authorization": "${{ secrets.FOUNDRY_API_TOKEN }}" }'
+          accept: 200
+          body: '{"id": "sheet-export", "dry-run": true, "release": { "version": "${{ github.event.release.tag_name }}", "manifest": "https://github.com/${{ github.repository }}/releases/download/${{ github.event.release.tag_name }}/module.json", "notes": "https://github.com/gioppoluca/sheet-export/blob/master/CHANGELOG.md", "compatibility": { "minimum": "11", "verified": "11", "maximum": "" } } }'
+          log-response: true
+      - name: "Use response"
+        run: echo ${{ steps.foundry-api.outputs.response }}          
+
+        # response = await fetch("https://api.foundryvtt.com/_api/packages/release_version/", {
+        #   headers: {
+        #     'Content-Type': 'application/json',
+        #     'Authorization': 'fvttp_...'
+        #   },
+        #   method: "POST",
+        #   body: JSON.stringify({
+        #     "id": "example-module",
+        #     "dry-run": true,
+        #     "release": {
+        #       "version": "1.0.0",
+        #       "manifest": "https://github.com/example/example-module/issues/releases/download/release-1.0.0/system.json",
+        #       "notes": "https://github.com/example/example-module/releases/tag/release-1.0.0",
+        #       "compatibility": {
+        #         "minimum": "10.312",
+        #         "verified": "11",
+        #         "maximum": ""
+        #       }
+        #     }
+        #   })
+        # });
