@@ -1,4 +1,12 @@
 
+## [0.2.0] - 2024-01-27
+### :sparkles: New Features
+- [`66cba7e`](https://github.com/gioppoluca/sheet-export/commit/66cba7ef46fc7a225a661ae23ffaf6396bd080de) - added CoC7 *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+### :bug: Bug Fixes
+- [`54b2372`](https://github.com/gioppoluca/sheet-export/commit/54b2372cc74098fb6b4fb686b33129efe3b22454) - save file with actor name *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+
 ## [0.1.0] - 2024-01-27
 ### :sparkles: New Features
 - [`7680150`](https://github.com/gioppoluca/sheet-export/commit/76801505326c1f7007d379976080b4e0fddcdc36) - added npc for dnd5e *(commit by [@gioppoluca](https://github.com/gioppoluca))*
@@ -119,3 +127,4 @@
 [0.0.11]: https://github.com/gioppoluca/sheet-export/compare/0.0.10...0.0.11
 [0.0.13]: https://github.com/gioppoluca/sheet-export/compare/0.0.12...0.0.13
 [0.1.0]: https://github.com/gioppoluca/sheet-export/compare/0.0.14...0.1.0
+[0.2.0]: https://github.com/gioppoluca/sheet-export/compare/0.1.0...0.2.0
