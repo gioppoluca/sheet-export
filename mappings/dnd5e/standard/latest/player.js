@@ -18,9 +18,9 @@ class MappingClass extends baseMapping {
         this.systemName = "dnd5e";
         // Set the PDF files to use - MIND that the order of the files is important!
         this.pdfFiles.push({
-            pdfUrl: '/modules/sheet-export/mappings/dnd5e/Extended character sheet 5e.pdf',
+            pdfUrl: '/modules/sheet-export/mappings/dnd5e/5E_CharacterSheet_Fillable.pdf',
             nameDownload: `${this.actor.name ?? "character"}.pdf`,
-            name: "Extended character sheet 5e.pdf",
+            name: "5E_CharacterSheet_Fillable.pdf",
         });
 
         // Set Player image
