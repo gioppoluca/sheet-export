@@ -166,7 +166,7 @@ class SheetExportconfig extends FormApplication {
 					break;
 				case "jpg":
 				case "jpeg":
-					embedding_image = await pdf.embedPng(arrayBuffer)
+					embedding_image = await pdf.embedJpg(arrayBuffer)
 					break;
 				case "webp":
 					// Create an OffscreenCanvas and draw the WebP image
