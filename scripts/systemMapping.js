@@ -14,6 +14,9 @@ export const systemMapping = function () {
         "pf1":{
             "player": "character"
         },
+        "CoC7":{
+            "player": "character"
+        },
         "cyphersystem":{
             "player": "PC"
         }
