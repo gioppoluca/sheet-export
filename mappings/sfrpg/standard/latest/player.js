@@ -16,9 +16,9 @@ class MappingClass extends baseMapping {
 
         // Set the PDF files to use - MIND that the order of the files is important!
         this.pdfFiles.push({
-            pdfUrl: '/modules/sheet-export/mappings/sfrpg/PZO7101-CharacterSheet.pdf',
+            pdfUrl: '/modules/sheet-export/mappings/sfrpg/Autofillable_CharacterSheet.pdf',
             nameDownload: `${this.actor.name ?? "character"}.pdf`,
-            name: "PZO7101-CharacterSheet.pdf",
+            name: "Autofillable_CharacterSheet.pdf",
         });
 
         this.setCalculated("Character Name",  this.actor.name );
