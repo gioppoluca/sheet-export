@@ -213,6 +213,8 @@ class SheetExportconfig extends FormApplication {
 	 */
 	async createForm(buffer) {
 		console.log("create form");
+		document.getElementById("sheet-export-form").style.cursor = "wait";
+
 		const inputForm = document.getElementById("fieldList");
 
 		// get the mapping version and release for the game system set in the config
@@ -596,5 +598,7 @@ this.filledPdf = await pdf.save();
 */
 		document.getElementById("sheet-export-header").setAttribute("style", "display: none");
 		document.getElementById("sheet-export-final").style.display = "block";
+		document.getElementById("sheet-export-form").style.cursor = "default";
+
 	}
 }
