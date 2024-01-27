@@ -17,6 +17,9 @@ export const systemMapping = function () {
         "CoC7":{
             "player": "character"
         },
+        "shadowrun6-eden":{
+            "player": "Player"
+        },
         "cyphersystem":{
             "player": "PC"
         }
