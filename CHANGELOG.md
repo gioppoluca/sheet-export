@@ -1,4 +1,9 @@
 
+## [0.4.1] - 2024-01-27
+### :bug: Bug Fixes
+- [`70829b0`](https://github.com/gioppoluca/sheet-export/commit/70829b0fd04f702fa4c1ab2ccb2c6fc349271b87) - typo in embed image *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+
 ## [0.4.0] - 2024-01-27
 ### :sparkles: New Features
 - [`98d7353`](https://github.com/gioppoluca/sheet-export/commit/98d73535073eae5d8f3b592f4d851cbccf2beb92) - added starfinder *(commit by [@gioppoluca](https://github.com/gioppoluca))*
@@ -152,3 +157,4 @@
 [0.3.0]: https://github.com/gioppoluca/sheet-export/compare/0.2.0...0.3.0
 [0.3.1]: https://github.com/gioppoluca/sheet-export/compare/0.3.0...0.3.1
 [0.4.0]: https://github.com/gioppoluca/sheet-export/compare/0.3.1...0.4.0
+[0.4.1]: https://github.com/gioppoluca/sheet-export/compare/0.4.0...0.4.1
