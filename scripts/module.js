@@ -135,6 +135,7 @@ class SheetExportconfig extends FormApplication {
 	download(buffer) {
 		//		console.log(buffer);
 		for (let index = 0; index < this.filledPdf.length; index++) {
+			console.log(this.filledPdf[index]);
 			const theFile = this.filledPdf[index];
 			const blob = new Blob([theFile.file], { type: "application/pdf" });
 			console.log(blob);
@@ -343,7 +344,8 @@ class SheetExportconfig extends FormApplication {
 				i++;
 			})
 			// TODO this has to be an array
-			this.filledPdf.push({ file: await pdf.save(), name: pdfFile.name });
+			console.log(pdfFile);
+			this.filledPdf.push({ file: await pdf.save(), name: pdfFile.name, nameDownload: this.actor.name + ".pdf" });
 
 		}
 		/*
