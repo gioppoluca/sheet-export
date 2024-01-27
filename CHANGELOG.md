@@ -1,4 +1,9 @@
 
+## [0.3.1] - 2024-01-27
+### :bug: Bug Fixes
+- [`3e0c2f2`](https://github.com/gioppoluca/sheet-export/commit/3e0c2f2ed82fbcf31a2777bb55a2c3ec5073c7d8) - added wait on cursor to give hint that it is working *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+
 ## [0.3.0] - 2024-01-27
 ### :sparkles: New Features
 - [`9c0d9a6`](https://github.com/gioppoluca/sheet-export/commit/9c0d9a654a7cb4176a7ed1066e6dd69f0d3defd3) - added shadowrun 6e *(commit by [@gioppoluca](https://github.com/gioppoluca))*
@@ -137,3 +142,4 @@
 [0.1.0]: https://github.com/gioppoluca/sheet-export/compare/0.0.14...0.1.0
 [0.2.0]: https://github.com/gioppoluca/sheet-export/compare/0.1.0...0.2.0
 [0.3.0]: https://github.com/gioppoluca/sheet-export/compare/0.2.0...0.3.0
+[0.3.1]: https://github.com/gioppoluca/sheet-export/compare/0.3.0...0.3.1
