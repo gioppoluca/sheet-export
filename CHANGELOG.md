@@ -1,4 +1,12 @@
 
+## [0.3.0] - 2024-01-27
+### :sparkles: New Features
+- [`9c0d9a6`](https://github.com/gioppoluca/sheet-export/commit/9c0d9a654a7cb4176a7ed1066e6dd69f0d3defd3) - added shadowrun 6e *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+### :bug: Bug Fixes
+- [`1e0bafa`](https://github.com/gioppoluca/sheet-export/commit/1e0bafa5a79f9867f55b710c517f2073da42d990) - missing export in generated mapping file *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+
 ## [0.2.0] - 2024-01-27
 ### :sparkles: New Features
 - [`66cba7e`](https://github.com/gioppoluca/sheet-export/commit/66cba7ef46fc7a225a661ae23ffaf6396bd080de) - added CoC7 *(commit by [@gioppoluca](https://github.com/gioppoluca))*
@@ -128,3 +136,4 @@
 [0.0.13]: https://github.com/gioppoluca/sheet-export/compare/0.0.12...0.0.13
 [0.1.0]: https://github.com/gioppoluca/sheet-export/compare/0.0.14...0.1.0
 [0.2.0]: https://github.com/gioppoluca/sheet-export/compare/0.1.0...0.2.0
+[0.3.0]: https://github.com/gioppoluca/sheet-export/compare/0.2.0...0.3.0
