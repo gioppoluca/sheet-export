@@ -11,14 +11,19 @@ It aims to offer the ability to export in PDF all the sheets for PC, NPC, Spells
 At the moment the module manages:
 
 
-| Game System | Version    | Release | Sheets | Mantainer                             | Description                                                                           |
-| ------------- | ------------ | --------- | -------- | --------------------------------------- | --------------------------------------------------------------------------------------- |
-| dnd5e       | standard   | latest  | PC     |                                       | The classical PC PDF from WotC for the PC for latest release                          |
-|             |            |         | NPC    |                                       | a custom PDF for NPC for latest release                                               |
-|             | extended   | latest  | PC     |                                       | A union of the classical WotC with extended pages for equipment and spells            |
-|             |            |         | NPC    |                                       | a custom PDF for NPC                                                                  |
-|             | BR         | latest  | PC     |                                       | The Brazilian version of the classical PC PDF from WotC for the PC for latest release |
-| pfe2        | remastered | latest  | PC     | [bushvin](https://github.com/bushvin) | The remastered PC PDF for Pathfinder 2° Edition                                      |
+| Game System     | Version    | Release | Sheets | Mantainer                             | Description                                                                           |
+| ----------------- | ------------ | --------- | -------- | --------------------------------------- | --------------------------------------------------------------------------------------- |
+| dnd5e           | standard   | latest  | PC     |                                       | The classical PC PDF from WotC for the PC for latest release                          |
+|                 |            |         | NPC    |                                       | a custom PDF for NPC for latest release                                               |
+|                 | extended   | latest  | PC     |                                       | A union of the classical WotC with extended pages for equipment and spells            |
+|                 |            |         | NPC    |                                       | a custom PDF for NPC                                                                  |
+|                 | BR         | latest  | PC     |                                       | The Brazilian version of the classical PC PDF from WotC for the PC for latest release |
+| pfe2            | remastered | latest  | PC     | [bushvin](https://github.com/bushvin) | The remastered PC PDF for Pathfinder 2° Edition                                      |
+| CoC7            | standard   | latest  | PC     |                                       | The PC PDF for Call of Cthuluh 7° Edition                                            |
+| shadowrun6-eden | standard   | latest  | PC     |                                       | The PC PDF for Shadowrun 6° Edition (incomplete)                                     |
+
+
+If you want to become a mantainer of a game system, please contact me.
 
 ## Features
 
@@ -95,7 +100,6 @@ The settings form presents the drop down list for choosing the mapping for the g
 The **Genarate mapping** button opens a dialog to access the button **Generate mapping for PC from PDF** allows you to generate the JS mapping file from the PDF file you will upload: you will get a js file with all PDF fields listed and all the mapping empty for you to complete.
 
 ![edit mapping](img/edit-mapping.png)
-
 
 ## Changelog
 
