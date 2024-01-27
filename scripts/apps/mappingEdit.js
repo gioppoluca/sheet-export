@@ -143,6 +143,8 @@ ${all_mapping}
 
     }
 }
+export default MappingClass;
+
 `
         console.log(new_mapping);
         const blob = new Blob([new_mapping], { type: "text/javascript;charset=utf-8" });
