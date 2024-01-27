@@ -1,4 +1,12 @@
 
+## [0.4.0] - 2024-01-27
+### :sparkles: New Features
+- [`98d7353`](https://github.com/gioppoluca/sheet-export/commit/98d73535073eae5d8f3b592f4d851cbccf2beb92) - added starfinder *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+### :bug: Bug Fixes
+- [`9dd5037`](https://github.com/gioppoluca/sheet-export/commit/9dd5037aab1215c2b62ff9ecaa53be09488007b4) - added log error to UI *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+
 ## [0.3.1] - 2024-01-27
 ### :bug: Bug Fixes
 - [`3e0c2f2`](https://github.com/gioppoluca/sheet-export/commit/3e0c2f2ed82fbcf31a2777bb55a2c3ec5073c7d8) - added wait on cursor to give hint that it is working *(commit by [@gioppoluca](https://github.com/gioppoluca))*
@@ -143,3 +151,4 @@
 [0.2.0]: https://github.com/gioppoluca/sheet-export/compare/0.1.0...0.2.0
 [0.3.0]: https://github.com/gioppoluca/sheet-export/compare/0.2.0...0.3.0
 [0.3.1]: https://github.com/gioppoluca/sheet-export/compare/0.3.0...0.3.1
+[0.4.0]: https://github.com/gioppoluca/sheet-export/compare/0.3.1...0.4.0
