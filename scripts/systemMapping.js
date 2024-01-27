@@ -20,6 +20,9 @@ export const systemMapping = function () {
         "shadowrun6-eden":{
             "player": "Player"
         },
+        "sfrpg":{
+            "player": "character"
+        },
         "cyphersystem":{
             "player": "PC"
         }
