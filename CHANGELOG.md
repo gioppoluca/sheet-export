@@ -1,4 +1,14 @@
 
+## [0.5.0] - 2024-01-28
+### :sparkles: New Features
+- [`95eea96`](https://github.com/gioppoluca/sheet-export/commit/95eea9610cf8eebc39bded2cb67f6eacae053582) - new placement of image scaled within the box *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+- [`ccbdb86`](https://github.com/gioppoluca/sheet-export/commit/ccbdb86f598ad8ba38a36d621327ec65adda07e5) - added swade mapping *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+### :bug: Bug Fixes
+- [`e4cb8c0`](https://github.com/gioppoluca/sheet-export/commit/e4cb8c09433fc0343e29b4a28d7a57daadd1ba48) - image now placed in box *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+- [`58fadbd`](https://github.com/gioppoluca/sheet-export/commit/58fadbd48d1c57d07b02a95e73af275a4ccc811f) - image placed vased on new bounding box *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+
 ## [0.4.1] - 2024-01-27
 ### :bug: Bug Fixes
 - [`70829b0`](https://github.com/gioppoluca/sheet-export/commit/70829b0fd04f702fa4c1ab2ccb2c6fc349271b87) - typo in embed image *(commit by [@gioppoluca](https://github.com/gioppoluca))*
@@ -158,3 +168,4 @@
 [0.3.1]: https://github.com/gioppoluca/sheet-export/compare/0.3.0...0.3.1
 [0.4.0]: https://github.com/gioppoluca/sheet-export/compare/0.3.1...0.4.0
 [0.4.1]: https://github.com/gioppoluca/sheet-export/compare/0.4.0...0.4.1
+[0.5.0]: https://github.com/gioppoluca/sheet-export/compare/0.4.1...0.5.0
