@@ -23,6 +23,9 @@ export const systemMapping = function () {
         "sfrpg":{
             "player": "character"
         },
+        "swade":{
+            "player": "character"
+        },
         "cyphersystem":{
             "player": "PC"
         }
