@@ -24,7 +24,7 @@ class MappingClass extends baseMapping {
         });
 
         // Set Player image
-        this.setImage(this.actor.img, 1, 60, 460, 100, 100);
+        this.setImage(this.actor.img, 1, 30, 440, 160, 220);
 
         //        this.setCalculated("ClassLevel", this.actor.items.filter(i => i.type === 'class').map(i => `${i.name} ${i.system.levels}`).join(' / '));
         this.setCalculated("ClassLevel", this.getLocalizedClassAndSubclassAndLevel(this.getPrimaryClassObj()));
