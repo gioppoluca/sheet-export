@@ -150,10 +150,59 @@ class SheetExportconfig extends FormApplication {
 		this.createForm(this.currentBuffer);
 	}
 
+	async getMeta(url) {
+		const img = new Image();
+		img.src = url;
+		await img.decode();
+		return img
+	};
+
+	fitImage2Box(img, box) {
+		const ratioImg = img.naturalWidth / img.naturalHeight;
+		const ratioBox = box.width / box.height;
+		console.log(ratioImg);
+		console.log(ratioBox);
+		if (ratioBox > ratioImg) {
+			console.log("box is a ractangle with greater aspect ratio than than image");
+			const height = box.height;
+			const ratio = box.height / img.naturalHeight;
+			console.log(ratio);
+			const width = img.naturalWidth * ratio;
+			const x = box.pos_x + (box.width - width) / 2;
+			const y = box.pos_y;
+			return { width, height, x, y };
+		} else {
+			console.log("box is a ractangle with lower aspect ratio than image");
+			const width = box.width;
+			const ratio = box.width / img.naturalWidth;
+			console.log(ratio);
+			const height = img.naturalHeight * ratio;
+			const x = box.pos_x;
+			const y = box.pos_y + (box.height - height) / 2;
+			return { width, height, x, y };
+		}
+	}
 
 	async embedImages(pdf, images) {
 		for (let i = 0; i < images.length; i++) {
 			let img_path = images[i].path;
+
+			// test to get image dimensions from url
+
+			console.log(images[i]);
+			console.log(images[i].height / images[i].width)
+			// Usage example:
+			let coords = null;
+			await this.getMeta(getRoute(img_path)).then(img => {
+				console.log("IMG dimensions")
+				console.log(img.naturalHeight + ' ' + img.naturalWidth);
+				console.log(img.naturalHeight / img.naturalWidth);
+				console.log(img);
+				coords = this.fitImage2Box(img, images[i]);
+				console.log(coords);
+			});
+
+
 			console.log(img_path);
 			console.log(images[i]);
 			let img_ext = img_path.split('.').pop();
@@ -197,11 +246,19 @@ class SheetExportconfig extends FormApplication {
 				console.log(images[i]);
 				// Draw the JPG image in the center of the page
 				page.drawImage(embedding_image, {
-					x: images[i].pos_x,
-					y: images[i].pos_y,
-					width: images[i].width,
-					height: images[i].height,
+					x: coords.x,
+					y: coords.y,
+					width: coords.width,
+					height: coords.height,
 				})
+				/*
+								page.drawImage(embedding_image, {
+									x: images[i].pos_x,
+									y: images[i].pos_y,
+									width: images[i].width,
+									height: images[i].height,
+								})
+				*/
 			}
 		};
 	}
