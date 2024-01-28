@@ -85,7 +85,8 @@ class MappingClass extends baseMapping {
 ```
 
 **Add images**
-Images can be embedded in the generated PDF; as shown in the code above there is a function to call: the parameters are (image path to embed, page of the pdf, x position, y position, width, height).
+Images can be embedded in the generated PDF; as shown in the code above there is a function to call: the parameters are (image path to embed, page of the pdf, x position of the bounding box, y position of the bounding box, width of the bounding box, height of the bounding box).
+The image will be placed within the defined bounding box in the proper page of the PDF; image will be scaled proportionally.
 
 **Global content**
 The base class offers a function to keep content that could be splitted in different fields.
