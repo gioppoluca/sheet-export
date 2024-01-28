@@ -18,6 +18,7 @@ At the moment the module manages:
 |                 | extended   | latest  | PC     |                                       | A union of the classical WotC with extended pages for equipment and spells            |
 |                 |            |         | NPC    |                                       | a custom PDF for NPC                                                                  |
 |                 | BR         | latest  | PC     |                                       | The Brazilian version of the classical PC PDF from WotC for the PC for latest release |
+| pf1             | standard   | latest  | PC     |                                       | The remastered PC PDF for Pathfinder 1° Edition                                      |
 | pfe2            | remastered | latest  | PC     | [bushvin](https://github.com/bushvin) | The remastered PC PDF for Pathfinder 2° Edition                                      |
 | CoC7            | standard   | latest  | PC     |                                       | The PC PDF for Call of Cthuluh 7° Edition                                            |
 | sfrpg           | standard   | latest  | PC     |                                       | The PC PDF for Starfinder Edition                                                     |
