@@ -66,6 +66,58 @@ class MappingClass extends baseMapping {
             }
         );
 
+        /* Skills section */
+        let loreCount = 1;
+        let skillNotes = '';
+        let extraLores = [];
+        for (const slug in this.actor.skills) {
+            const skill = this.actor.skills[slug];
+            let skillSlug = slug;
+            
+            // Handle Lores
+            if (skillSlug.endsWith('-lore')) {
+                if (loreCount > 2) //Sheet only has 2 lore fields
+                    extraLore += skill;
+                skillSlug = `lore${loreCount}`;
+                const loreSubcat = skill.label.replace(' Lore', '');
+                this.setCalculated(`${skillSlug}_subcategory`, loreSubcat);
+                loreCount++;
+            }
+            
+            switch (true) {
+                case (skill.rank == 4):
+                    this.setCalculated(`${skillSlug}_legendary`, true);
+                case (skill.rank >= 3):
+                    this.setCalculated(`${skillSlug}_master`, true);
+                case (skill.rank >= 2):
+                    this.setCalculated(`${skillSlug}_expert`, true);
+                case (skill.rank >= 1):
+                    this.setCalculated(`${skillSlug}_trained`, true);
+            }
+
+            skill.modifiers.forEach((modifier) => {
+                let type = modifier.type;
+                if (modifier.slug == 'armor-check-penalty')
+                    type = 'armor';
+
+                if (type == 'ability')
+                    type = 'attribute';
+
+                this.setCalculated(`${skillSlug}_${type}_modifier`, this.formatModifier(modifier.modifier));
+            });
+
+            this.setCalculated(`${skillSlug}`, this.formatModifier(skill.mod));
+        }
+        // Handle lores > 2
+        extraLores.forEach((lore) => {
+            const rank = ['U','T','E','M','L'][lore.rank];
+            const value = this.formatModifier(lore.mod);
+            skillNotes += '${lore.label}(${lore.rank}) ${value}\n';
+        });
+
+        this.setCalculated('skill_notes', skillNotes);
+
+
         /* Defenses Section*/
 
         /* Armor Class */
