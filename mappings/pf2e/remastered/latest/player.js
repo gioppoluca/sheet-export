@@ -117,6 +117,23 @@ class MappingClass extends baseMapping {
 
         this.setCalculated('skill_notes', skillNotes);
 
+        /* Languages */
+        const languageSlugs = this.actor.system.details.languages.value;
+        const commonLanguage = game.pf2e.settings.campaign.languages.commonLanguage;
+        const localizedLanguages = languageSlugs.flatMap((language) => {
+            if (language === commonLanguage && languageSlugs.includes("common")) {
+                return;
+            }
+            const label =
+                language === "common" && commonLanguage
+                    ? game.i18n.format("PF2E.Actor.Creature.Language.CommonLanguage", {
+                          language: game.i18n.localize(CONFIG.PF2E.languages[commonLanguage]),
+                      })
+                    : game.i18n.localize(CONFIG.PF2E.languages[language]);
+            return label;
+        })
+
+        this.setCalculated("languages", localizedLanguages.join(', '))
 
         /* Defenses Section*/
         this.setCalculated("hp_max", this.actor.hitPoints.max)
