@@ -119,6 +119,7 @@ class MappingClass extends baseMapping {
 
 
         /* Defenses Section*/
+        this.setCalculated("hp_max", this.actor.hitPoints.max)
 
         /* Armor Class */
         this.setCalculated("ac", this.actor.armorClass.value);
