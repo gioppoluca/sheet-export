@@ -163,10 +163,13 @@ class MappingClass extends baseMapping {
 
 
         /* Shield */
-        this.setCalculated("ac_shield_bonus", this.actor.heldShield.acBonus);
-        this.setCalculated("shield_hardness", this.actor.heldShield.hardness);
-        this.setCalculated("shield_max_hp", this.actor.heldShield.hitPoints.max);
-        this.setCalculated("shield_bt", this.actor.heldShield.hitPoints.brokenThreshold);
+        if (this.actor.heldShield)
+        {
+            this.setCalculated("ac_shield_bonus", this.actor.heldShield.acBonus);
+            this.setCalculated("shield_hardness", this.actor.heldShield.hardness);
+            this.setCalculated("shield_max_hp", this.actor.heldShield.hitPoints.max);
+            this.setCalculated("shield_bt", this.actor.heldShield.hitPoints.brokenThreshold);
+        }
 
         /* Armor proficiencies */
         Object.keys(this.actor.system.proficiencies.defenses).forEach(
