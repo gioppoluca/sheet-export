@@ -138,6 +138,24 @@ class MappingClass extends baseMapping {
         /* Defenses Section*/
         this.setCalculated("hp_max", this.actor.hitPoints.max)
 
+        const immunities = Object.values(this.actor.system.attributes.immunities).map(
+            (immunity) => {
+                return immunity.type;
+            }
+        );
+        const resistances = Object.values(this.actor.system.attributes.resistances).map(
+            (resistance) => {
+                return `${resistance.type} ${resistance.value}`;
+            }
+        );
+        const weaknesses = Object.values(this.actor.system.attributes.weaknesses).map(
+            (weakness) => {
+                return `${weakness.type} ${weakness.value}`;
+            }
+        );
+        
+        this.setCalculated("resistances_immunities", `Immun: ${immunities.join(', ')}; Resist: ${resistances.join(', ')}; Weak: ${weaknesses.join(', ')}`);
+
         /* Armor Class */
         this.setCalculated("ac", this.actor.armorClass.value);
         this.setCalculated("ac_attribute_modifier", this.actor.armorClass.modifiers.filter(i => i.type === 'ability').map(i => i.modifier)[0] || 0);
