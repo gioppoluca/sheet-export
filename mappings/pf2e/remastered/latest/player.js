@@ -206,6 +206,16 @@ class MappingClass extends baseMapping {
         this.setCalculated('speed', this.actor.system.attributes.speed.value)
         this.setCalculated('special_movement', this.actor.system.attributes.speed.otherSpeeds.map(s => `${s.label}: ${s.value}`).join(', '))
 
+        /* Class DC */
+        const classDCAttribute = this.actor.classDC.modifiers.filter(m => m.type === 'ability' && m.enabled).map(m => m.modifier)[0] || 0;
+        const classDCProficiency = this.actor.classDC.modifiers.filter(m => m.type === 'proficiency' && m.enabled).map(m => m.modifier)[0] || 0;
+        const classDCItem = this.actor.classDC.modifiers.filter(m => m.type === 'item' && m.enabled).map(m => m.modifier)[0] || 0;
+        this.setCalculated('class_dc_attribute_modifier', classDCAttribute);
+        this.setCalculated('class_dc_proficiency_modifier', classDCProficiency);
+        this.setCalculated('class_dc_item_modifier', classDCItem);
+        this.setCalculated('class_dc', 10 + classDCAttribute + classDCProficiency + classDCItem)
+
+        
         // Set Player image
         this.setImage(this.actor.img, 2, 40, 500, 120, 200);
 
