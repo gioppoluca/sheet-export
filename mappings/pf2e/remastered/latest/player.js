@@ -215,7 +215,22 @@ class MappingClass extends baseMapping {
         this.setCalculated('class_dc_item_modifier', classDCItem);
         this.setCalculated('class_dc', 10 + classDCAttribute + classDCProficiency + classDCItem)
 
-        
+        /* Weapon Profs */
+        for (const slug in this.actor.system.proficiencies.attacks)
+        {
+            const attack = this.actor.system.proficiencies.attacks[slug];
+            switch (true)
+            {
+                case (attack.rank == 4):
+                    this.setCalculated(`attack_${slug}_legendary`, true);
+                case (attack.rank >= 3):
+                    this.setCalculated(`attack_${slug}_master`, true);
+                case (attack.rank >= 2):
+                    this.setCalculated(`attack_${slug}_expert`, true);
+                case (attack.rank >= 1):
+                    this.setCalculated(`attack_${slug}_trained`, true);
+            }
+        }
         // Set Player image
         this.setImage(this.actor.img, 2, 40, 500, 120, 200);
 
