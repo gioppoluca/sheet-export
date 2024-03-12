@@ -231,6 +231,120 @@ class MappingClass extends baseMapping {
                     this.setCalculated(`attack_${slug}_trained`, true);
             }
         }
+
+        var firstLevelClassFeatures = '';
+        this.actor.feats.forEach((featGroup) =>
+        {
+            if (featGroup.id === 'ancestryfeature')
+            {
+                featGroup.feats.forEach((feature) =>
+                {
+                    var ancestryFeature = feature.feat.name;
+                    if (feature.feat.grants.length > 0)
+                    {
+                        ancestryFeature += ' - ';
+                        ancestryFeature += feature.feat.grants.map(f => f.name).join(', ');
+                    }
+                    this.setCalculated('1_ancestry_hertitage_abilities', ancestryFeature);
+                });
+            }
+
+            /* Class Features */
+            if (featGroup.id === 'classfeature')
+            {
+                featGroup.feats.forEach((feature) =>
+                {
+                    var classFeature = feature.feat.name;
+                    if (feature.feat.grants.length > 0)
+                    {
+                        classFeature += ' - ';
+                        classFeature += feature.feat.grants.map(f => f.name).join(', ');
+                    }
+        
+                    if (feature.label == 1)
+                    {
+                        firstLevelClassFeatures += `${classFeature} \n`;
+                    }
+                    else
+                    {
+                        this.setCalculated(`${feature.label}_class_feature`, classFeature)
+                    }
+                });
+            }
+            /* Ancestry Feats */
+            if (featGroup.id === 'ancestry')
+            {
+                featGroup.feats.forEach((feat) =>
+                {
+                    var ancestryFeat = feat.feat.name;
+                    if (feat.feat.grants.length > 0)
+                    {
+                        ancestryFeat += ' - ';
+                        ancestryFeat += feat.feat.grants.map(f => f.name).join(', ');
+                    }
+                    this.setCalculated(`${feat.label}_ancestry_feat`, ancestryFeat);
+                });
+            }
+            /* Class Feats */
+            if (featGroup.id === 'class')
+            {
+                featGroup.feats.forEach((feat) =>
+                {
+                    var classFeat = feat.feat.name;
+                    if (feat.feat.grants.length > 0)
+                    {
+                        classFeat += ' - ';
+                        classFeat += feat.feat.grants.map(f => f.name).join(', ');
+                    }
+        
+                    if (feat.label == 1)
+                    {
+                        firstLevelClassFeatures += `${classFeat} \n`;
+                    }
+                    else
+                    {
+                        this.setCalculated(`${feat.label}_class_feat`, classFeat)
+                    }
+                });
+            }
+            /* Skill Feats */
+            if (featGroup.id === 'skill')
+            {
+                featGroup.feats.forEach((feat) =>
+                {
+                    var skillFeat = feat.feat.name;
+                    if (feat.feat.grants.length > 0)
+                    {
+                        skillFeat += ' - ';
+                        skillFeat += feat.feat.grants.map(f => f.name).join(', ');
+                    }
+                    if (feat.label === 'BG')
+                    {
+                        this.setCalculated('1_background_skill_feat', skillFeat);
+                    }
+                    else
+                    {
+                        this.setCalculated(`${feat.level}_skill_feat`, skillFeat);
+                    }
+                });
+            }
+            /* General Feats */
+            if (featGroup.id === 'general')
+            {
+                featGroup.feats.forEach((feat) =>
+                {
+                    var skillFeat = feat.feat.name;
+                    if (feat.feat.grants.length > 0)
+                    {
+                        skillFeat += ' - ';
+                        skillFeat += feat.feat.grants.map(f => f.name).join(', ');
+                    }
+                    this.setCalculated(`${feat.label}_general_feat`, skillFeat);
+                });
+            }
+        });
+        this.setCalculated('1_class_feats_features', firstLevelClassFeatures);
+
         // Set Player image
         this.setImage(this.actor.img, 2, 40, 500, 120, 200);
 
