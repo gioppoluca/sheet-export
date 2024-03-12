@@ -75,12 +75,11 @@ class MappingClass extends baseMapping {
             let skillSlug = slug;
             
             // Handle Lores
-            if (skillSlug.endsWith('-lore')) {
+            if (skill.lore) {
                 if (loreCount > 2) //Sheet only has 2 lore fields
                     extraLore += skill;
                 skillSlug = `lore${loreCount}`;
-                const loreSubcat = skill.label.replace(' Lore', '');
-                this.setCalculated(`${skillSlug}_subcategory`, loreSubcat);
+                this.setCalculated(`${skillSlug}_subcategory`, skill.label);
                 loreCount++;
             }
             
