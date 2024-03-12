@@ -164,11 +164,10 @@ class MappingClass extends baseMapping {
 
 
         /* Shield */
-        this.setCalculated("ac_shield_bonus", this.actor.items.filter(i => i.system.category === 'shield' && i.isEquipped).map(i => i.system.acBonus)[0] || '');
-        this.setCalculated("shield_hardness", this.actor.items.filter(i => i.system.category === 'shield' && i.isEquipped).map(i => i.system.hardness)[0] || '-');
-        this.setCalculated("shield_max_hp", this.actor.items.filter(i => i.system.category === 'shield' && i.isEquipped).map(i => i.system.hp.max)[0] || '-');
-        this.setCalculated("shield_bt", this.actor.items.filter(i => i.system.category === 'shield' && i.isEquipped).map(i => i.system.hp.brokenThreshold)[0] || '-');
-        this.setCalculated("shield_current_hp", this.actor.items.filter(i => i.system.category === 'shield' && i.isEquipped).map(i => i.system.hp.value)[0] || '-');
+        this.setCalculated("ac_shield_bonus", this.actor.heldShield.acBonus);
+        this.setCalculated("shield_hardness", this.actor.heldShield.hardness);
+        this.setCalculated("shield_max_hp", this.actor.heldShield.hitPoints.max);
+        this.setCalculated("shield_bt", this.actor.heldShield.hitPoints.brokenThreshold);
 
         /* Armor proficiencies */
         Object.keys(this.actor.system.proficiencies.defenses).forEach(
@@ -179,7 +178,7 @@ class MappingClass extends baseMapping {
                 this.setCalculated(`defense_${d}_legendary`, this.actor.system.proficiencies.defenses[d].rank >= 4 || false );
             }
         );
-        
+
         /* Saving Throws */
         Object.keys(this.actor.saves).forEach(
             (s) => {
