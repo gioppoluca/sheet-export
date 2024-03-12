@@ -162,6 +162,7 @@ class MappingClass extends baseMapping {
         this.setCalculated("ac_proficiency_modifier", this.actor.armorClass.modifiers.filter(i => i.type === 'proficiency').map(i => i.modifier)[0] || 0);
         this.setCalculated("ac_item_modifier", this.actor.armorClass.modifiers.filter(i => i.type === 'item').map(i => i.modifier)[0] || 0);
 
+
         /* Shield */
         this.setCalculated("ac_shield_bonus", this.actor.items.filter(i => i.system.category === 'shield' && i.isEquipped).map(i => i.system.acBonus)[0] || '');
         this.setCalculated("shield_hardness", this.actor.items.filter(i => i.system.category === 'shield' && i.isEquipped).map(i => i.system.hardness)[0] || '-');
@@ -170,7 +171,6 @@ class MappingClass extends baseMapping {
         this.setCalculated("shield_current_hp", this.actor.items.filter(i => i.system.category === 'shield' && i.isEquipped).map(i => i.system.hp.value)[0] || '-');
 
         /* Armor proficiencies */
-        /* TODO: this gives error
         Object.keys(this.actor.system.proficiencies.defenses).forEach(
             (d) => {
                 this.setCalculated(`defense_${d}_trained`, this.actor.system.proficiencies.defenses[d].rank >= 1 || false );
@@ -179,7 +179,7 @@ class MappingClass extends baseMapping {
                 this.setCalculated(`defense_${d}_legendary`, this.actor.system.proficiencies.defenses[d].rank >= 4 || false );
             }
         );
-*/
+        
         /* Saving Throws */
         Object.keys(this.actor.saves).forEach(
             (s) => {
