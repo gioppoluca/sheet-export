@@ -202,6 +202,10 @@ class MappingClass extends baseMapping {
         this.setCalculated('perception_master', this.actor.perception.rank >= 3)
         this.setCalculated('perception_legendary', this.actor.perception.rank >= 4)
 
+        /* Speed */
+        this.setCalculated('speed', this.actor.system.attributes.speed.value)
+        this.setCalculated('special_movement', this.actor.system.attributes.speed.otherSpeeds.map(s => `${s.label}: ${s.value}`).join(', '))
+
         // Set Player image
         this.setImage(this.actor.img, 2, 40, 500, 120, 200);
 
