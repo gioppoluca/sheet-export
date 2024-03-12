@@ -192,6 +192,16 @@ class MappingClass extends baseMapping {
             }
         );
 
+        /* Perception */
+        this.setCalculated('perception', this.formatModifier(this.actor.perception.mod))
+        this.setCalculated('perception_attribute_modifier', this.actor.perception.modifiers.filter(i => i.type === 'ability' && i.enabled).map(i => i.modifier)[0] || 0)
+        this.setCalculated('perception_proficiency_modifier', this.actor.perception.modifiers.filter(i => i.type === 'proficiency' && i.enabled).map(i => i.modifier)[0] || 0)
+        this.setCalculated('perception_item_modifier', this.actor.perception.modifiers.filter(i => i.type === 'item' && i.enabled).map(i => i.modifier)[0] || 0)
+        this.setCalculated('perception_trained', this.actor.perception.rank >= 1)
+        this.setCalculated('perception_expert', this.actor.perception.rank >= 2)
+        this.setCalculated('perception_master', this.actor.perception.rank >= 3)
+        this.setCalculated('perception_legendary', this.actor.perception.rank >= 4)
+
         // Set Player image
         this.setImage(this.actor.img, 2, 40, 500, 120, 200);
 
