@@ -37,8 +37,8 @@ class MappingClass extends baseMapping {
 
         /* Ancestry Section*/
         this.setCalculated("ancestry", this.actor.ancestry.name);
-        this.setCalculated("heritage_and_traits", this.actor.heritage.name);
-        this.setCalculated("heritage_and_traits", this.actor.system.traits.size.value);
+        this.setCalculated("heritage_and_traits", this.actor.heritage?.name);
+        this.setCalculated("size", this.actor.system.traits.size.value);
 
         /* Character Name Section*/
         this.setCalculated("character_name", this.actor.name);
