@@ -37,8 +37,8 @@ class MappingClass extends baseMapping {
 
         /* Ancestry Section*/
         this.setCalculated("ancestry", this.actor.ancestry.name);
-        this.setCalculated("heritage_and_traits", this.actor.heritage.name);
-        this.setCalculated("heritage_and_traits", this.actor.system.traits.size.value);
+        this.setCalculated("heritage_and_traits", this.actor.heritage?.name);
+        this.setCalculated("size", this.actor.system.traits.size.value);
 
         /* Character Name Section*/
         this.setCalculated("character_name", this.actor.name);
@@ -75,12 +75,11 @@ class MappingClass extends baseMapping {
             let skillSlug = slug;
             
             // Handle Lores
-            if (skillSlug.endsWith('-lore')) {
+            if (skill.lore) {
                 if (loreCount > 2) //Sheet only has 2 lore fields
                     extraLore += skill;
                 skillSlug = `lore${loreCount}`;
-                const loreSubcat = skill.label.replace(' Lore', '');
-                this.setCalculated(`${skillSlug}_subcategory`, loreSubcat);
+                this.setCalculated(`${skillSlug}_subcategory`, skill.label);
                 loreCount++;
             }
             
@@ -117,8 +116,44 @@ class MappingClass extends baseMapping {
 
         this.setCalculated('skill_notes', skillNotes);
 
+        /* Languages */
+        const languageSlugs = this.actor.system.details.languages.value;
+        const commonLanguage = game.pf2e.settings.campaign.languages.commonLanguage;
+        const localizedLanguages = languageSlugs.flatMap((language) => {
+            if (language === commonLanguage && languageSlugs.includes("common")) {
+                return;
+            }
+            const label =
+                language === "common" && commonLanguage
+                    ? game.i18n.format("PF2E.Actor.Creature.Language.CommonLanguage", {
+                          language: game.i18n.localize(CONFIG.PF2E.languages[commonLanguage]),
+                      })
+                    : game.i18n.localize(CONFIG.PF2E.languages[language]);
+            return label;
+        })
+
+        this.setCalculated("languages", localizedLanguages.join(', '))
 
         /* Defenses Section*/
+        this.setCalculated("hp_max", this.actor.hitPoints.max)
+
+        const immunities = Object.values(this.actor.system.attributes.immunities).map(
+            (immunity) => {
+                return immunity.type;
+            }
+        );
+        const resistances = Object.values(this.actor.system.attributes.resistances).map(
+            (resistance) => {
+                return `${resistance.type} ${resistance.value}`;
+            }
+        );
+        const weaknesses = Object.values(this.actor.system.attributes.weaknesses).map(
+            (weakness) => {
+                return `${weakness.type} ${weakness.value}`;
+            }
+        );
+        
+        this.setCalculated("resistances_immunities", `Immun: ${immunities.join(', ')}; Resist: ${resistances.join(', ')}; Weak: ${weaknesses.join(', ')}`);
 
         /* Armor Class */
         this.setCalculated("ac", this.actor.armorClass.value);
@@ -126,15 +161,17 @@ class MappingClass extends baseMapping {
         this.setCalculated("ac_proficiency_modifier", this.actor.armorClass.modifiers.filter(i => i.type === 'proficiency').map(i => i.modifier)[0] || 0);
         this.setCalculated("ac_item_modifier", this.actor.armorClass.modifiers.filter(i => i.type === 'item').map(i => i.modifier)[0] || 0);
 
+
         /* Shield */
-        this.setCalculated("ac_shield_bonus", this.actor.items.filter(i => i.system.category === 'shield' && i.isEquipped).map(i => i.system.acBonus)[0] || '');
-        this.setCalculated("shield_hardness", this.actor.items.filter(i => i.system.category === 'shield' && i.isEquipped).map(i => i.system.hardness)[0] || '-');
-        this.setCalculated("shield_max_hp", this.actor.items.filter(i => i.system.category === 'shield' && i.isEquipped).map(i => i.system.hp.max)[0] || '-');
-        this.setCalculated("shield_bt", this.actor.items.filter(i => i.system.category === 'shield' && i.isEquipped).map(i => i.system.hp.brokenThreshold)[0] || '-');
-        this.setCalculated("shield_current_hp", this.actor.items.filter(i => i.system.category === 'shield' && i.isEquipped).map(i => i.system.hp.value)[0] || '-');
+        if (this.actor.heldShield)
+        {
+            this.setCalculated("ac_shield_bonus", this.actor.heldShield.acBonus);
+            this.setCalculated("shield_hardness", this.actor.heldShield.hardness);
+            this.setCalculated("shield_max_hp", this.actor.heldShield.hitPoints.max);
+            this.setCalculated("shield_bt", this.actor.heldShield.hitPoints.brokenThreshold);
+        }
 
         /* Armor proficiencies */
-        /* TODO: this gives error
         Object.keys(this.actor.system.proficiencies.defenses).forEach(
             (d) => {
                 this.setCalculated(`defense_${d}_trained`, this.actor.system.proficiencies.defenses[d].rank >= 1 || false );
@@ -143,7 +180,7 @@ class MappingClass extends baseMapping {
                 this.setCalculated(`defense_${d}_legendary`, this.actor.system.proficiencies.defenses[d].rank >= 4 || false );
             }
         );
-*/
+
         /* Saving Throws */
         Object.keys(this.actor.saves).forEach(
             (s) => {
@@ -157,6 +194,159 @@ class MappingClass extends baseMapping {
                 this.setCalculated(`${s}_legendary`, this.actor.saves[s].rank >= 4 || false);
             }
         );
+
+        /* Perception */
+        this.setCalculated('perception', this.formatModifier(this.actor.perception.mod))
+        this.setCalculated('perception_attribute_modifier', this.actor.perception.modifiers.filter(i => i.type === 'ability' && i.enabled).map(i => i.modifier)[0] || 0)
+        this.setCalculated('perception_proficiency_modifier', this.actor.perception.modifiers.filter(i => i.type === 'proficiency' && i.enabled).map(i => i.modifier)[0] || 0)
+        this.setCalculated('perception_item_modifier', this.actor.perception.modifiers.filter(i => i.type === 'item' && i.enabled).map(i => i.modifier)[0] || 0)
+        this.setCalculated('perception_trained', this.actor.perception.rank >= 1)
+        this.setCalculated('perception_expert', this.actor.perception.rank >= 2)
+        this.setCalculated('perception_master', this.actor.perception.rank >= 3)
+        this.setCalculated('perception_legendary', this.actor.perception.rank >= 4)
+
+        /* Speed */
+        this.setCalculated('speed', this.actor.system.attributes.speed.value)
+        this.setCalculated('special_movement', this.actor.system.attributes.speed.otherSpeeds.map(s => `${s.label}: ${s.value}`).join(', '))
+
+        /* Class DC */
+        const classDCAttribute = this.actor.classDC.modifiers.filter(m => m.type === 'ability' && m.enabled).map(m => m.modifier)[0] || 0;
+        const classDCProficiency = this.actor.classDC.modifiers.filter(m => m.type === 'proficiency' && m.enabled).map(m => m.modifier)[0] || 0;
+        const classDCItem = this.actor.classDC.modifiers.filter(m => m.type === 'item' && m.enabled).map(m => m.modifier)[0] || 0;
+        this.setCalculated('class_dc_attribute_modifier', classDCAttribute);
+        this.setCalculated('class_dc_proficiency_modifier', classDCProficiency);
+        this.setCalculated('class_dc_item_modifier', classDCItem);
+        this.setCalculated('class_dc', 10 + classDCAttribute + classDCProficiency + classDCItem)
+
+        /* Weapon Profs */
+        for (const slug in this.actor.system.proficiencies.attacks)
+        {
+            const attack = this.actor.system.proficiencies.attacks[slug];
+            switch (true)
+            {
+                case (attack.rank == 4):
+                    this.setCalculated(`attack_${slug}_legendary`, true);
+                case (attack.rank >= 3):
+                    this.setCalculated(`attack_${slug}_master`, true);
+                case (attack.rank >= 2):
+                    this.setCalculated(`attack_${slug}_expert`, true);
+                case (attack.rank >= 1):
+                    this.setCalculated(`attack_${slug}_trained`, true);
+            }
+        }
+
+        var firstLevelClassFeatures = '';
+        this.actor.feats.forEach((featGroup) =>
+        {
+            if (featGroup.id === 'ancestryfeature')
+            {
+                featGroup.feats.forEach((feature) =>
+                {
+                    var ancestryFeature = feature.feat.name;
+                    if (feature.feat.grants.length > 0)
+                    {
+                        ancestryFeature += ' - ';
+                        ancestryFeature += feature.feat.grants.map(f => f.name).join(', ');
+                    }
+                    this.setCalculated('1_ancestry_hertitage_abilities', ancestryFeature);
+                });
+            }
+
+            /* Class Features */
+            if (featGroup.id === 'classfeature')
+            {
+                featGroup.feats.forEach((feature) =>
+                {
+                    var classFeature = feature.feat.name;
+                    if (feature.feat.grants.length > 0)
+                    {
+                        classFeature += ' - ';
+                        classFeature += feature.feat.grants.map(f => f.name).join(', ');
+                    }
+        
+                    if (feature.label == 1)
+                    {
+                        firstLevelClassFeatures += `${classFeature} \n`;
+                    }
+                    else
+                    {
+                        this.setCalculated(`${feature.label}_class_feature`, classFeature)
+                    }
+                });
+            }
+            /* Ancestry Feats */
+            if (featGroup.id === 'ancestry')
+            {
+                featGroup.feats.forEach((feat) =>
+                {
+                    var ancestryFeat = feat.feat.name;
+                    if (feat.feat.grants.length > 0)
+                    {
+                        ancestryFeat += ' - ';
+                        ancestryFeat += feat.feat.grants.map(f => f.name).join(', ');
+                    }
+                    this.setCalculated(`${feat.label}_ancestry_feat`, ancestryFeat);
+                });
+            }
+            /* Class Feats */
+            if (featGroup.id === 'class')
+            {
+                featGroup.feats.forEach((feat) =>
+                {
+                    var classFeat = feat.feat.name;
+                    if (feat.feat.grants.length > 0)
+                    {
+                        classFeat += ' - ';
+                        classFeat += feat.feat.grants.map(f => f.name).join(', ');
+                    }
+        
+                    if (feat.label == 1)
+                    {
+                        firstLevelClassFeatures += `${classFeat} \n`;
+                    }
+                    else
+                    {
+                        this.setCalculated(`${feat.label}_class_feat`, classFeat)
+                    }
+                });
+            }
+            /* Skill Feats */
+            if (featGroup.id === 'skill')
+            {
+                featGroup.feats.forEach((feat) =>
+                {
+                    var skillFeat = feat.feat.name;
+                    if (feat.feat.grants.length > 0)
+                    {
+                        skillFeat += ' - ';
+                        skillFeat += feat.feat.grants.map(f => f.name).join(', ');
+                    }
+                    if (feat.label === 'BG')
+                    {
+                        this.setCalculated('1_background_skill_feat', skillFeat);
+                    }
+                    else
+                    {
+                        this.setCalculated(`${feat.level}_skill_feat`, skillFeat);
+                    }
+                });
+            }
+            /* General Feats */
+            if (featGroup.id === 'general')
+            {
+                featGroup.feats.forEach((feat) =>
+                {
+                    var skillFeat = feat.feat.name;
+                    if (feat.feat.grants.length > 0)
+                    {
+                        skillFeat += ' - ';
+                        skillFeat += feat.feat.grants.map(f => f.name).join(', ');
+                    }
+                    this.setCalculated(`${feat.label}_general_feat`, skillFeat);
+                });
+            }
+        });
+        this.setCalculated('1_class_feats_features', firstLevelClassFeatures);
 
         // Set Player image
         this.setImage(this.actor.img, 2, 40, 500, 120, 200);
