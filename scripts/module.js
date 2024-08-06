@@ -376,33 +376,38 @@ class SheetExportconfig extends FormApplication {
 				//		console.log(fieldMapping)
 				//				functionSet.secm.setCurrentField(field);
 				//				functionSet.secm.setCurrentFontsize(getDefaultFontSize(field.acroField));
+				try {
 
-				switch (type) {
-					case "PDFTextField":
-						if (field.isMultiline()) {
-							input.innerHTML = fieldMapping ? fieldMapping.calculated : "";
-						} else {
-							input.setAttribute("type", "text");
-							input.value = fieldMapping ? fieldMapping.calculated : "";
-						}
-						field.setText(fieldMapping ? (fieldMapping.calculated ? fieldMapping.calculated.toString() : "") : "");
-						field.markAsClean();
-						break;
-					case "PDFCheckBox":
-						input.setAttribute("type", "checkbox");
-						input.checked = fieldMapping ? fieldMapping.calculated : "";
-						fieldMapping ? (fieldMapping.calculated ? field.check() : field.uncheck()) : field.uncheck();
-						break;
-					case "PDFButton":
-						console.log("PDFButton");
-						break;
-					case "PDFRadioGroup":
-						console.log("PDFRadioGroup");
-						break;
+					switch (type) {
+						case "PDFTextField":
+							if (field.isMultiline()) {
+								input.innerHTML = fieldMapping ? fieldMapping.calculated : "";
+							} else {
+								input.setAttribute("type", "text");
+								input.value = fieldMapping ? fieldMapping.calculated : "";
+							}
+							field.setText(fieldMapping ? (fieldMapping.calculated ? fieldMapping.calculated.toString() : "") : "");
+							field.markAsClean();
+							break;
+						case "PDFCheckBox":
+							input.setAttribute("type", "checkbox");
+							input.checked = fieldMapping ? fieldMapping.calculated : "";
+							fieldMapping ? (fieldMapping.calculated ? field.check() : field.uncheck()) : field.uncheck();
+							break;
+						case "PDFButton":
+							console.log("PDFButton");
+							break;
+						case "PDFRadioGroup":
+							console.log("PDFRadioGroup");
+							break;
 
-					default:
-						//				console.log("nothing in switch");
-						break;
+						default:
+							//				console.log("nothing in switch");
+							break;
+					}
+				} catch (error) {
+					console.error(`Error processing field ${name} of type ${type}:`, error);
+					ui.notifications.error(`Error processing field ${name}: ${error.message}`);
 				}
 				row.appendChild(input); // Add to DOM
 
