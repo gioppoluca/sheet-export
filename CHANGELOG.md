@@ -1,4 +1,9 @@
 
+## [0.6.0] - 2024-01-28
+### :sparkles: New Features
+- [`8b308d5`](https://github.com/gioppoluca/sheet-export/commit/8b308d5ce2174f522215f52923a1d8bd92a85323) - added pf1 *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+
 ## [0.5.0] - 2024-01-28
 ### :sparkles: New Features
 - [`95eea96`](https://github.com/gioppoluca/sheet-export/commit/95eea9610cf8eebc39bded2cb67f6eacae053582) - new placement of image scaled within the box *(commit by [@gioppoluca](https://github.com/gioppoluca))*
@@ -169,3 +174,4 @@
 [0.4.0]: https://github.com/gioppoluca/sheet-export/compare/0.3.1...0.4.0
 [0.4.1]: https://github.com/gioppoluca/sheet-export/compare/0.4.0...0.4.1
 [0.5.0]: https://github.com/gioppoluca/sheet-export/compare/0.4.1...0.5.0
+[0.6.0]: https://github.com/gioppoluca/sheet-export/compare/0.5.0...0.6.0
