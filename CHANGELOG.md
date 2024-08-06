@@ -1,4 +1,10 @@
 
+## [0.7.0] - 2024-08-06
+### :sparkles: New Features
+- [`bd24b5f`](https://github.com/gioppoluca/sheet-export/commit/bd24b5fba2223bd7e52dd138f2658e306a6d3ea3) - added compatibility with V12 and DND5e 3+ *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+- [`b94e578`](https://github.com/gioppoluca/sheet-export/commit/b94e578f9b675429049654744c82762a7007550a) - added compatibility with V12 and dnd5e 3+ *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+
 ## [0.6.0] - 2024-01-28
 ### :sparkles: New Features
 - [`8b308d5`](https://github.com/gioppoluca/sheet-export/commit/8b308d5ce2174f522215f52923a1d8bd92a85323) - added pf1 *(commit by [@gioppoluca](https://github.com/gioppoluca))*
@@ -175,3 +181,4 @@
 [0.4.1]: https://github.com/gioppoluca/sheet-export/compare/0.4.0...0.4.1
 [0.5.0]: https://github.com/gioppoluca/sheet-export/compare/0.4.1...0.5.0
 [0.6.0]: https://github.com/gioppoluca/sheet-export/compare/0.5.0...0.6.0
+[0.7.0]: https://github.com/gioppoluca/sheet-export/compare/0.6.0...0.7.0
