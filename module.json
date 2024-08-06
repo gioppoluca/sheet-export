@@ -6,15 +6,16 @@
   "library": "false",
   "manifestPlusVersion": "1.2.0",
   "compatibility": {
-    "minimum": 11,
-    "verified": 11,
-    "maximum": 11
+    "minimum": "11",
+    "verified": "12",
+    "maximum": "12"
   },
   "authors": [
     {
       "name": "Luca Gioppo",
       "url": "https://github.com/gioppoluca",
-      "discord": "gioppoluca"
+      "discord": "gioppoluca",
+      "flags": {}
     }
   ],
   "relationships": {
@@ -34,7 +35,8 @@
     {
       "lang": "en",
       "name": "English",
-      "path": "languages/en.json"
+      "path": "languages/en.json",
+      "flags": {}
     }
   ],
   "url": "#{URL}#",
@@ -45,7 +47,9 @@
   "media": [
     {
       "type": "icon",
-      "url": "https://avatars2.githubusercontent.com/u/71292812?s=400&u=ccdb4eeb7abf551ca8f314e5a9bfd0479a4d3d41&v=4"
+      "url": "https://avatars2.githubusercontent.com/u/71292812?s=400&u=ccdb4eeb7abf551ca8f314e5a9bfd0479a4d3d41&v=4",
+      "loop": false,
+      "flags": {}
     }
   ]
 }
