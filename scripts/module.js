@@ -1,12 +1,14 @@
 import { PDFDocument, PDFRawStream, PDFName, StandardFonts, getDefaultFontSize } from './lib/pdf-lib.esm.js';
 import fontkit from './lib/fontkit.es.js';
 import { registerSettings } from "./settings.js";
-import { getPdf, getSheetType } from "./sheet-export-api.js";
+import { getPdf, getSheetType, getSheetTypeFromActor } from "./sheet-export-api.js";
 
 //global saveAs;
 
 Hooks.once('ready', async function () {
-
+	console.log("---------------GIOPPO--------------")
+	console.log(Hooks)
+	console.log(Hooks.events)
 });
 
 // Store mapping
@@ -35,7 +37,49 @@ Hooks.on("renderSettingsConfig", (app, html) => {
 
 });
 
+Hooks.on("getActorDirectoryEntryContext", (sidebar, menuItems) => {
+	console.log("gioppo")
+	console.log(menuItems)
+	console.log(sidebar)
+	//	console.log(arguments)
+
+	menuItems.push({
+		name: game.i18n.localize(`sheet-export.menu.label`),
+		icon: '<i class="fas fa-file-pdf"></i>',
+		condition: () => game.user.isGM,
+		callback: header => {
+			console.log(header)
+			const li = header.closest(".directory-item");
+			console.log(li)
+			console.log(li.data("documentId"))
+			console.log(header.data("documentId"))
+			//console.log(header.dataset.documentId)
+			const type = "Actor"
+			const actor = fromUuidSync(`${type}.${header.data("documentId")}`)
+			console.log(actor)
+			const sheet = actor.sheet
+			console.log(actor.type)
+			let mappingVersion = game.settings.get(SheetExportconfig.ID, "mapping-version");
+			let mappingRelease = game.settings.get(SheetExportconfig.ID, "mapping-release");
+			let sheetType = getSheetTypeFromActor(actor, mappingVersion, mappingRelease);
+			if (sheetType) {
+				new SheetExportconfig(actor, sheetType, sheet).render(true);
+			} else {
+				ui.notifications.error("We cannot export the sheet for this entity")
+			}
+			/* 	  new DocumentOwnershipConfig(document, {
+					top: Math.min(li[0].offsetTop, window.innerHeight - 350),
+					left: window.innerWidth - 720
+				  }).render(true); */
+		}
+	})
+
+
+
+});
+
 // Add button to Actor Sheet for opening app
+/*
 Hooks.on("getActorSheetHeaderButtons", (sheet, buttons) => {
 	console.log("check the sheet")
 	console.log(sheet)
@@ -62,7 +106,7 @@ Hooks.on("getActorSheetHeaderButtons", (sheet, buttons) => {
 		});
 	}
 });
-
+*/
 class SheetExportconfig extends FormApplication {
 	constructor(actor, sheetType, sheet) {
 		super();

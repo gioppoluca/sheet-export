@@ -1,5 +1,5 @@
 import { PDFDocument } from './lib/pdf-lib.esm.js';
-import { systemMapping } from './systemMapping.js';
+import { systemMapping, systemMappingSheet } from './systemMapping.js';
 
 
 async function getMapping(mappingChoice, mappingRelease, mappingElement) {
@@ -41,6 +41,31 @@ async function getPdf(pdfUrl, buffer = null) {
 	return pdfDoc;
 }
 
+function getSheetTypeFromActor(actor, mappingChoice = "", mappingRelease = "") {
+	let systemMappingsSheet = systemMappingSheet();
+	let sheetType = "";
+	if (systemMappingsSheet[game.system.id] == undefined) {
+		console.log("game system not yet supported by sheet-export");
+		return;
+	} else if (systemMappingsSheet[game.system.id][actor.type]) {
+		console.log("there is a mapping for the actor type");
+		console.log(`/modules/sheet-export/mappings/${game.system.id}/${mappingChoice}/${mappingRelease}/${systemMappingsSheet[game.system.id][actor.type]}.js`);
+		const request = new XMLHttpRequest();
+		request.open("HEAD", getRoute(`/modules/sheet-export/mappings/${game.system.id}/${mappingChoice}/${mappingRelease}/${systemMappingsSheet[game.system.id][actor.type]}.js`), false); // `false` makes the request synchronous
+		request.send(null);
+		if (request.status === 200) {
+			sheetType = systemMappingsSheet[game.system.id][actor.type];
+		} else {
+			console.log("the sheet for PC Type should be supported but mapping is not present for this release");
+			return;
+		}
+	} else {
+		console.log("the sheet for this Document Type is not supported by sheet-export");
+		return;
+	}
+	return sheetType;
+}
+
 function getSheetType(actor, mappingChoice = "", mappingRelease = "") {
 	let systemMappings = systemMapping();
 	let sheetType = "";
@@ -75,5 +100,5 @@ function getSheetType(actor, mappingChoice = "", mappingRelease = "") {
 	return sheetType;
 }
 
-export { getMapping, getPdf, getSheetType };
+export { getMapping, getPdf, getSheetType, getSheetTypeFromActor };
 
