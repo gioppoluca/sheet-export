@@ -1,5 +1,8 @@
 {
   "sheet-export": {
+    "menu":{
+      "label": "Sheet Export"
+    },
     "settings": {
       "mappingOption": {
         "Name": "Mappings version-release",
