@@ -4,7 +4,6 @@
   "description": "Module to export Foundry sheets in PDF",
   "version": "#{VERSION}#",
   "library": "false",
-  "manifestPlusVersion": "1.2.0",
   "compatibility": {
     "minimum": "11",
     "verified": "12",
