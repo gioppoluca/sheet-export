@@ -1,4 +1,4 @@
-- ![](https://img.shields.io/badge/Foundry-v11-informational)
+- ![](https://img.shields.io/badge/Foundry-v12-informational)
 - ![Latest Release Download Count](https://img.shields.io/github/downloads/gioppoluca/sheet-export/latest/module.zip)
 - ![Forge Installs](https://img.shields.io/badge/dynamic/json?label=Forge%20Installs&query=package.installs&suffix=%25&url=https%3A%2F%2Fforge-vtt.com%2Fapi%2Fbazaar%2Fpackage%2Fsheet-export&colorB=4aa94a)
 
@@ -24,6 +24,7 @@ At the moment the module manages:
 | sfrpg           | standard   | latest  | PC     |                                       | The PC PDF for Starfinder Edition                                                     |
 | shadowrun6-eden | standard   | latest  | PC     |                                       | The PC PDF for Shadowrun 6° Edition (incomplete)                                     |
 | swade           | standard   | latest  | PC     |                                       | The PC PDF for SWADE                                                                  |
+| vtme5           | standard   | latest  | Vampire     |                                       | The Vampire PDF for World of Darkness - Vampire the Masquerade                                                                  |
 
 If you want to become a mantainer of a game system, please contact me.
 
@@ -40,9 +41,9 @@ If you want to become a mantainer of a game system, please contact me.
 
 ### Export
 
-As seen in the image below in the actor sheet there is an **Export to PDF** button in the toolbar
+As seen in the image below in the actor sidebar menu on  the right click there is the  **Export to PDF** button
 
-![Button](img/button.png)
+![Menu](img/menu.png)
 
 By pressing it you can choose to either use the default PDF that comes with the module (by pressing **Apply**) or to upload your own PDF (by choosing the button **Override mapping's PDF**).
 
