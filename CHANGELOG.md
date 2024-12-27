@@ -1,4 +1,14 @@
 
+## [0.8.0] - 2024-12-27
+### :sparkles: New Features
+- [`ef0340a`](https://github.com/gioppoluca/sheet-export/commit/ef0340a0f643eed6422f4c2b7094a49503368a5a) - work with actor sidebar menu and not sheet button for compatibility with ApplicationV2 *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+- [`941b837`](https://github.com/gioppoluca/sheet-export/commit/941b8371dd3fcb1905b2d0cfcc2192ccc40e8e3e) - menu lang *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+- [`3b9c3f3`](https://github.com/gioppoluca/sheet-export/commit/3b9c3f397f46cffeef03da2433efb31769f1240d) - added WoD vampire sheet *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+### :bug: Bug Fixes
+- [`7749259`](https://github.com/gioppoluca/sheet-export/commit/7749259324204543957ada56f27c624b2224e157) - ci not waiting long enough *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+
 ## [0.7.0] - 2024-08-06
 ### :sparkles: New Features
 - [`bd24b5f`](https://github.com/gioppoluca/sheet-export/commit/bd24b5fba2223bd7e52dd138f2658e306a6d3ea3) - added compatibility with V12 and DND5e 3+ *(commit by [@gioppoluca](https://github.com/gioppoluca))*
@@ -182,3 +192,4 @@
 [0.5.0]: https://github.com/gioppoluca/sheet-export/compare/0.4.1...0.5.0
 [0.6.0]: https://github.com/gioppoluca/sheet-export/compare/0.5.0...0.6.0
 [0.7.0]: https://github.com/gioppoluca/sheet-export/compare/0.6.0...0.7.0
+[0.8.0]: https://github.com/gioppoluca/sheet-export/compare/0.7.0...0.8.0
