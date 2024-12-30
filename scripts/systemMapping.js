@@ -65,7 +65,8 @@ const systemMappingSheet = function () {
             "character": "player"
         },
         "vtm5e":{
-            "vampire": "vampire"
+            "vampire": "vampire",
+            "werewolf": "werewolf"
         },
         "cyphersystem":{
             "PC": "player",
