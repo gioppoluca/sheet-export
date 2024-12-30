@@ -181,7 +181,7 @@ class MappingClass extends baseMapping {
         // humanity
         for (let index = 1; index < 11; index++) {
             //const element = array[index];
-            this.setCalculated(`hum-${index-1}`, this.actor.system.humanity.value >= index ? true : false);
+            this.setCalculated(`hum-${index - 1}`, this.actor.system.humanity.value >= index ? true : false);
         }
 
         let discIndex = 1
@@ -217,7 +217,7 @@ class MappingClass extends baseMapping {
             discIndex++
         })
 
-        this.setCalculated("Chronicle Tenets", this.actor.SOMETHING);
+        this.setCalculated("Chronicle Tenets", this.htmlToText(this.actor.system.headers.tenets));
         this.setCalculated("Touchstones Convictions", (function (h) {
             const d = document.createElement("div");
             d.innerHTML = h;
