@@ -1,4 +1,13 @@
 
+## [0.9.0] - 2024-12-30
+### :sparkles: New Features
+- [`1aa814b`](https://github.com/gioppoluca/sheet-export/commit/1aa814b5e2e6b58a934729d31d2f3bf7ff11f31d) - added werewolf sheet *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+### :bug: Bug Fixes
+- [`1b76164`](https://github.com/gioppoluca/sheet-export/commit/1b76164a9abb3f61f5835824aff7f866d213676e) - removed old and unused moduleplus since is not used anymore *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+- [`e8557de`](https://github.com/gioppoluca/sheet-export/commit/e8557de82d46eebaf71c09fa494dc1d494335d38) - mapping in vampire sheet *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+
 ## [0.8.0] - 2024-12-27
 ### :sparkles: New Features
 - [`ef0340a`](https://github.com/gioppoluca/sheet-export/commit/ef0340a0f643eed6422f4c2b7094a49503368a5a) - work with actor sidebar menu and not sheet button for compatibility with ApplicationV2 *(commit by [@gioppoluca](https://github.com/gioppoluca))*
@@ -193,3 +202,4 @@
 [0.6.0]: https://github.com/gioppoluca/sheet-export/compare/0.5.0...0.6.0
 [0.7.0]: https://github.com/gioppoluca/sheet-export/compare/0.6.0...0.7.0
 [0.8.0]: https://github.com/gioppoluca/sheet-export/compare/0.7.0...0.8.0
+[0.9.0]: https://github.com/gioppoluca/sheet-export/compare/0.8.0...0.9.0
