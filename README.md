@@ -25,6 +25,7 @@ At the moment the module manages:
 | shadowrun6-eden | standard   | latest  | PC     |                                       | The PC PDF for Shadowrun 6° Edition (incomplete)                                     |
 | swade           | standard   | latest  | PC     |                                       | The PC PDF for SWADE                                                                  |
 | vtme5           | standard   | latest  | Vampire     |                                       | The Vampire PDF for World of Darkness - Vampire the Masquerade                                                                  |
+| black-flag           | standard   | latest  | PC     |                                       | The PC PDF for Black Flag - Tales of the Valiant                                                                  |
 
 If you want to become a mantainer of a game system, please contact me.
 
