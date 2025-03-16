@@ -94,7 +94,7 @@ The image will be placed within the defined bounding box in the proper page of t
 **Global content**
 The base class offers a function to keep content that could be splitted in different fields.
 **setGlobalValue** function has a key parameter and the mapping value to assign the **Global Value**.
-With the **getGlobalValue** it is ossible to get a number of charcters of the global content by passing (key to the content, start char, end char) the syntax is the same as the substring function.
+With the **getGlobalValue** it is possible to get a number of characters of the global content by passing (key to the content, start char, end char) the syntax is the same as the substring function.
 
 ### Settings
 
@@ -103,6 +103,7 @@ The settings form presents the drop down list for choosing the mapping for the g
 ![Settings](img/settings.png)
 
 The **Genarate mapping** button opens a dialog to access the button **Generate mapping for PC from PDF** allows you to generate the JS mapping file from the PDF file you will upload: you will get a js file with all PDF fields listed and all the mapping empty for you to complete.
+The **js** file will have to be associated to the proper system mapping. The best option is to open an issue and send both the PDF and the js file to the Discord server so that it will be possible to add it to the module; otherwise associate the newly create JS to the `systemMapping.js` file in the `systemMappingSheet` function.
 
 ![edit mapping](img/edit-mapping.png)
 
