@@ -18,9 +18,9 @@ class MappingClass extends baseMapping {
         this.systemName = "dnd5e";
         // Set the PDF files to use - MIND that the order of the files is important!
         this.pdfFiles.push({
-            pdfUrl: '/modules/sheet-export/mappings/dnd5e/5E_CharacterSheet_Fillable.pdf',
+            pdfUrl: '/modules/sheet-export/mappings/dnd5e/Extended character sheet 5e.pdf',
             nameDownload: `${this.actor.name ?? "character"}.pdf`,
-            name: "5E_CharacterSheet_Fillable.pdf",
+            name: "Extended character sheet 5e.pdf",
         });
 
         // Set Player image
@@ -103,7 +103,7 @@ class MappingClass extends baseMapping {
         this.setCalculated("Wpn Name", this.localizedItemName(this.actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[0]) || "");
         this.setCalculated("Wpn1 AtkBonus", (function (actor) {
             const theWeapon = actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[0];
-            //theWeapon?.prepareFinalAttributes();
+            theWeapon?.prepareFinalAttributes();
             return theWeapon?.labels?.toHit?.replace(/^\+ $/, "0") || ""
         })(this.actor)
         );
@@ -117,14 +117,14 @@ class MappingClass extends baseMapping {
         this.setCalculated("Wpn Name 2", this.actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[1]?.name || "");
         this.setCalculated("Wpn2 AtkBonus", (function (actor) {
             const theWeapon = actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[1];
-            //theWeapon?.prepareFinalAttributes();
+            theWeapon?.prepareFinalAttributes();
             return theWeapon?.labels?.toHit?.replace(/^\+ $/, "0") || ""
         })(this.actor)
         );
         this.setCalculated("Wpn Name 3", this.actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[2]?.name || "");
         this.setCalculated("Wpn3 AtkBonus", (function (actor) {
             const theWeapon = actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[2];
-            //theWeapon?.prepareFinalAttributes();
+            theWeapon?.prepareFinalAttributes();
             return theWeapon?.labels?.toHit?.replace(/^\+ $/, "0") || ""
         })(this.actor)
         );
@@ -424,6 +424,48 @@ class MappingClass extends baseMapping {
         this.setCalculated("Check Box 3081", this.actor.items.filter(i => i.type === 'spell' && i.system.level === 9)[4]?.system.preparation.prepared || "");
         this.setCalculated("Check Box 3082", this.actor.items.filter(i => i.type === 'spell' && i.system.level === 9)[5]?.system.preparation.prepared || "");
         this.setCalculated("Check Box 3083", this.actor.items.filter(i => i.type === 'spell' && i.system.level === 9)[6]?.system.preparation.prepared || "");
+        this.mapCompleteSpells();
+        this.mapEquipment();
+    }
+
+
+    mapCompleteSpells() {
+        let orderedSpells = this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) })
+        const maxSpells = orderedSpells.length < 80 ? orderedSpells.length : 80;
+        for (let index = 0; index < maxSpells; index++) {
+            const theSpell = orderedSpells[index];
+            const spellIndex = (index + 1).toLocaleString('en-US', { minimumIntegerDigits: 2, useGrouping: false });
+            this.setCalculated(`spell_name_${spellIndex}`, theSpell.name + ((typeof theSpell.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(theSpell.flags['items-with-spells-5e']['parent-item']).name + ']' : '') || "");
+            this.setCalculated(`spell_school_${spellIndex}`, theSpell.system.school || "");
+            this.setCalculated(`spell_level_${spellIndex}`, theSpell.system.level || 0);
+            this.setCalculated(`spell_description_${spellIndex}`, (function (h) {
+                const d = document.createElement("div");
+                d.innerHTML = h;
+                return d.textContent || d.innerText || "";
+            })(theSpell.system.description.value || ""));
+            this.setCalculated(`spell_verbal_${spellIndex}`, theSpell.system.properties.has('vocal') || 0);
+            this.setCalculated(`spell_somatic_${spellIndex}`, theSpell.system.properties.has('somatic') || 0);
+            this.setCalculated(`spell_material_${spellIndex}`, theSpell.system.properties.has('material') || 0);
+            this.setCalculated(`spell_ritual_${spellIndex}`, theSpell.system.properties.has('ritual') || 0);
+            this.setCalculated(`spell_concentration_${spellIndex}`, theSpell.system.properties.has('concentration') || 0);
+            this.setCalculated(`spell_range_${spellIndex}`, theSpell.system.range.value + " " + theSpell.system.range.units || "");
+            this.setCalculated(`spell_casting_${spellIndex}`, theSpell.system.activation.cost + " " + theSpell.system.activation.type || "");
+            this.setCalculated(`spell_duration_${spellIndex}`, theSpell.system.duration.value + " " + theSpell.system.duration.units || "");
+        }
+    }
+
+    mapEquipment(){
+        this.setGlobalValue("equipment_extended",this.actor.items.filter(i => ['weapon', 'equipment', 'tool', 'consumable', 'loot','backpack'].includes(i.type)).map(i => `${i.name} (${i.system.quantity}): \n${((h) => {
+            const d = document.createElement("div");
+            d.innerHTML = h;
+            return d.textContent || d.innerText || "";
+        })(i.system.description.value)}\n`).join("\n"));
+
+        this.setCalculated("equipment_extended1", this.getGlobalValue("equipment_extended",0,2500));
+        this.setCalculated("equipment_extended2", this.getGlobalValue("equipment_extended",2500,5000));
+        this.setCalculated("equipment_extended3", this.getGlobalValue("equipment_extended",5000,7500));
+        this.setCalculated("equipment_extended4", this.getGlobalValue("equipment_extended",7500,10000));
+        
     }
 
     getPrimaryClassObj() {

@@ -103,7 +103,7 @@ class MappingClass extends baseMapping {
         this.setCalculated("Wpn Name", this.localizedItemName(this.actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[0]) || "");
         this.setCalculated("Wpn1 AtkBonus", (function (actor) {
             const theWeapon = actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[0];
-            //theWeapon?.prepareFinalAttributes();
+            theWeapon?.prepareFinalAttributes();
             return theWeapon?.labels?.toHit?.replace(/^\+ $/, "0") || ""
         })(this.actor)
         );
@@ -117,14 +117,14 @@ class MappingClass extends baseMapping {
         this.setCalculated("Wpn Name 2", this.actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[1]?.name || "");
         this.setCalculated("Wpn2 AtkBonus", (function (actor) {
             const theWeapon = actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[1];
-            //theWeapon?.prepareFinalAttributes();
+            theWeapon?.prepareFinalAttributes();
             return theWeapon?.labels?.toHit?.replace(/^\+ $/, "0") || ""
         })(this.actor)
         );
         this.setCalculated("Wpn Name 3", this.actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[2]?.name || "");
         this.setCalculated("Wpn3 AtkBonus", (function (actor) {
             const theWeapon = actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[2];
-            //theWeapon?.prepareFinalAttributes();
+            theWeapon?.prepareFinalAttributes();
             return theWeapon?.labels?.toHit?.replace(/^\+ $/, "0") || ""
         })(this.actor)
         );

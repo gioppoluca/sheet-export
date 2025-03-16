@@ -67,7 +67,7 @@ class MappingClass extends baseMapping {
         this.setCalculated("Wpn1 Name", this.actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[0]?.name || "");
         this.setCalculated("Wpn1 AtkBonus", (function (actor) {
             const theWeapon = actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[0];
-            //theWeapon?.prepareFinalAttributes();
+            theWeapon?.prepareFinalAttributes();
             return theWeapon?.labels?.toHit?.replace(/^\+ $/, "0") || ""
         })(this.actor)
         );
@@ -79,7 +79,7 @@ class MappingClass extends baseMapping {
         this.setCalculated("Wpn2 Name", this.actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[1]?.name || "");
         this.setCalculated("Wpn2 AtkBonus", (function (actor) {
             const theWeapon = actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[1];
-            //theWeapon?.prepareFinalAttributes();
+            theWeapon?.prepareFinalAttributes();
             return theWeapon?.labels?.toHit?.replace(/^\+ $/, "0") || ""
         })(this.actor)
         );
@@ -91,7 +91,7 @@ class MappingClass extends baseMapping {
         this.setCalculated("Wpn3 Name", this.actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[2]?.name || "");
         this.setCalculated("Wpn3 AtkBonus", (function (actor) {
             const theWeapon = actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[2];
-            //theWeapon?.prepareFinalAttributes();
+            theWeapon?.prepareFinalAttributes();
             return theWeapon?.labels?.toHit?.replace(/^\+ $/, "0") || ""
         })(this.actor)
         );
@@ -103,7 +103,7 @@ class MappingClass extends baseMapping {
         this.setCalculated("Wpn4 Name", this.actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[3]?.name || "");
         this.setCalculated("Wpn4 AtkBonus", (function (actor) {
             const theWeapon = actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[3];
-            //theWeapon?.prepareFinalAttributes();
+            theWeapon?.prepareFinalAttributes();
             return theWeapon?.labels?.toHit?.replace(/^\+ $/, "0") || ""
         })(this.actor)
         );
@@ -115,7 +115,7 @@ class MappingClass extends baseMapping {
         this.setCalculated("Wpn5 Name", this.actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[4]?.name || "");
         this.setCalculated("Wpn5 AtkBonus", (function (actor) {
             const theWeapon = actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[4];
-            //theWeapon?.prepareFinalAttributes();
+            theWeapon?.prepareFinalAttributes();
             return theWeapon?.labels?.toHit?.replace(/^\+ $/, "0") || ""
         })(this.actor)
         );
@@ -127,7 +127,7 @@ class MappingClass extends baseMapping {
         this.setCalculated("Wpn6 Name", this.actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[5]?.name || "");
         this.setCalculated("Wpn6 AtkBonus", (function (actor) {
             const theWeapon = actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[5];
-            //theWeapon?.prepareFinalAttributes();
+            theWeapon?.prepareFinalAttributes();
             return theWeapon?.labels?.toHit?.replace(/^\+ $/, "0") || ""
         })(this.actor)
         );
@@ -139,7 +139,7 @@ class MappingClass extends baseMapping {
         this.setCalculated("Wpn7 Name", this.actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[6]?.name || "");
         this.setCalculated("Wpn7 AtkBonus", (function (actor) {
             const theWeapon = actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[6];
-            //theWeapon?.prepareFinalAttributes();
+            theWeapon?.prepareFinalAttributes();
             return theWeapon?.labels?.toHit?.replace(/^\+ $/, "0") || ""
         })(this.actor)
         );

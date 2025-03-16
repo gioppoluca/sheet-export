@@ -100,13 +100,18 @@ class MappingClass extends baseMapping {
         this.setCalculated("Athletics", this.actor.system.skills.ath.total);
         this.setCalculated("Deception", this.actor.system.skills.dec.total);
         this.setCalculated("History", this.actor.system.skills.his.total);
+        console.log("before weapon start");
         this.setCalculated("Wpn Name", this.localizedItemName(this.actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[0]) || "");
+        console.log(this.localizedItemName(this.actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[0]) || "");
+        console.log("before weapon atkbonus");
         this.setCalculated("Wpn1 AtkBonus", (function (actor) {
             const theWeapon = actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[0];
-            theWeapon?.prepareFinalAttributes();
+            console.log(theWeapon);
+            //theWeapon?.prepareFinalAttributes();
             return theWeapon?.labels?.toHit?.replace(/^\+ $/, "0") || ""
         })(this.actor)
         );
+        console.log("before weapon damage");
         this.setCalculated("Wpn1 Damage", (function (actor) {
             const dda = Array.from(actor.itemTypes.weapon.filter(i => i.system.equipped && i.hasAttack && i.hasDamage))?.[0]?.labels.derivedDamage;
             return !dda ? "" : dda.map(dd => `${dd.formula || ""} ${game.dnd5e.config.damageTypes[dd.damageType]}`).join('\n');
@@ -117,14 +122,14 @@ class MappingClass extends baseMapping {
         this.setCalculated("Wpn Name 2", this.actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[1]?.name || "");
         this.setCalculated("Wpn2 AtkBonus", (function (actor) {
             const theWeapon = actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[1];
-            theWeapon?.prepareFinalAttributes();
+            //theWeapon?.prepareFinalAttributes();
             return theWeapon?.labels?.toHit?.replace(/^\+ $/, "0") || ""
         })(this.actor)
         );
         this.setCalculated("Wpn Name 3", this.actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[2]?.name || "");
         this.setCalculated("Wpn3 AtkBonus", (function (actor) {
             const theWeapon = actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[2];
-            theWeapon?.prepareFinalAttributes();
+            //theWeapon?.prepareFinalAttributes();
             return theWeapon?.labels?.toHit?.replace(/^\+ $/, "0") || ""
         })(this.actor)
         );
