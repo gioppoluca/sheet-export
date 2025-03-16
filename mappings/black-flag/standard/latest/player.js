@@ -21,13 +21,16 @@ class MappingClass extends baseMapping {
             name: "ToV-Character-Sheet.pdf",
         });
 
+
+        this.setImage(this.actor.img, 1, 45, 550, 140, 220);
+
         this.setCalculated("Name", this.actor.name);
         this.setCalculated("Class & Level", this.getLocalizedClassAndSubclassAndLevel(this.getPrimaryClassObj()));
         this.setCalculated("Subclass", this.actor.SOMETHING);
-        this.setCalculated("XP", this.actor.SOMETHING);
-        this.setCalculated("Lineage", this.actor.SOMETHING);
-        this.setCalculated("Heritage", this.actor.SOMETHING);
-        this.setCalculated("Background", this.actor.SOMETHING);
+        this.setCalculated("XP", this.actor.system.progression.xp.value);
+        this.setCalculated("Lineage", this.actor.system.progression.lineage.name);
+        this.setCalculated("Heritage", this.actor.system.progression.heritage.name);
+        this.setCalculated("Background", this.actor.system.progression.background.name);
         this.setCalculated("Player", Object.entries(this.actor.ownership).filter(entry => entry[1] === 3).map(entry => entry[0]).map(id => !game.users.get(id)?.isGM ? game.users.get(id)?.name : null).filter(x => x).join(", "));
         this.setCalculated("DexSave", this.actor.system.abilities.dexterity.save.bonus);
         this.setCalculated("ConSave", this.actor.system.abilities.constitution.save.bonus);
@@ -53,11 +56,11 @@ class MappingClass extends baseMapping {
         this.setCalculated("WisMod", this.actor.system.abilities.wisdom.mod);
         this.setCalculated("ChaMod", this.actor.system.abilities.charisma.mod);
         this.setCalculated("DexValue", this.actor.system.abilities.dexterity.value);
-        this.setCalculated("Speed1", this.actor.SOMETHING);
-        this.setCalculated("Speed2", this.actor.SOMETHING);
-        this.setCalculated("Speed3", this.actor.SOMETHING);
+        this.setCalculated("Speed1", this.actor.system.traits.movement.labels[0] ? this.actor.system.traits.movement.labels[0] : "");
+        this.setCalculated("Speed2", this.actor.system.traits.movement.labels[1] ? this.actor.system.traits.movement.labels[1] : "");
+        this.setCalculated("Speed3", this.actor.system.traits.movement.labels[2] ? this.actor.system.traits.movement.labels[2] : "");
         this.setCalculated("Initiative", this.actor.system.attributes.initiative.mod);
-        this.setCalculated("Proficiency", this.actor.SOMETHING);
+        this.setCalculated("Proficiency", this.actor.system.attributes.proficiency);
         this.setCalculated("PassiveINS", this.actor.SOMETHING);
         this.setCalculated("PassiveINV", this.actor.SOMETHING);
         this.setCalculated("PassivePER", this.actor.SOMETHING);
@@ -68,10 +71,10 @@ class MappingClass extends baseMapping {
         this.setCalculated("Luck5", this.actor.SOMETHING);
         this.setCalculated("MaxHP", this.actor.system.attributes.hp.max);
         this.setCalculated("CurrentHP", this.actor.system.attributes.hp.value);
-        this.setCalculated("TempHP", this.actor.SOMETHING);
-        this.setCalculated("HDType", this.actor.SOMETHING);
-        this.setCalculated("HDUsed", this.actor.SOMETHING);
-        this.setCalculated("HDMax", this.actor.SOMETHING);
+        this.setCalculated("TempHP", this.actor.system.attributes.hp.temp);
+        this.setCalculated("HDType", this.formatHD(this.actor.system.attributes.hd.d));
+        this.setCalculated("HDUsed", this.actor.system.attributes.hd.spent);
+        this.setCalculated("HDMax", this.actor.system.attributes.hd.max);
         this.setCalculated("ATKName1", this.actor.SOMETHING);
         this.setCalculated("ATKName4", this.actor.SOMETHING);
         this.setCalculated("ATKName5", this.actor.SOMETHING);
@@ -158,17 +161,29 @@ class MappingClass extends baseMapping {
         this.setCalculated("Copper", this.actor.SOMETHING);
         this.setCalculated("Features", this.actor.SOMETHING);
         this.setCalculated("Homeland", this.actor.SOMETHING);
-        this.setCalculated("Backstory", this.actor.SOMETHING);
+        this.setCalculated("Backstory",  (function (h) {
+            const d = document.createElement("div");
+            d.innerHTML = h;
+            return d.textContent || d.innerText || "";
+        })(this.actor.system.biography.backstory));
         this.setCalculated("CharacterName2", this.actor.SOMETHING);
         this.setCalculated("Appearance", this.actor.SOMETHING);
-        this.setCalculated("Allies & Orgs", this.actor.SOMETHING);
-        this.setCalculated("Age", this.actor.SOMETHING);
-        this.setCalculated("Height", this.actor.SOMETHING);
-        this.setCalculated("Weight", this.actor.SOMETHING);
-        this.setCalculated("Eyes", this.actor.SOMETHING);
-        this.setCalculated("Skin", this.actor.SOMETHING);
-        this.setCalculated("Hair", this.actor.SOMETHING);
-        this.setCalculated("Motivation", this.actor.SOMETHING);
+        this.setCalculated("Allies & Orgs",  (function (h) {
+            const d = document.createElement("div");
+            d.innerHTML = h;
+            return d.textContent || d.innerText || "";
+        })(this.actor.system.biography.allies));
+        this.setCalculated("Age", this.actor.system.biography.age);
+        this.setCalculated("Height", this.actor.system.biography.height);
+        this.setCalculated("Weight", this.actor.system.biography.weight);
+        this.setCalculated("Eyes", this.actor.system.biography.eyes);
+        this.setCalculated("Skin", this.actor.system.biography.skin);
+        this.setCalculated("Hair", this.actor.system.biography.hair);
+        this.setCalculated("Motivation",  (function (h) {
+            const d = document.createElement("div");
+            d.innerHTML = h;
+            return d.textContent || d.innerText || "";
+        })(this.actor.system.biography.motivation));
         this.setCalculated("Additional Features & Traits", this.actor.SOMETHING);
         this.setCalculated("Additional Treasure", this.actor.SOMETHING);
         this.setCalculated("Spellcaster Class & Source", this.actor.SOMETHING);
@@ -411,6 +426,15 @@ class MappingClass extends baseMapping {
     getLocalizedClassAndSubclassAndLevel(classItem) {
         return `${this.getLocalizedClassAndSubclass(classItem)} ${classItem.system.levels}`;
     }    
+
+    formatHD(diceObject) {
+        if (!diceObject || typeof diceObject !== "object") return "";
+      
+        return Object.entries(diceObject)
+          .map(([key, value]) => `${value.available}D${key}`)
+          .join(", ");
+      }
+
 }
 export default MappingClass;
 
