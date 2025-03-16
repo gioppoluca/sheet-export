@@ -68,6 +68,9 @@ const systemMappingSheet = function () {
             "vampire": "vampire",
             "werewolf": "werewolf"
         },
+        "black-flag":{
+            "pc": "player"
+        },
         "cyphersystem":{
             "PC": "player",
         }
