@@ -108,6 +108,7 @@ Hooks.on("getActorSheetHeaderButtons", (sheet, buttons) => {
 });
 */
 
+
 Hooks.on("getHeaderControlsActorSheetV2", (actorSheet, menu) => {
 
     console.log(actorSheet);
