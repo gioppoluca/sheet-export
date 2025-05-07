@@ -114,6 +114,10 @@ Hooks.on("getHeaderControlsActorSheetV2", (actorSheet, menu) => {
     console.log(actorSheet);
     console.log(menu);
 
+	let mappingVersion = game.settings.get(SheetExportconfig.ID, "mapping-version");
+	let mappingRelease = game.settings.get(SheetExportconfig.ID, "mapping-release");
+	let sheetType = getSheetType(actorSheet.actor, mappingVersion, mappingRelease);
+
     menu.push({
 		label: "Export to PDF",
         class: "export-pdf",
@@ -121,7 +125,7 @@ Hooks.on("getHeaderControlsActorSheetV2", (actorSheet, menu) => {
         position: "menu",
         onClick: () => {
             // Open Config window
-            new SheetExportconfig(sheet.actor, sheetType, sheet).render(true);
+            new SheetExportconfig(actorSheet.actor, sheetType, sheet).render(true);
 
             // Bring window to top
             Object.values(ui.windows)
