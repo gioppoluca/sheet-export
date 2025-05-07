@@ -1,4 +1,9 @@
 
+## [0.7.0] - 2025-05-07
+### :sparkles: New Features
+- [`131a379`](https://github.com/wmbest2/sheet-export/commit/131a37941dca92a915afcd7517cfadbee9421f8b) - fix other error *(commit by [@wmbest2](https://github.com/wmbest2))*
+
+
 ## [0.6.0] - 2025-05-07
 ### :sparkles: New Features
 - [`8121105`](https://github.com/wmbest2/sheet-export/commit/81211052a69004e0b8d87964730530dd3db55aa4) - Update to support v13 *(commit by [@wmbest2](https://github.com/wmbest2))*
@@ -216,3 +221,4 @@
 [0.9.0]: https://github.com/gioppoluca/sheet-export/compare/0.8.0...0.9.0
 [0.4.0]: https://github.com/wmbest2/sheet-export/compare/0.3.0...0.4.0
 [0.6.0]: https://github.com/wmbest2/sheet-export/compare/0.5.0...0.6.0
+[0.7.0]: https://github.com/wmbest2/sheet-export/compare/0.6.0...0.7.0
