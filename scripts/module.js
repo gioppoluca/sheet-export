@@ -107,6 +107,31 @@ Hooks.on("getActorSheetHeaderButtons", (sheet, buttons) => {
 	}
 });
 */
+
+Hooks.on("getHeaderControlsActorSheetV2", (actorSheet, menu) => {
+
+    console.log(actorSheet);
+    console.log(menu);
+
+    menu.push({
+		label: "Export to PDF",
+        class: "export-pdf",
+        icon: "fas fa-file-export",
+        position: "menu",
+        onClick: () => {
+            // Open Config window
+            new SheetExportconfig(sheet.actor, sheetType, sheet).render(true);
+
+            // Bring window to top
+            Object.values(ui.windows)
+                .filter(window => window instanceof SheetExportconfig)[0]
+                ?.bringToTop();
+        },
+	});
+
+});
+
+
 class SheetExportconfig extends FormApplication {
 	constructor(actor, sheetType, sheet) {
 		super();
