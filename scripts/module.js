@@ -125,7 +125,7 @@ Hooks.on("getHeaderControlsActorSheetV2", (actorSheet, menu) => {
         position: "menu",
         onClick: () => {
             // Open Config window
-            new SheetExportconfig(actorSheet.actor, sheetType, sheet).render(true);
+            new SheetExportconfig(actorSheet.actor, sheetType, actorSheet).render(true);
 
             // Bring window to top
             Object.values(ui.windows)
