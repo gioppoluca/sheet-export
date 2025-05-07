@@ -468,13 +468,13 @@ class MappingClass extends baseMapping {
 
     traitsLangs() {
         let s = "";
-        let a = this.actor.system.traits.weaponProf.value.map(x => game.dnd5e.config.weaponProficiencies[x]
-            || game.packs.get("dnd5e.items").index.get(game.dnd5e.config.weaponIds[x])?.name).first();
+        let a = this.actor.system.traits.weaponProf.value.first(x => game.dnd5e.config.weaponProficiencies[x]
+            || game.packs.get("dnd5e.items").index.get(game.dnd5e.config.weaponIds[x])?.name);
         let b = this.actor.system.traits.weaponProf.custom.split(";").filter(x => String(x) && x?.length);
 
         if (a?.length > 0) { s = `${s}Weapons: ${a} ${b.join(', ')}\n`; }
-        a = this.actor.system.traits.armorProf.value.map(x => game.dnd5e.config.armorProficiencies[x]
-            || game.packs.get("dnd5e.items").index.get(game.dnd5e.config.armorIds[x])?.name).first();
+        a = this.actor.system.traits.armorProf.value.first(x => game.dnd5e.config.armorProficiencies[x]
+            || game.packs.get("dnd5e.items").index.get(game.dnd5e.config.armorIds[x])?.name);
         b = this.actor.system.traits.armorProf.custom.split(";").filter(x => String(x) && x?.length);
         if (a?.length > 0) { s = `${s}Armor: ${a} ${b.join(', ')}\n`; }
         a = Object.keys(this.actor.system.tools).map(x => game.dnd5e.config.toolProficiencies[x]
