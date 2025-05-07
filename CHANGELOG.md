@@ -1,4 +1,9 @@
 
+## [0.8.0] - 2025-05-07
+### :sparkles: New Features
+- [`5088944`](https://github.com/wmbest2/sheet-export/commit/50889447f12f0fe22fc9388053215755988ffeb3) - Fix first for immutable map *(commit by [@wmbest2](https://github.com/wmbest2))*
+
+
 ## [0.7.0] - 2025-05-07
 ### :sparkles: New Features
 - [`131a379`](https://github.com/wmbest2/sheet-export/commit/131a37941dca92a915afcd7517cfadbee9421f8b) - fix other error *(commit by [@wmbest2](https://github.com/wmbest2))*
@@ -222,3 +227,4 @@
 [0.4.0]: https://github.com/wmbest2/sheet-export/compare/0.3.0...0.4.0
 [0.6.0]: https://github.com/wmbest2/sheet-export/compare/0.5.0...0.6.0
 [0.7.0]: https://github.com/wmbest2/sheet-export/compare/0.6.0...0.7.0
+[0.8.0]: https://github.com/wmbest2/sheet-export/compare/0.7.0...0.8.0
