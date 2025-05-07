@@ -1,4 +1,9 @@
 
+## [0.4.0] - 2025-05-07
+### :sparkles: New Features
+- [`665d0c6`](https://github.com/wmbest2/sheet-export/commit/665d0c628c66e5c348e38146e8738e795287c292) - fixes changelog *(commit by [@wmbest2](https://github.com/wmbest2))*
+
+
 ## [0.9.0] - 2024-12-30
 ### :sparkles: New Features
 - [`1aa814b`](https://github.com/gioppoluca/sheet-export/commit/1aa814b5e2e6b58a934729d31d2f3bf7ff11f31d) - added werewolf sheet *(commit by [@gioppoluca](https://github.com/gioppoluca))*
@@ -203,3 +208,4 @@
 [0.7.0]: https://github.com/gioppoluca/sheet-export/compare/0.6.0...0.7.0
 [0.8.0]: https://github.com/gioppoluca/sheet-export/compare/0.7.0...0.8.0
 [0.9.0]: https://github.com/gioppoluca/sheet-export/compare/0.8.0...0.9.0
+[0.4.0]: https://github.com/wmbest2/sheet-export/compare/0.3.0...0.4.0
