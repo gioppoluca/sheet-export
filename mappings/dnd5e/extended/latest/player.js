@@ -113,8 +113,8 @@ class MappingClass extends baseMapping {
         );
         console.log("before weapon damage");
         this.setCalculated("Wpn1 Damage", (function (actor) {
-            const dda = Array.from(actor.itemTypes.weapon.filter(i => i.system.equipped && i.hasAttack && i.hasDamage))?.[0]?.labels.derivedDamage;
-            return !dda ? "" : dda.map(dd => `${dd.formula || ""} ${game.dnd5e.config.damageTypes[dd.damageType]}`).join('\n');
+            const dda = Array.from(actor.itemTypes.weapon.filter(i => i.system.equipped && i.hasAttack && i.hasDamage))?.[0]?.labels?.damages[0]?.label;
+            return !dda ? "" : dda;
         })(this.actor)
         );
         this.setCalculated("Insight", this.actor.system.skills.ins.total);
@@ -141,8 +141,8 @@ class MappingClass extends baseMapping {
         this.setCalculated("Check Box 22", this.actor.system.abilities.cha.proficient);
         this.setCalculated("INTmod", this.actor.system.abilities.int.mod);
         this.setCalculated("Wpn2 Damage", (function (actor) {
-            const dda = Array.from(actor.itemTypes.weapon.filter(i => i.system.equipped && i.hasAttack && i.hasDamage))?.[1]?.labels.derivedDamage;
-            return !dda ? "" : dda.map(dd => `${dd.formula || ""} ${game.dnd5e.config.damageTypes[dd.damageType]}`).join('\n');
+            const dda = Array.from(actor.itemTypes.weapon.filter(i => i.system.equipped && i.hasAttack && i.hasDamage))?.[1]?.labels?.damages[0]?.label;
+            return !dda ? "" : dda;
         })(this.actor)
         );
         this.setCalculated("Investigation", this.actor.system.skills.inv.total);
@@ -179,8 +179,8 @@ class MappingClass extends baseMapping {
         this.setCalculated("HPCurrent", this.actor.system.attributes.hp.value);
         this.setCalculated("HPTemp", this.actor.system.attributes.hp.temp);
         this.setCalculated("Wpn3 Damage", (function (actor) {
-            const dda = Array.from(actor.itemTypes.weapon.filter(i => i.system.equipped && i.hasAttack && i.hasDamage))?.[2]?.labels.derivedDamage;
-            return !dda ? "" : dda.map(dd => `${dd.formula || ""} ${game.dnd5e.config.damageTypes[dd.damageType]}`).join('\n');
+            const dda = Array.from(actor.itemTypes.weapon.filter(i => i.system.equipped && i.hasAttack && i.hasDamage))?.[2]?.labels?.damages[0]?.label;
+            return !dda ? "" : dda;
         })(this.actor)
         );
         this.setCalculated("SleightofHand", this.actor.system.skills.slt.total);
@@ -198,12 +198,12 @@ class MappingClass extends baseMapping {
         this.setCalculated("Equipment", this.actor.items.filter(i => ['weapon', 'equipment', 'tool'].includes(i.type)).map(i => (i.system.quantity <= 1) ? i.name : `${i.name} (${i.system.quantity})`).join(', '));
         this.setCalculated("Features and Traits", this.getFeatsAndTraits());
         this.setCalculated("CharacterName 2", this.actor.name || "");
-        this.setCalculated("Age", this.actor.flags["tidy5e-sheet"]?.age || "");
-        this.setCalculated("Height", this.actor.flags["tidy5e-sheet"]?.height || "");
-        this.setCalculated("Weight", this.actor.flags["tidy5e-sheet"]?.weight || "");
-        this.setCalculated("Eyes", this.actor.flags["tidy5e-sheet"]?.eyes || "");
-        this.setCalculated("Skin", this.actor.flags["tidy5e-sheet"]?.skin || "");
-        this.setCalculated("Hair", this.actor.flags["tidy5e-sheet"]?.hair || "");
+        this.setCalculated("Age", this.actor.system?.details?.age || "");
+        this.setCalculated("Height", this.actor.system?.details?.height || "");
+        this.setCalculated("Weight", this.actor.system?.details?.weight || "");
+        this.setCalculated("Eyes", this.actor.system?.details?.eyes || "");
+        this.setCalculated("Skin", this.actor.system?.details?.skin || "");
+        this.setCalculated("Hair", this.actor.system?.details?.hair || "");
         this.setCalculated("Faction Symbol Image", "");
         this.setCalculated("Allies", "");
         this.setCalculated("FactionName", "");
@@ -453,9 +453,9 @@ class MappingClass extends baseMapping {
             this.setCalculated(`spell_material_${spellIndex}`, theSpell.system.properties.has('material') || 0);
             this.setCalculated(`spell_ritual_${spellIndex}`, theSpell.system.properties.has('ritual') || 0);
             this.setCalculated(`spell_concentration_${spellIndex}`, theSpell.system.properties.has('concentration') || 0);
-            this.setCalculated(`spell_range_${spellIndex}`, theSpell.system.range.value + " " + theSpell.system.range.units || "");
-            this.setCalculated(`spell_casting_${spellIndex}`, theSpell.system.activation.cost + " " + theSpell.system.activation.type || "");
-            this.setCalculated(`spell_duration_${spellIndex}`, theSpell.system.duration.value + " " + theSpell.system.duration.units || "");
+            this.setCalculated(`spell_range_${spellIndex}`, (theSpell.system.range?.value != null ? theSpell.system.range.value + " " : "") + theSpell.system.range.units || "");
+            this.setCalculated(`spell_casting_${spellIndex}`, (theSpell.system.activation?.cost != null ? theSpell.system.activation?.cost + " " : "") + theSpell.system.activation.type || "");
+            this.setCalculated(`spell_duration_${spellIndex}`, theSpell.system.duration?.value + " " + theSpell.system.duration.units || "");
         }
     }
 
