@@ -1,4 +1,25 @@
 
+## [0.8.0] - 2025-05-07
+### :sparkles: New Features
+- [`5088944`](https://github.com/wmbest2/sheet-export/commit/50889447f12f0fe22fc9388053215755988ffeb3) - Fix first for immutable map *(commit by [@wmbest2](https://github.com/wmbest2))*
+
+
+## [0.7.0] - 2025-05-07
+### :sparkles: New Features
+- [`131a379`](https://github.com/wmbest2/sheet-export/commit/131a37941dca92a915afcd7517cfadbee9421f8b) - fix other error *(commit by [@wmbest2](https://github.com/wmbest2))*
+
+
+## [0.6.0] - 2025-05-07
+### :sparkles: New Features
+- [`8121105`](https://github.com/wmbest2/sheet-export/commit/81211052a69004e0b8d87964730530dd3db55aa4) - Update to support v13 *(commit by [@wmbest2](https://github.com/wmbest2))*
+- [`1c893c0`](https://github.com/wmbest2/sheet-export/commit/1c893c05245c42c68e094bf75c8ecf11d7b2d9b8) - Fixes sheet error *(commit by [@wmbest2](https://github.com/wmbest2))*
+
+
+## [0.4.0] - 2025-05-07
+### :sparkles: New Features
+- [`665d0c6`](https://github.com/wmbest2/sheet-export/commit/665d0c628c66e5c348e38146e8738e795287c292) - fixes changelog *(commit by [@wmbest2](https://github.com/wmbest2))*
+
+
 ## [0.9.0] - 2024-12-30
 ### :sparkles: New Features
 - [`1aa814b`](https://github.com/gioppoluca/sheet-export/commit/1aa814b5e2e6b58a934729d31d2f3bf7ff11f31d) - added werewolf sheet *(commit by [@gioppoluca](https://github.com/gioppoluca))*
@@ -203,3 +224,7 @@
 [0.7.0]: https://github.com/gioppoluca/sheet-export/compare/0.6.0...0.7.0
 [0.8.0]: https://github.com/gioppoluca/sheet-export/compare/0.7.0...0.8.0
 [0.9.0]: https://github.com/gioppoluca/sheet-export/compare/0.8.0...0.9.0
+[0.4.0]: https://github.com/wmbest2/sheet-export/compare/0.3.0...0.4.0
+[0.6.0]: https://github.com/wmbest2/sheet-export/compare/0.5.0...0.6.0
+[0.7.0]: https://github.com/wmbest2/sheet-export/compare/0.6.0...0.7.0
+[0.8.0]: https://github.com/wmbest2/sheet-export/compare/0.7.0...0.8.0
