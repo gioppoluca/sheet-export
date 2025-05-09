@@ -249,7 +249,10 @@ class SheetExportconfig extends FormApplication {
 
 			console.log(img_path);
 			console.log(images[i]);
-			let img_ext = img_path.split('.').pop();
+			// let img_ext = img_path.split('.').pop();
+			let url = new URL(img_path, window.location.origin);
+            let pathname = url.pathname;
+			let img_ext = pathname.split('.').pop().toLowerCase();
 			console.log(img_ext);
 			const arrayBuffer = await fetch(getRoute(img_path)).then(res => res.arrayBuffer())
 			let embedding_image = null;
