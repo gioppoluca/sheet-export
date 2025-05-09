@@ -1,4 +1,9 @@
 
+## [0.13.1] - 2025-05-09
+### :bug: Bug Fixes
+- [`483e0b2`](https://github.com/gioppoluca/sheet-export/commit/483e0b219a138460d6862952cd1a84b608321d03) - closes [#31](https://github.com/gioppoluca/sheet-export/pull/31) *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+
 ## [0.13.0] - 2025-05-09
 ### :sparkles: New Features
 - [`f20b4b7`](https://github.com/gioppoluca/sheet-export/commit/f20b4b7af6491b71d206e455d00e679df5a73634) - V13 compatibility *(commit by [@gioppoluca](https://github.com/gioppoluca))*
@@ -217,3 +222,4 @@
 [0.9.0]: https://github.com/gioppoluca/sheet-export/compare/0.8.0...0.9.0
 [0.10.7]: https://github.com/gioppoluca/sheet-export/compare/0.10.6...0.10.7
 [0.13.0]: https://github.com/gioppoluca/sheet-export/compare/0.10.7...0.13.0
+[0.13.1]: https://github.com/gioppoluca/sheet-export/compare/0.13.0...0.13.1
