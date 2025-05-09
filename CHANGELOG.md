@@ -1,4 +1,10 @@
 
+## [0.10.7] - 2025-05-09
+### :bug: Bug Fixes
+- [`9015f9b`](https://github.com/gioppoluca/sheet-export/commit/9015f9b2e74e30ce9bf35d9cb63e40282079efc1) - closes [#32](https://github.com/gioppoluca/sheet-export/pull/32) *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+- [`12dca6d`](https://github.com/gioppoluca/sheet-export/commit/12dca6d66361fb6766d015eec892bbf1d218516f) - fixed mapping of weapon damage, null in spells and attributes of new 4.x data *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+
 ## [0.9.0] - 2024-12-30
 ### :sparkles: New Features
 - [`1aa814b`](https://github.com/gioppoluca/sheet-export/commit/1aa814b5e2e6b58a934729d31d2f3bf7ff11f31d) - added werewolf sheet *(commit by [@gioppoluca](https://github.com/gioppoluca))*
@@ -203,3 +209,4 @@
 [0.7.0]: https://github.com/gioppoluca/sheet-export/compare/0.6.0...0.7.0
 [0.8.0]: https://github.com/gioppoluca/sheet-export/compare/0.7.0...0.8.0
 [0.9.0]: https://github.com/gioppoluca/sheet-export/compare/0.8.0...0.9.0
+[0.10.7]: https://github.com/gioppoluca/sheet-export/compare/0.10.6...0.10.7
