@@ -53,7 +53,7 @@ const systemMappingSheet = function () {
             "character": "player"
         },
         "CoC7":{
-            "player": "character"
+            "character": "player"
         },
         "shadowrun6-eden":{
             "Player": "player"
