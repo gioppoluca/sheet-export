@@ -24,14 +24,14 @@ At the moment the module manages:
 | sfrpg           | standard   | latest  | PC     |                                       | The PC PDF for Starfinder Edition                                                     |
 | shadowrun6-eden | standard   | latest  | PC     |                                       | The PC PDF for Shadowrun 6° Edition (incomplete)                                     |
 | swade           | standard   | latest  | PC     |                                       | The PC PDF for SWADE                                                                  |
-| vtme5           | standard   | latest  | Vampire     |                                       | The Vampire PDF for World of Darkness - Vampire the Masquerade                                                                  |
+| vtme5           | standard   | latest  | Vampire, Werewolf     |                                       | The Vampire and Werewolf PDF for World of Darkness - Vampire the Masquerade                                                                  |
 | black-flag           | standard   | latest  | PC     |                                       | The PC PDF for Black Flag - Tales of the Valiant                                                                  |
 
 If you want to become a mantainer of a game system, please contact me.
 
 ## Features
 
-1. Allow to choose different mapping from the ones aviable for the game system (like in the case of dnd5e with standard and extended)
+1. Allow to choose different mapping from the ones available for the game system (like in the case of dnd5e with standard and extended)
 2. Allow to export images in the PDF
 3. Error management that explain precisely which mapping field had problems
 4. Generate mapping file from PDF form by uploading PDF
@@ -50,7 +50,7 @@ By pressing it you can choose to either use the default PDF that comes with the 
 
 ![Export to PDF](img/export.png)
 
-Applying the data to the PDF could require some time so wait untill it is finished and presents the following content:
+Applying the data to the PDF could require some time so wait until it is finished and presents the following content:
 
 ![Alt text](img/export-applyed.png)
 
