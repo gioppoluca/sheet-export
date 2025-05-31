@@ -2,6 +2,7 @@ import { PDFDocument, PDFRawStream, PDFName, StandardFonts, getDefaultFontSize }
 import fontkit from './lib/fontkit.es.js';
 import { registerSettings } from "./settings.js";
 import { getPdf, getSheetType, getSheetTypeFromActor } from "./sheet-export-api.js";
+import { detectImageType } from './lib/image-type-detector.js';
 
 Hooks.once('ready', async function () {
 	console.log("---------------GIOPPO--------------")
@@ -280,13 +281,16 @@ class SheetExportconfig extends FormApplication {
 			console.log(img_path);
 			console.log(images[i]);
 			// let img_ext = img_path.split('.').pop();
-			let url = new URL(img_path, window.location.origin);
-            let pathname = url.pathname;
-			let img_ext = pathname.split('.').pop().toLowerCase();
-			console.log(img_ext);
+			//let url = new URL(img_path, window.location.origin);
+			const imageType = await detectImageType(getRoute(img_path));
+			console.log(`Detected image type: ${imageType}`);
+
+			//let pathname = url.pathname;
+			//let img_ext = pathname.split('.').pop().toLowerCase();
+			//console.log(img_ext);
 			const arrayBuffer = await fetch(getRoute(img_path)).then(res => res.arrayBuffer())
 			let embedding_image = null;
-			switch (img_ext) {
+			switch (imageType) {
 				case "png":
 					embedding_image = await pdf.embedPng(arrayBuffer)
 					break;
