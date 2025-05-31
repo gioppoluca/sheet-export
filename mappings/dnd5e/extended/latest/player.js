@@ -194,7 +194,7 @@ class MappingClass extends baseMapping {
         this.setCalculated("EP", this.actor.system.currency.ep || "");
         this.setCalculated("GP", this.actor.system.currency.gp || "");
         this.setCalculated("PP", this.actor.system.currency.pp || "");
-        
+
         this.setCalculated("Equipment", this.actor.items.filter(i => ['weapon', 'equipment', 'tool'].includes(i.type)).map(i => (i.system.quantity <= 1) ? i.name : `${i.name} (${i.system.quantity})`).join(', '));
         this.setCalculated("Features and Traits", this.getFeatsAndTraits());
         this.setCalculated("CharacterName 2", this.actor.name || "");
@@ -459,18 +459,18 @@ class MappingClass extends baseMapping {
         }
     }
 
-    mapEquipment(){
-        this.setGlobalValue("equipment_extended",this.actor.items.filter(i => ['weapon', 'equipment', 'tool', 'consumable', 'loot','backpack'].includes(i.type)).map(i => `${i.name} (${i.system.quantity}): \n${((h) => {
+    mapEquipment() {
+        this.setGlobalValue("equipment_extended", this.actor.items.filter(i => ['weapon', 'equipment', 'tool', 'consumable', 'loot', 'backpack'].includes(i.type)).map(i => `${i.name} (${i.system.quantity}): \n${((h) => {
             const d = document.createElement("div");
             d.innerHTML = h;
             return d.textContent || d.innerText || "";
         })(i.system.description.value)}\n`).join("\n"));
 
-        this.setCalculated("equipment_extended1", this.getGlobalValue("equipment_extended",0,2500));
-        this.setCalculated("equipment_extended2", this.getGlobalValue("equipment_extended",2500,5000));
-        this.setCalculated("equipment_extended3", this.getGlobalValue("equipment_extended",5000,7500));
-        this.setCalculated("equipment_extended4", this.getGlobalValue("equipment_extended",7500,10000));
-        
+        this.setCalculated("equipment_extended1", this.getGlobalValue("equipment_extended", 0, 2500));
+        this.setCalculated("equipment_extended2", this.getGlobalValue("equipment_extended", 2500, 5000));
+        this.setCalculated("equipment_extended3", this.getGlobalValue("equipment_extended", 5000, 7500));
+        this.setCalculated("equipment_extended4", this.getGlobalValue("equipment_extended", 7500, 10000));
+
     }
 
     getPrimaryClassObj() {
@@ -544,6 +544,64 @@ class MappingClass extends baseMapping {
         return s;
     }
 
+    // this is the override of the function to define the layout of the spell cards
+    getCardLayoutConfig() {
+        return super.getCardLayoutConfig({
+            fonts: {
+                TitleFont: "/modules/sheet-export/mappings/dnd5e/BLKCHCRY.TTF",
+                BodyFont: "/modules/sheet-export/mappings/dnd5e/Roboto-Regular.ttf"
+            },
+            images: {
+                evocationIcon: {
+                    path: "/modules/sheet-export/mappings/dnd5e/ench.png",
+                    width: 24,
+                    height: 24
+                }
+            }
+        });
+    }
+
+
+    // this is override of the card template
+    getCardTemplate() {
+        return super.getCardTemplate({
+            fields: [
+                {
+                    key: "title",
+                    type: "text",
+                    fontName: "TitleFont",
+                    size: 16,
+                    color: "#550000",
+                    x: 20,
+                    y: 160
+                },
+                {
+                    key: "description",
+                    type: "text",
+                    fontName: "BodyFont",
+                    size: 10,
+                    color: "#222222",
+                    x: 20,
+                    y: 140
+                }
+            ]
+        });
+    }
+
+
+    getCardDataArray() {
+        const spells = this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) })
+        return spells.map(spell => ({
+            title: spell.name,
+            description: this.htmlToText(spell.system.description?.value || ""),
+            verbal: spell.system.components?.v ?? false,
+            somatic: spell.system.components?.s ?? false,
+            material: spell.system.components?.m ?? false,
+            ritual: spell.system.ritual === true,
+            concentration: spell.system.concentration === true,
+            schoolIcon: spell.system.school // must match image key in layoutConfig
+        }));
+    }
 }
 
 export default MappingClass;

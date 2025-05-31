@@ -70,42 +70,42 @@ Hooks.on("getActorDirectoryEntryContext", (sidebar, menuItems) => {
 
 // add function and hook for V13 that is different than V12
 function addSheetDirectoryContextOptions(sidebar, menuItems) {
-	if ( sidebar instanceof foundry.applications.sidebar.apps.Compendium ) return;
+	if (sidebar instanceof foundry.applications.sidebar.apps.Compendium) return;
 	console.log("gioppo getActorContextOptions")
 	console.log(menuItems)
 	console.log(sidebar)
 
 	menuItems.push({
-				name: game.i18n.localize(`sheet-export.menu.label`),
-				icon: '<i class="fas fa-file-pdf"></i>',
-				condition: li => { 
-					console.log(li);
-					return game.user.isGM 
-				},
-				callback: header => {
-					console.log(header)
-					
-					const li = header.closest(".directory-item");
-					const actor = game.actors.get(li.dataset.documentId ?? li.dataset.entryId);
-					console.log(actor)
-					const sheet = actor.sheet
-					console.log(actor.type)
-					let mappingVersion = game.settings.get(SheetExportconfig.ID, "mapping-version");
-					let mappingRelease = game.settings.get(SheetExportconfig.ID, "mapping-release");
-					let sheetType = getSheetTypeFromActor(actor, mappingVersion, mappingRelease);
-					if (sheetType) {
-						new SheetExportconfig(actor, sheetType, sheet).render(true);
-					} else {
-						ui.notifications.error("We cannot export the sheet for this entity")
-					}
-						
-					return;
-				},
-				group: 'system'
-			});
-			
-		};
-		
+		name: game.i18n.localize(`sheet-export.menu.label`),
+		icon: '<i class="fas fa-file-pdf"></i>',
+		condition: li => {
+			console.log(li);
+			return game.user.isGM
+		},
+		callback: header => {
+			console.log(header)
+
+			const li = header.closest(".directory-item");
+			const actor = game.actors.get(li.dataset.documentId ?? li.dataset.entryId);
+			console.log(actor)
+			const sheet = actor.sheet
+			console.log(actor.type)
+			let mappingVersion = game.settings.get(SheetExportconfig.ID, "mapping-version");
+			let mappingRelease = game.settings.get(SheetExportconfig.ID, "mapping-release");
+			let sheetType = getSheetTypeFromActor(actor, mappingVersion, mappingRelease);
+			if (sheetType) {
+				new SheetExportconfig(actor, sheetType, sheet).render(true);
+			} else {
+				ui.notifications.error("We cannot export the sheet for this entity")
+			}
+
+			return;
+		},
+		group: 'system'
+	});
+
+};
+
 Hooks.on('getActorContextOptions', addSheetDirectoryContextOptions);
 
 
@@ -494,6 +494,15 @@ class SheetExportconfig extends FormApplication {
 
 				i++;
 			})
+			// TODO HERE the code to add pages
+			console.log(pdf);
+			console.log("Before adding:", pdf.getPageCount());
+			await mappingClass.addCardPages(pdf);
+			console.log("After adding:", pdf.getPageCount());
+			for (let i = 0; i < pdf.getPageCount(); i++) {
+				const size = pdf.getPage(i).getSize();
+				console.log(`Page ${i}: ${size.width}x${size.height}`);
+			}
 			// TODO this has to be an array
 			console.log(pdfFile);
 			this.filledPdf.push({ file: await pdf.save(), name: pdfFile.name, nameDownload: this.actor.name + ".pdf" });
