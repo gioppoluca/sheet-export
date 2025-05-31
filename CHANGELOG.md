@@ -1,4 +1,9 @@
 
+## [0.13.2] - 2025-05-31
+### :bug: Bug Fixes
+- [`e8b3699`](https://github.com/gioppoluca/sheet-export/commit/e8b3699b2d079e6ddbd89e821a53301f16ca756e) - image mapping and extension done properly *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+
 ## [0.13.1] - 2025-05-09
 ### :bug: Bug Fixes
 - [`483e0b2`](https://github.com/gioppoluca/sheet-export/commit/483e0b219a138460d6862952cd1a84b608321d03) - closes [#31](https://github.com/gioppoluca/sheet-export/pull/31) *(commit by [@gioppoluca](https://github.com/gioppoluca))*
@@ -223,3 +228,4 @@
 [0.10.7]: https://github.com/gioppoluca/sheet-export/compare/0.10.6...0.10.7
 [0.13.0]: https://github.com/gioppoluca/sheet-export/compare/0.10.7...0.13.0
 [0.13.1]: https://github.com/gioppoluca/sheet-export/compare/0.13.0...0.13.1
+[0.13.2]: https://github.com/gioppoluca/sheet-export/compare/0.13.1...0.13.2
