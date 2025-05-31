@@ -12,7 +12,7 @@ Hooks.once('ready', async function () {
 
 // Store mapping
 Hooks.once('init', async function () {
-	if (game.version && isNewerVersion(game.version, "9.230")) {
+	if (game.version && foundry.utils.isNewerVersion(game.version, "9.230")) {
 		game.keybindings.register(SheetExportconfig.ID, "showConfig", {
 			name: "Show Config",
 			hint: "Show PDF config menu for the character currently open",
@@ -268,7 +268,7 @@ class SheetExportconfig extends FormApplication {
 			console.log(images[i].height / images[i].width)
 			// Usage example:
 			let coords = null;
-			await this.getMeta(getRoute(img_path)).then(img => {
+			await this.getMeta(foundry.utils.getRoute(img_path)).then(img => {
 				console.log("IMG dimensions")
 				console.log(img.naturalHeight + ' ' + img.naturalWidth);
 				console.log(img.naturalHeight / img.naturalWidth);
@@ -282,13 +282,13 @@ class SheetExportconfig extends FormApplication {
 			console.log(images[i]);
 			// let img_ext = img_path.split('.').pop();
 			//let url = new URL(img_path, window.location.origin);
-			const imageType = await detectImageType(getRoute(img_path));
+			const imageType = await detectImageType(foundry.utils.getRoute(img_path));
 			console.log(`Detected image type: ${imageType}`);
 
 			//let pathname = url.pathname;
 			//let img_ext = pathname.split('.').pop().toLowerCase();
 			//console.log(img_ext);
-			const arrayBuffer = await fetch(getRoute(img_path)).then(res => res.arrayBuffer())
+			const arrayBuffer = await fetch(foundry.utils.getRoute(img_path)).then(res => res.arrayBuffer())
 			let embedding_image = null;
 			switch (imageType) {
 				case "png":
@@ -359,7 +359,7 @@ class SheetExportconfig extends FormApplication {
 		console.log(this.sheetType);
 
 		// get the mapping for the game system and the version set in the config
-		const { default: MappingClass } = await import(getRoute(`/modules/sheet-export/mappings/${game.system.id}/${this.mappingVersion}/${this.mappingRelease}/${this.sheetType}.js`));
+		const { default: MappingClass } = await import(foundry.utils.getRoute(`/modules/sheet-export/mappings/${game.system.id}/${this.mappingVersion}/${this.mappingRelease}/${this.sheetType}.js`));
 		var mappingClass = null;
 		try {
 			mappingClass = new MappingClass(this.actor, this.sheetType, this.sheet);
