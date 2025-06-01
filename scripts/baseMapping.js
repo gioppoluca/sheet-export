@@ -1,6 +1,6 @@
 import { detectImageType } from './lib/image-type-detector.js';
 import { rgb } from './lib/pdf-lib.esm.js';
-
+import { drawCenteredParagraph, drawLeftAlignedParagraph, drawCenteredText, drawTopLeftAlignedParagraph } from './pdf-utils.js'
 
 class baseMapping {
 
@@ -368,6 +368,8 @@ class baseMapping {
                 this.logError(`Embedding failed for "${name}": ${embedErr}`);
             }
         }
+        console.log("end of embedImages with:")
+        console.log(this.embeddedImages)
     }
 
     /**
@@ -455,7 +457,10 @@ class baseMapping {
 
         let currentPage = null;
         let currentPageIndex = -1;
-
+        // if there is a background image we add it only once
+        if (layoutConfig.page.backgroundImage) {
+            await this.embedImages(pdfDoc, layoutConfig.page.backgroundImage);
+        }
         for (let i = 0; i < cardDataArray.length; i++) {
             const cardIndexOnPage = i % cardsPerPage;
             const isNewPage = cardIndexOnPage === 0;
@@ -466,7 +471,10 @@ class baseMapping {
 
                 // Optional: draw background image
                 if (layoutConfig.page.backgroundImage) {
-                    const bg = this.embeddedImages.get("background");
+                    const bgName = Object.entries(layoutConfig.page.backgroundImage)[0];
+                    console.log(bgName)
+                    console.log(bgName[0])
+                    const bg = this.embeddedImages.get(bgName[0]);
                     if (bg?.image) {
                         currentPage.drawImage(bg.image, {
                             x: 0,
@@ -483,6 +491,8 @@ class baseMapping {
 
             const originX = page.margin + col * card.width;
             const originY = page.height - page.margin - (row + 1) * card.height;
+            console.log(`originX: ${originX}`)
+            console.log(`originY: ${originY}`)
 
             const cardData = cardDataArray[i];
 
@@ -530,6 +540,7 @@ class baseMapping {
             const drawArea = {
                 x: originX + x,
                 y: originY + y,
+//                y: originY - y - (height ?? 20),
                 width: width ?? 100,
                 height: height ?? 20,
                 font: fontEntry.font,
@@ -537,8 +548,16 @@ class baseMapping {
                 color: this._parseRGBColor(color)
             };
 
+            console.log(`drawArea.y: ${drawArea.y}`)
+
+
             if (type === "imageRef") {
+                console.log("we have ImageRef")
                 const imageEntry = this.embeddedImages.get(value);
+                console.log(this.embeddedImages)
+                console.log(imageEntry)
+                console.log(value)
+                console.log(drawArea)
                 if (!imageEntry?.image) {
                     this.logWarning(`Image "${value}" not found for field "${key}"`);
                     continue;
@@ -556,13 +575,15 @@ class baseMapping {
                 if (wrap && center) {
                     drawCenteredParagraph(page, String(value), drawArea);
                 } else if (wrap) {
-                    drawLeftAlignedParagraph(page, String(value), drawArea);
+                    drawTopLeftAlignedParagraph(page, String(value), drawArea);
                 } else if (center) {
                     drawCenteredText(page, String(value), drawArea);
                 } else {
                     page.drawText(String(value), {
                         x: drawArea.x,
                         y: drawArea.y,
+                        width: drawArea.width,
+                        height: drawArea.height,
                         size,
                         font: drawArea.font,
                         color: drawArea.color
@@ -573,6 +594,8 @@ class baseMapping {
 
         for (const box of checkboxes ?? []) {
             const { key, label, x, y } = box;
+            console.log(box)
+            console.log(cardData)
             const checked = Boolean(cardData[key]);
 
             // Checkbox rectangle

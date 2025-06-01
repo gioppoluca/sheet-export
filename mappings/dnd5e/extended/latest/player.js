@@ -18,7 +18,7 @@ class MappingClass extends baseMapping {
         this.systemName = "dnd5e";
         // Set the PDF files to use - MIND that the order of the files is important!
         this.pdfFiles.push({
-            pdfUrl: '/modules/sheet-export/mappings/dnd5e/Extended character sheet 5e.pdf',
+            pdfUrl: '/modules/sheet-export/mappings/dnd5e/5E_CharacterSheet_Fillable.pdf',
             nameDownload: `${this.actor.name ?? "character"}.pdf`,
             name: "Extended character sheet 5e.pdf",
         });
@@ -429,11 +429,11 @@ class MappingClass extends baseMapping {
         this.setCalculated("Check Box 3081", this.actor.items.filter(i => i.type === 'spell' && i.system.level === 9)[4]?.system.preparation.prepared || "");
         this.setCalculated("Check Box 3082", this.actor.items.filter(i => i.type === 'spell' && i.system.level === 9)[5]?.system.preparation.prepared || "");
         this.setCalculated("Check Box 3083", this.actor.items.filter(i => i.type === 'spell' && i.system.level === 9)[6]?.system.preparation.prepared || "");
-        this.mapCompleteSpells();
-        this.mapEquipment();
+//        this.mapCompleteSpells();
+//        this.mapEquipment();
     }
 
-
+/*
     mapCompleteSpells() {
         let orderedSpells = this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) })
         const maxSpells = orderedSpells.length < 80 ? orderedSpells.length : 80;
@@ -472,7 +472,7 @@ class MappingClass extends baseMapping {
         this.setCalculated("equipment_extended4", this.getGlobalValue("equipment_extended", 7500, 10000));
 
     }
-
+*/
     getPrimaryClassObj() {
         const allClasses = this.actor.items.filter(i => i.type === 'class').map(i => i);
         if (allClasses.length > 1) {
@@ -547,13 +547,46 @@ class MappingClass extends baseMapping {
     // this is the override of the function to define the layout of the spell cards
     getCardLayoutConfig() {
         return super.getCardLayoutConfig({
+            page: {
+                width: 595.28,
+                height: 841.89,
+                margin: 0,
+                backgroundImage: {
+                    background: {
+                        path: "/modules/sheet-export/mappings/dnd5e/SpellCardPage.png",
+                        width: 24,
+                        height: 24
+                    }
+                }
+            },
+            card: {
+                width: 297.64,
+                height: 420.945
+            },
+            rows: 2,
+            columns: 2,
             fonts: {
                 TitleFont: "/modules/sheet-export/mappings/dnd5e/BLKCHCRY.TTF",
                 BodyFont: "/modules/sheet-export/mappings/dnd5e/Roboto-Regular.ttf"
             },
             images: {
-                evocationIcon: {
-                    path: "/modules/sheet-export/mappings/dnd5e/ench.png",
+                Evocation: {
+                    path: "/modules/sheet-export/mappings/dnd5e/Evocation.webp",
+                    width: 24,
+                    height: 24
+                },
+                Conjuration: {
+                    path: "/modules/sheet-export/mappings/dnd5e/Conjuration.webp",
+                    width: 24,
+                    height: 24
+                },
+                Transmutation: {
+                    path: "/modules/sheet-export/mappings/dnd5e/Transmutation.webp",
+                    width: 24,
+                    height: 24
+                },
+                Necromancy: {
+                    path: "/modules/sheet-export/mappings/dnd5e/Necromancy.webp",
                     width: 24,
                     height: 24
                 }
@@ -570,20 +603,110 @@ class MappingClass extends baseMapping {
                     key: "title",
                     type: "text",
                     fontName: "TitleFont",
-                    size: 16,
+                    size: 12,
+                    center: true,
                     color: "#550000",
-                    x: 20,
-                    y: 160
+                    width: 211.2,
+                    height: 16.8,
+                    x: 13.2,
+                    y: 387.545
+                    //                    y: 803.49
+                },
+                {
+                    key: "level",
+                    type: "text",
+                    fontName: "BodyFont",
+                    size: 15,
+                    color: "#e0b710",
+                    x: 248.8,
+                    y: 383
+                },
+                {
+                    key: "school",
+                    type: "imageRef",
+                    width: 24,
+                    height: 24,
+                    x: 241.7,
+                    y: 353
+                },
+                {
+                    key: "school",
+                    type: "text",
+                    fontName: "BodyFont",
+                    size: 6,
+                    center: true,
+                    color: "#e0b710",
+                    width: 38.4,
+                    height: 10,
+                    x: 234.24,
+                    y: 340
+                },
+                {
+                    key: "casting",
+                    type: "text",
+                    fontName: "BodyFont",
+                    size: 9,
+                    color: "#222222",
+                    x: 12,
+                    y: 357
+                },
+                {
+                    key: "range",
+                    type: "text",
+                    fontName: "BodyFont",
+                    size: 9,
+                    color: "#222222",
+                    x: 86,
+                    y: 357
+                },
+                {
+                    key: "duration",
+                    type: "text",
+                    fontName: "BodyFont",
+                    size: 9,
+                    color: "#222222",
+                    x: 160,
+                    y: 357
                 },
                 {
                     key: "description",
                     type: "text",
                     fontName: "BodyFont",
-                    size: 10,
+                    wrap: true,
+                    size: 9,
                     color: "#222222",
-                    x: 20,
-                    y: 140
+                    width: 273.6,
+                    height: 312,
+                    x: 12,
+                    y: 12.945
+                    //                    y: 433.89
                 }
+            ],
+            checkboxes: [{
+                key: "ritual",
+                x: 38.2,
+                y: 328.5
+            },
+            {
+                key: "concentration",
+                x: 91.3,
+                y: 328.5
+            },
+            {
+                key: "verbal",
+                x: 135,
+                y: 328.5
+            },
+            {
+                key: "somatic",
+                x: 175.5,
+                y: 328.5
+            },
+            {
+                key: "material",
+                x: 218.55,
+                y: 328.5
+            }
             ]
         });
     }
@@ -591,16 +714,109 @@ class MappingClass extends baseMapping {
 
     getCardDataArray() {
         const spells = this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) })
+        console.log(spells)
         return spells.map(spell => ({
             title: spell.name,
             description: this.htmlToText(spell.system.description?.value || ""),
-            verbal: spell.system.components?.v ?? false,
-            somatic: spell.system.components?.s ?? false,
-            material: spell.system.components?.m ?? false,
+            range: spell.labels.range,
+            casting: spell.labels.activation,
+            duration: spell.labels.duration,
+            verbal: spell.system.properties.has("verbal"),
+            somatic: spell.system.properties.has("somatic"),
+            material: spell.system.properties.has("mgc"),
             ritual: spell.system.ritual === true,
-            concentration: spell.system.concentration === true,
-            schoolIcon: spell.system.school // must match image key in layoutConfig
+            level: spell.system.level,
+            concentration: spell.system.properties.has("concentration"),
+            school: spell.labels.school // must match image key in layoutConfig
         }));
+    }
+
+    getCardItemLayoutConfig() {
+        return super.getCardLayoutConfig({
+            page: {
+                width: 595.28,
+                height: 841.89,
+                margin: 0,
+                backgroundImage: {
+                    background: {
+                        path: "/modules/sheet-export/mappings/dnd5e/ItemCardPage.png",
+                        width: 24,
+                        height: 24
+                    }
+                }
+            },
+            card: {
+                width: 297.64,
+                height: 210.472
+            },
+            rows: 4,
+            columns: 2,
+            fonts: {
+                TitleFont: "/modules/sheet-export/mappings/dnd5e/BLKCHCRY.TTF",
+                BodyFont: "/modules/sheet-export/mappings/dnd5e/Roboto-Regular.ttf"
+            },
+            images: {
+            }
+        });
+    }
+
+    getCardItemTemplate() {
+        return super.getCardTemplate({
+            fields: [
+                {
+                    key: "title",
+                    type: "text",
+                    fontName: "TitleFont",
+                    size: 12,
+                    center: true,
+                    color: "#550000",
+                    width: 211.2,
+                    height: 16.8,
+                    x: 13.2,
+                    y: 177.073
+                    //                    y: 803.49
+                },
+                {
+                    key: "description",
+                    type: "text",
+                    fontName: "BodyFont",
+                    wrap: true,
+                    size: 8,
+                    color: "#222222",
+                    width: 273.6,
+                    height: 144.96,
+                    x: 12,
+                    y: 7
+                    //                    y: 12.945
+                    //                    y: 433.89
+                }
+            ]
+        });
+    }
+
+    getCardItemDataArray() {
+        //const spells = this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) })
+        const items = this.actor.items.filter(i => ['weapon', 'equipment', 'tool', 'consumable', 'loot', 'backpack'].includes(i.type));
+        console.log(items)
+        return items.map(item => ({
+            title: item.name,
+            description: this.htmlToText(item.system.description?.value || ""),
+        }));
+    }
+
+    getCardSections() {
+        return [
+            {
+                layoutConfig: this.getCardItemLayoutConfig(),
+                cardTemplate: this.getCardItemTemplate(),
+                cardDataArray: this.getCardItemDataArray()  // e.g., monster abilities
+            },
+            {
+                layoutConfig: this.getCardLayoutConfig(),
+                cardTemplate: this.getCardTemplate(),
+                cardDataArray: this.getCardDataArray()   // e.g., player spells
+            }
+        ];
     }
 }
 
