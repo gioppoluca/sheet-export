@@ -29,6 +29,9 @@ const systemMapping = function () {
         "vtm5e":{
             "player": "vampire"
         },
+        "dragonbane":{
+            "player": "character"
+        },
         "cyphersystem":{
             "player": "PC"
         }
@@ -70,6 +73,9 @@ const systemMappingSheet = function () {
         },
         "black-flag":{
             "pc": "player"
+        },
+        "dragonbane":{
+            "character": "player"
         },
         "cyphersystem":{
             "PC": "player",
