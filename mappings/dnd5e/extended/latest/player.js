@@ -781,7 +781,7 @@ class MappingClass extends baseMapping {
                     type: "text",
                     fontName: "BodyFont",
                     wrap: true,
-                    size: 8,
+                    size: 7,
                     color: "#222222",
                     width: 273.6,
                     height: 144.96,
