@@ -80,7 +80,9 @@ function addSheetDirectoryContextOptions(sidebar, menuItems) {
 		icon: '<i class="fas fa-file-pdf"></i>',
 		condition: li => {
 			console.log(li);
-			return game.user.isGM
+			const actor = game.actors.get(li.dataset.documentId ?? li.dataset.entryId);
+			const isOwner = actor.testUserPermission(game.user, "OWNER");
+			return (game.user.isGM || isOwner)
 		},
 		callback: header => {
 			console.log(header)
