@@ -1,4 +1,23 @@
 
+## [0.13.3] - 2025-06-20
+### :sparkles: New Features
+- [`47b9272`](https://github.com/gioppoluca/sheet-export/commit/47b92720a53f59beeb88a0c7da211566776ca35c) - implementation for dynamical adding of pages *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+- [`4d41dac`](https://github.com/gioppoluca/sheet-export/commit/4d41dac298e110b725823f999c6bdeda8c36d7f2) - added dynamic management of objects,refined PDF cards *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+- [`4bfd5b5`](https://github.com/gioppoluca/sheet-export/commit/4bfd5b51548cc5678f4a3cc0d9edd30e7c31cf97) - alpha dragonbane mapping *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+- [`9903f35`](https://github.com/gioppoluca/sheet-export/commit/9903f356d8b295e6d12d6953f9d6b25a8db6e25a) - new pages for extended char sheet *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+- [`a93feb9`](https://github.com/gioppoluca/sheet-export/commit/a93feb98122b4b0ba90b57c7b6d80a8882902ead) - closes [#38](https://github.com/gioppoluca/sheet-export/pull/38) Allow for Players owners to print the sheet *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+- [`d35ef0f`](https://github.com/gioppoluca/sheet-export/commit/d35ef0fde6e742976f2e7a85e0ac5dfd5b1c7501) - allow for owner's Player to print the sheet also in V12 *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+- [`c63c40d`](https://github.com/gioppoluca/sheet-export/commit/c63c40d59993fc465b62c473a11ad3e2030298e8) - added swedish dragonbane pdf with initial mapping *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+- [`0655f66`](https://github.com/gioppoluca/sheet-export/commit/0655f66a6a0a4dbad74ed5a83d39c115d68fed29) - fix PF1 mapping, closes [#34](https://github.com/gioppoluca/sheet-export/pull/34) *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+### :bug: Bug Fixes
+- [`c72d39a`](https://github.com/gioppoluca/sheet-export/commit/c72d39a9d7266024a7b846b31cff0c968effd89a) - clean deprecations *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+- [`eaa82f8`](https://github.com/gioppoluca/sheet-export/commit/eaa82f80904acd41740012ea304bd99fcee5d48d) - have it verified on v13 *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+- [`848711c`](https://github.com/gioppoluca/sheet-export/commit/848711c009250fd31ea7697256f12f3bbd5e4e92) - error for newly created character *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+- [`2f69d2a`](https://github.com/gioppoluca/sheet-export/commit/2f69d2ac3e551c799b33198cc19e52d6361aa6f1) - font smaller to allow for better item description *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+- [`a5827d7`](https://github.com/gioppoluca/sheet-export/commit/a5827d7ed003738c12d3c0f93c7126acc11b922f) - removed image comment *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+
 ## [0.13.2] - 2025-05-31
 ### :bug: Bug Fixes
 - [`e8b3699`](https://github.com/gioppoluca/sheet-export/commit/e8b3699b2d079e6ddbd89e821a53301f16ca756e) - image mapping and extension done properly *(commit by [@gioppoluca](https://github.com/gioppoluca))*
@@ -229,3 +248,4 @@
 [0.13.0]: https://github.com/gioppoluca/sheet-export/compare/0.10.7...0.13.0
 [0.13.1]: https://github.com/gioppoluca/sheet-export/compare/0.13.0...0.13.1
 [0.13.2]: https://github.com/gioppoluca/sheet-export/compare/0.13.1...0.13.2
+[0.13.3]: https://github.com/gioppoluca/sheet-export/compare/0.13.2...0.13.3
