@@ -485,12 +485,12 @@ class MappingClass extends baseMapping {
     }
 
     getLocalizedClassAndSubclass(classItem) {
-        const sc = classItem.system.subclass;
-        return sc ? game.i18n.localize(classItem.name) + "/" + game.i18n.localize(sc) : game.i18n.localize(classItem.name);
+        const sc = classItem?.system?.subclass;
+        return sc ? game.i18n.localize(classItem?.name) + "/" + game.i18n.localize(sc) : game.i18n.localize(classItem?.name);
     }
 
     getLocalizedClassAndSubclassAndLevel(classItem) {
-        return `${this.getLocalizedClassAndSubclass(classItem)} ${classItem.system.levels}`;
+        return `${this.getLocalizedClassAndSubclass(classItem)} ${classItem?.system?.levels}`;
     }
 
     getFeatsAndTraits() {
