@@ -44,7 +44,14 @@ Hooks.on("getActorDirectoryEntryContext", (sidebar, menuItems) => {
 	menuItems.push({
 		name: game.i18n.localize(`sheet-export.menu.label`),
 		icon: '<i class="fas fa-file-pdf"></i>',
-		condition: () => game.user.isGM,
+		condition: header => {
+			console.log("opening header")
+			console.log(header)
+			const type = "Actor"
+			const actor = fromUuidSync(`${type}.${header.data("documentId")}`)
+			const isOwner = actor.testUserPermission(game.user, "OWNER");
+			return (game.user.isGM || isOwner)
+		},
 		callback: header => {
 			console.log(header)
 			const li = header.closest(".directory-item");
