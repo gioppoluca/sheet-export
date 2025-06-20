@@ -26,12 +26,12 @@ class MappingClass extends baseMapping {
         this.setCalculated("Player", Object.entries(this.actor.permission).filter(entry => entry[1] === 3).map(entry => entry[0]).map(id => !game.users.get(id)?.isGM ? game.users.get(id)?.name : null).filter(x => x).join(", "));
         this.setCalculated("Character Name", this.actor.name);
         this.setCalculated("Alignment", this.actor.system.details.alignment);
-        this.setCalculated("Class", this.actor.items.filter(i => i.type === "class").map(i => i.data.name)[0]);
+        this.setCalculated("Class", this.actor.items.filter(i => i.type === "class").map(i => i.name)[0]);
         this.setCalculated("Level", this.actor.items.filter(i => i.type === "class").map(i => i.system.level)[0]);
-        this.setCalculated("Class1", this.actor.items.filter(i => i.type === "class").map(i => i.data.name)[1] || "");
+        this.setCalculated("Class1", this.actor.items.filter(i => i.type === "class").map(i => i.name)[1] || "");
         this.setCalculated("Level1", this.actor.items.filter(i => i.type === "class").map(i => i.system.level)[1] || "");
         this.setCalculated("Deity", this.actor.system.details.deity);
-        this.setCalculated("Race", this.actor.items.filter(i => i.type === "race").map(i => i.data.name)[0]);
+        this.setCalculated("Race", this.actor.items.filter(i => i.type === "race").map(i => i.name)[0]);
         this.setCalculated("Size", this.actor.system.traits.size);
         this.setCalculated("Gender", this.actor.system.details.gender);
         this.setCalculated("Age", this.actor.system.details.age);
@@ -289,8 +289,8 @@ class MappingClass extends baseMapping {
         this.setCalculated("Craft 3", this.actor.system.skills.crf.subSkills.crf3?.name || "");
         this.setCalculated("Total Bonus 7", (this.actor.system.skills.crf.subSkills.crf3?.name) ? this.actor.system.skills.crf.subSkills.crf3.mod : "");
         this.setCalculated("Ranks 7", (this.actor.system.skills.crf.subSkills.crf3?.name) ? this.actor.system.skills.crf.subSkills.crf3.rank : "");
-        this.setCalculated("Languages Line 1", [this.actor.system.traits.languages.value.filter(String).map(l => l.capitalize()).sort().join(", "), this.actor.system.traits.languages.custom,].filter(String).join(", "));
-        this.setCalculated("Conditional Modifiers Line 1", [this.actor.system.traits.weaponProf.total.filter(String).map(l => l.capitalize()).join(", "), this.actor.system.traits.weaponProf.custom, this.actor.system.traits.armorProf.total.filter(String).map(l => l.capitalize()).join(", "), this.actor.system.traits.armorProf.custom,].filter(String).join(", "));
+        //this.setCalculated("Languages Line 1", [this.actor.system.traits.languages.value.filter(String).map(l => l.capitalize()).sort().join(", "), this.actor.system.traits.languages.custom,].filter(String).join(", "));
+        //this.setCalculated("Conditional Modifiers Line 1", [this.actor.system.traits.weaponProf.total.filter(String).map(l => l.capitalize()).join(", "), this.actor.system.traits.weaponProf.custom, this.actor.system.traits.armorProf.total.filter(String).map(l => l.capitalize()).join(", "), this.actor.system.traits.armorProf.custom,].filter(String).join(", "));
         /*
         this.setCalculated("Damage Slot 1", this.actor.items.filter(i => i.type === "weapon" && i.system.equipped && i.hasAttack && i.hasDamage)[0]?.data?.data?.damage?.parts[0][0]?.replace(/sizeRoll\((?<count>[0-9]*), ?(?<size>[0-9]*), ?\u0040size\)/, "$<count>d$<size>") || "");
         this.setCalculated("DT Slot 1", this.actor.items.filter(i => i.type === "weapon" && i.system.equipped && i.hasAttack && i.hasDamage)[0]?.data?.data?.damage?.parts[0][1] || "");
