@@ -25,7 +25,7 @@ class MappingClass extends baseMapping {
     }
 
     // override createMappings method from base class
-    createMappings() {
+    async createMappings() {
         super.createMappings();
 
         // Set the PDF files to use - MIND that the order of the files is important!
@@ -73,7 +73,7 @@ class MappingClass extends baseMapping {
         for (const slug in this.actor.skills) {
             const skill = this.actor.skills[slug];
             let skillSlug = slug;
-            
+
             // Handle Lores
             if (skill.lore) {
                 if (loreCount > 2) //Sheet only has 2 lore fields
@@ -82,7 +82,7 @@ class MappingClass extends baseMapping {
                 this.setCalculated(`${skillSlug}_subcategory`, skill.label);
                 loreCount++;
             }
-            
+
             switch (true) {
                 case (skill.rank == 4):
                     this.setCalculated(`${skillSlug}_legendary`, true);
@@ -109,7 +109,7 @@ class MappingClass extends baseMapping {
         }
         // Handle lores > 2
         extraLores.forEach((lore) => {
-            const rank = ['U','T','E','M','L'][lore.rank];
+            const rank = ['U', 'T', 'E', 'M', 'L'][lore.rank];
             const value = this.formatModifier(lore.mod);
             skillNotes += '${lore.label}(${lore.rank}) ${value}\n';
         });
@@ -126,8 +126,8 @@ class MappingClass extends baseMapping {
             const label =
                 language === "common" && commonLanguage
                     ? game.i18n.format("PF2E.Actor.Creature.Language.CommonLanguage", {
-                          language: game.i18n.localize(CONFIG.PF2E.languages[commonLanguage]),
-                      })
+                        language: game.i18n.localize(CONFIG.PF2E.languages[commonLanguage]),
+                    })
                     : game.i18n.localize(CONFIG.PF2E.languages[language]);
             return label;
         })
@@ -152,7 +152,7 @@ class MappingClass extends baseMapping {
                 return `${weakness.type} ${weakness.value}`;
             }
         );
-        
+
         this.setCalculated("resistances_immunities", `Immun: ${immunities.join(', ')}; Resist: ${resistances.join(', ')}; Weak: ${weaknesses.join(', ')}`);
 
         /* Armor Class */
@@ -163,8 +163,7 @@ class MappingClass extends baseMapping {
 
 
         /* Shield */
-        if (this.actor.heldShield)
-        {
+        if (this.actor.heldShield) {
             this.setCalculated("ac_shield_bonus", this.actor.heldShield.acBonus);
             this.setCalculated("shield_hardness", this.actor.heldShield.hardness);
             this.setCalculated("shield_max_hp", this.actor.heldShield.hitPoints.max);
@@ -174,10 +173,10 @@ class MappingClass extends baseMapping {
         /* Armor proficiencies */
         Object.keys(this.actor.system.proficiencies.defenses).forEach(
             (d) => {
-                this.setCalculated(`defense_${d}_trained`, this.actor.system.proficiencies.defenses[d].rank >= 1 || false );
-                this.setCalculated(`defense_${d}_expert`, this.actor.system.proficiencies.defenses[d].rank >= 2 || false );
-                this.setCalculated(`defense_${d}_master`, this.actor.system.proficiencies.defenses[d].rank >= 3 || false );
-                this.setCalculated(`defense_${d}_legendary`, this.actor.system.proficiencies.defenses[d].rank >= 4 || false );
+                this.setCalculated(`defense_${d}_trained`, this.actor.system.proficiencies.defenses[d].rank >= 1 || false);
+                this.setCalculated(`defense_${d}_expert`, this.actor.system.proficiencies.defenses[d].rank >= 2 || false);
+                this.setCalculated(`defense_${d}_master`, this.actor.system.proficiencies.defenses[d].rank >= 3 || false);
+                this.setCalculated(`defense_${d}_legendary`, this.actor.system.proficiencies.defenses[d].rank >= 4 || false);
             }
         );
 
@@ -219,11 +218,9 @@ class MappingClass extends baseMapping {
         this.setCalculated('class_dc', 10 + classDCAttribute + classDCProficiency + classDCItem)
 
         /* Weapon Profs */
-        for (const slug in this.actor.system.proficiencies.attacks)
-        {
+        for (const slug in this.actor.system.proficiencies.attacks) {
             const attack = this.actor.system.proficiencies.attacks[slug];
-            switch (true)
-            {
+            switch (true) {
                 case (attack.rank == 4):
                     this.setCalculated(`attack_${slug}_legendary`, true);
                 case (attack.rank >= 3):
@@ -236,114 +233,102 @@ class MappingClass extends baseMapping {
         }
 
         var firstLevelClassFeatures = '';
-        this.actor.feats.forEach((featGroup) =>
-        {
-            if (featGroup.id === 'ancestryfeature')
-            {
-                featGroup.feats.forEach((feature) =>
-                {
-                    var ancestryFeature = feature.feat.name;
-                    if (feature.feat.grants.length > 0)
-                    {
-                        ancestryFeature += ' - ';
-                        ancestryFeature += feature.feat.grants.map(f => f.name).join(', ');
+        this.actor.feats.forEach((featGroup) => {
+            if (featGroup.id === 'ancestryfeature') {
+                featGroup.feats.forEach((feature) => {
+                    if (feature.feat !== undefined) {
+                        var ancestryFeature = feature.feat.name;
+                        if (feature.feat.grants.length > 0) {
+                            ancestryFeature += ' - ';
+                            ancestryFeature += feature.feat.grants.map(f => f.name).join(', ');
+                        }
+                        this.setCalculated('1_ancestry_hertitage_abilities', ancestryFeature);
                     }
-                    this.setCalculated('1_ancestry_hertitage_abilities', ancestryFeature);
                 });
             }
 
             /* Class Features */
-            if (featGroup.id === 'classfeature')
-            {
-                featGroup.feats.forEach((feature) =>
-                {
-                    var classFeature = feature.feat.name;
-                    if (feature.feat.grants.length > 0)
-                    {
-                        classFeature += ' - ';
-                        classFeature += feature.feat.grants.map(f => f.name).join(', ');
-                    }
-        
-                    if (feature.label == 1)
-                    {
-                        firstLevelClassFeatures += `${classFeature} \n`;
-                    }
-                    else
-                    {
-                        this.setCalculated(`${feature.label}_class_feature`, classFeature)
+            if (featGroup.id === 'classfeature') {
+                featGroup.feats.forEach((feature) => {
+                    if (feature.feat !== undefined) {
+                        var classFeature = feature.feat.name;
+                        if (feature.feat.grants.length > 0) {
+                            classFeature += ' - ';
+                            classFeature += feature.feat.grants.map(f => f.name).join(', ');
+                        }
+
+                        if (feature.label == 1) {
+                            firstLevelClassFeatures += `${classFeature} \n`;
+                        }
+                        else {
+                            this.setCalculated(`${feature.label}_class_feature`, classFeature)
+                        }
                     }
                 });
             }
             /* Ancestry Feats */
-            if (featGroup.id === 'ancestry')
-            {
-                featGroup.feats.forEach((feat) =>
-                {
-                    var ancestryFeat = feat.feat.name;
-                    if (feat.feat.grants.length > 0)
-                    {
-                        ancestryFeat += ' - ';
-                        ancestryFeat += feat.feat.grants.map(f => f.name).join(', ');
+            if (featGroup.id === 'ancestry') {
+                featGroup.feats.forEach((feat) => {
+                    if (feat.feat !== undefined) {
+                        var ancestryFeat = feat.feat.name;
+                        if (feat.feat.grants.length > 0) {
+                            ancestryFeat += ' - ';
+                            ancestryFeat += feat.feat.grants.map(f => f.name).join(', ');
+                        }
+                        this.setCalculated(`${feat.label}_ancestry_feat`, ancestryFeat);
                     }
-                    this.setCalculated(`${feat.label}_ancestry_feat`, ancestryFeat);
                 });
             }
             /* Class Feats */
-            if (featGroup.id === 'class')
-            {
-                featGroup.feats.forEach((feat) =>
-                {
-                    var classFeat = feat.feat.name;
-                    if (feat.feat.grants.length > 0)
-                    {
-                        classFeat += ' - ';
-                        classFeat += feat.feat.grants.map(f => f.name).join(', ');
-                    }
-        
-                    if (feat.label == 1)
-                    {
-                        firstLevelClassFeatures += `${classFeat} \n`;
-                    }
-                    else
-                    {
-                        this.setCalculated(`${feat.label}_class_feat`, classFeat)
+            if (featGroup.id === 'class') {
+                featGroup.feats.forEach((feat) => {
+                    if (feat.feat !== undefined) {
+                        var classFeat = feat.feat.name;
+                        if (feat.feat.grants.length > 0) {
+                            classFeat += ' - ';
+                            classFeat += feat.feat.grants.map(f => f.name).join(', ');
+                        }
+
+                        if (feat.label == 1) {
+                            firstLevelClassFeatures += `${classFeat} \n`;
+                        }
+                        else {
+                            this.setCalculated(`${feat.label}_class_feat`, classFeat)
+                        }
                     }
                 });
             }
             /* Skill Feats */
-            if (featGroup.id === 'skill')
-            {
-                featGroup.feats.forEach((feat) =>
-                {
-                    var skillFeat = feat.feat.name;
-                    if (feat.feat.grants.length > 0)
-                    {
-                        skillFeat += ' - ';
-                        skillFeat += feat.feat.grants.map(f => f.name).join(', ');
-                    }
-                    if (feat.label === 'BG')
-                    {
-                        this.setCalculated('1_background_skill_feat', skillFeat);
-                    }
-                    else
-                    {
-                        this.setCalculated(`${feat.level}_skill_feat`, skillFeat);
+            if (featGroup.id === 'skill') {
+                featGroup.feats.forEach((feat) => {
+                    if (feat.feat !== undefined) {
+                        var skillFeat = feat.feat.name;
+                        if (feat.feat.grants.length > 0) {
+                            skillFeat += ' - ';
+                            skillFeat += feat.feat.grants.map(f => f.name).join(', ');
+                        }
+                        if (feat.label === 'BG') {
+                            this.setCalculated('1_background_skill_feat', skillFeat);
+                        }
+                        else {
+                            this.setCalculated(`${feat.level}_skill_feat`, skillFeat);
+                        }
                     }
                 });
             }
             /* General Feats */
-            if (featGroup.id === 'general')
-            {
-                featGroup.feats.forEach((feat) =>
-                {
-                    var skillFeat = feat.feat.name;
-                    if (feat.feat.grants.length > 0)
-                    {
-                        skillFeat += ' - ';
-                        skillFeat += feat.feat.grants.map(f => f.name).join(', ');
+            if (featGroup.id === 'general') {
+                featGroup.feats.forEach((feat) => {
+                    if (feat.feat !== undefined) {
+                        var skillFeat = feat.feat.name;
+                        if (feat.feat.grants.length > 0) {
+                            skillFeat += ' - ';
+                            skillFeat += feat.feat.grants.map(f => f.name).join(', ');
+                        }
+                        this.setCalculated(`${feat.label}_general_feat`, skillFeat);
                     }
-                    this.setCalculated(`${feat.label}_general_feat`, skillFeat);
                 });
+
             }
         });
         this.setCalculated('1_class_feats_features', firstLevelClassFeatures);
