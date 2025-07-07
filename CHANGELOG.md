@@ -1,4 +1,14 @@
 
+## [0.13.4] - 2025-07-07
+### :bug: Bug Fixes
+- [`9904e8d`](https://github.com/gioppoluca/sheet-export/commit/9904e8daab056077cf923e126ec8ae291f50d954) - refactoring for having async in createMapping *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+- [`af2fcad`](https://github.com/gioppoluca/sheet-export/commit/af2fcad6c25bf85ed19d6bc7ad754030152bcdc7) - refactoring and closes [#30](https://github.com/gioppoluca/sheet-export/pull/30) *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+- [`3e5c490`](https://github.com/gioppoluca/sheet-export/commit/3e5c490c8c23546c927b5774931c964e9a67f852) - refactoring for async and missing images in extended *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+- [`c6e5e86`](https://github.com/gioppoluca/sheet-export/commit/c6e5e8622919814f92d7263409fd4c11ed3d2460) - refactoring and fixes for dnd5e 5.x *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+- [`57777ac`](https://github.com/gioppoluca/sheet-export/commit/57777ac84bc988a474bac51fc9d44e990baec04b) - refactoring for async *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+- [`6bdeb2a`](https://github.com/gioppoluca/sheet-export/commit/6bdeb2a263c566d5f4550d36462e525f86b1b264) - closes [#39](https://github.com/gioppoluca/sheet-export/pull/39) *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+
 ## [0.13.3] - 2025-06-20
 ### :sparkles: New Features
 - [`47b9272`](https://github.com/gioppoluca/sheet-export/commit/47b92720a53f59beeb88a0c7da211566776ca35c) - implementation for dynamical adding of pages *(commit by [@gioppoluca](https://github.com/gioppoluca))*
@@ -249,3 +259,4 @@
 [0.13.1]: https://github.com/gioppoluca/sheet-export/compare/0.13.0...0.13.1
 [0.13.2]: https://github.com/gioppoluca/sheet-export/compare/0.13.1...0.13.2
 [0.13.3]: https://github.com/gioppoluca/sheet-export/compare/0.13.2...0.13.3
+[0.13.4]: https://github.com/gioppoluca/sheet-export/compare/0.13.3...0.13.4
