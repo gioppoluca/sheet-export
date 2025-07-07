@@ -14,7 +14,7 @@ class MappingClass extends baseMapping {
 
 
     // override createMappings method from base class
-    createMappings() {
+    async createMappings() {
         this.systemName = "dnd5e";
         // Set the PDF files to use - MIND that the order of the files is important!
         this.pdfFiles.push({
@@ -101,11 +101,12 @@ class MappingClass extends baseMapping {
         this.setCalculated("Deception", this.actor.system.skills.dec.total);
         this.setCalculated("History", this.actor.system.skills.his.total);
         console.log("before weapon start");
-        this.setCalculated("Wpn Name", this.localizedItemName(this.actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[0]) || "");
-        console.log(this.localizedItemName(this.actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[0]) || "");
+        console.log(this.actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack))
+        this.setCalculated("Wpn Name", this.localizedItemName(this.actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack)[0]) || "");
+        console.log(this.localizedItemName(this.actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack)[0]) || "");
         console.log("before weapon atkbonus");
         this.setCalculated("Wpn1 AtkBonus", (function (actor) {
-            const theWeapon = actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[0];
+            const theWeapon = actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack)[0];
             console.log(theWeapon);
             //theWeapon?.prepareFinalAttributes();
             return theWeapon?.labels?.toHit?.replace(/^\+ $/, "0") || ""
@@ -113,24 +114,34 @@ class MappingClass extends baseMapping {
         );
         console.log("before weapon damage");
         this.setCalculated("Wpn1 Damage", (function (actor) {
-            const dda = Array.from(actor.itemTypes.weapon.filter(i => i.system.equipped && i.hasAttack && i.hasDamage))?.[0]?.labels?.damages[0]?.label;
+            const dda = Array.from(actor.itemTypes.weapon.filter(i => i.system.equipped && i.hasAttack))?.[0]?.labels?.damages[0]?.label;
             return !dda ? "" : dda;
         })(this.actor)
         );
         this.setCalculated("Insight", this.actor.system.skills.ins.total);
         this.setCalculated("Intimidation", this.actor.system.skills.itm.total);
-        this.setCalculated("Wpn Name 2", this.actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[1]?.name || "");
+        this.setCalculated("Wpn Name 2", this.actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack)[1]?.name || "");
         this.setCalculated("Wpn2 AtkBonus", (function (actor) {
-            const theWeapon = actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[1];
+            const theWeapon = actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack)[1];
             //theWeapon?.prepareFinalAttributes();
             return theWeapon?.labels?.toHit?.replace(/^\+ $/, "0") || ""
         })(this.actor)
         );
-        this.setCalculated("Wpn Name 3", this.actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[2]?.name || "");
+        this.setCalculated("Wpn2 Damage", (function (actor) {
+            const dda = Array.from(actor.itemTypes.weapon.filter(i => i.system.equipped && i.hasAttack))?.[1]?.labels?.damages[0]?.label;
+            return !dda ? "" : dda;
+        })(this.actor)
+        );
+        this.setCalculated("Wpn Name 3", this.actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack)[2]?.name || "");
         this.setCalculated("Wpn3 AtkBonus", (function (actor) {
-            const theWeapon = actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[2];
+            const theWeapon = actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack)[2];
             //theWeapon?.prepareFinalAttributes();
             return theWeapon?.labels?.toHit?.replace(/^\+ $/, "0") || ""
+        })(this.actor)
+        );
+        this.setCalculated("Wpn3 Damage", (function (actor) {
+            const dda = Array.from(actor.itemTypes.weapon.filter(i => i.system.equipped && i.hasAttack))?.[2]?.labels?.damages[0]?.label;
+            return !dda ? "" : dda;
         })(this.actor)
         );
         this.setCalculated("Check Box 11", this.actor.system.abilities.str.proficient);
@@ -140,11 +151,6 @@ class MappingClass extends baseMapping {
         this.setCalculated("Check Box 21", this.actor.system.abilities.wis.proficient);
         this.setCalculated("Check Box 22", this.actor.system.abilities.cha.proficient);
         this.setCalculated("INTmod", this.actor.system.abilities.int.mod);
-        this.setCalculated("Wpn2 Damage", (function (actor) {
-            const dda = Array.from(actor.itemTypes.weapon.filter(i => i.system.equipped && i.hasAttack && i.hasDamage))?.[1]?.labels?.damages[0]?.label;
-            return !dda ? "" : dda;
-        })(this.actor)
-        );
         this.setCalculated("Investigation", this.actor.system.skills.inv.total);
         this.setCalculated("WIS", this.actor.system.abilities.wis.value);
         this.setCalculated("Arcana", this.actor.system.skills.arc.total);
@@ -178,18 +184,13 @@ class MappingClass extends baseMapping {
         this.setCalculated("HPMax", this.actor.system.attributes.hp.max);
         this.setCalculated("HPCurrent", this.actor.system.attributes.hp.value);
         this.setCalculated("HPTemp", this.actor.system.attributes.hp.temp);
-        this.setCalculated("Wpn3 Damage", (function (actor) {
-            const dda = Array.from(actor.itemTypes.weapon.filter(i => i.system.equipped && i.hasAttack && i.hasDamage))?.[2]?.labels?.damages[0]?.label;
-            return !dda ? "" : dda;
-        })(this.actor)
-        );
         this.setCalculated("SleightofHand", this.actor.system.skills.slt.total);
         this.setCalculated("CHamod", this.actor.system.abilities.cha.mod);
         this.setCalculated("Survival", this.actor.system.skills.sur.total);
         this.setCalculated("AttacksSpellcasting", "");
         this.setCalculated("Passive", this.actor.system.skills.prc.passive);
         this.setCalculated("CP", this.actor.system.currency.cp || "");
-        this.setCalculated("ProficienciesLang", this.traitsLangs());
+        this.setCalculated("ProficienciesLang", await this.traitsLangs());
         this.setCalculated("SP", this.actor.system.currency.sp || "");
         this.setCalculated("EP", this.actor.system.currency.ep || "");
         this.setCalculated("GP", this.actor.system.currency.gp || "");
@@ -429,50 +430,50 @@ class MappingClass extends baseMapping {
         this.setCalculated("Check Box 3081", this.actor.items.filter(i => i.type === 'spell' && i.system.level === 9)[4]?.system.preparation.prepared || "");
         this.setCalculated("Check Box 3082", this.actor.items.filter(i => i.type === 'spell' && i.system.level === 9)[5]?.system.preparation.prepared || "");
         this.setCalculated("Check Box 3083", this.actor.items.filter(i => i.type === 'spell' && i.system.level === 9)[6]?.system.preparation.prepared || "");
-//        this.mapCompleteSpells();
-//        this.mapEquipment();
+        //        this.mapCompleteSpells();
+        //        this.mapEquipment();
     }
 
-/*
-    mapCompleteSpells() {
-        let orderedSpells = this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) })
-        const maxSpells = orderedSpells.length < 80 ? orderedSpells.length : 80;
-        for (let index = 0; index < maxSpells; index++) {
-            const theSpell = orderedSpells[index];
-            const spellIndex = (index + 1).toLocaleString('en-US', { minimumIntegerDigits: 2, useGrouping: false });
-            this.setCalculated(`spell_name_${spellIndex}`, theSpell.name + ((typeof theSpell.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(theSpell.flags['items-with-spells-5e']['parent-item']).name + ']' : '') || "");
-            this.setCalculated(`spell_school_${spellIndex}`, theSpell.system.school || "");
-            this.setCalculated(`spell_level_${spellIndex}`, theSpell.system.level || 0);
-            this.setCalculated(`spell_description_${spellIndex}`, (function (h) {
+    /*
+        mapCompleteSpells() {
+            let orderedSpells = this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) })
+            const maxSpells = orderedSpells.length < 80 ? orderedSpells.length : 80;
+            for (let index = 0; index < maxSpells; index++) {
+                const theSpell = orderedSpells[index];
+                const spellIndex = (index + 1).toLocaleString('en-US', { minimumIntegerDigits: 2, useGrouping: false });
+                this.setCalculated(`spell_name_${spellIndex}`, theSpell.name + ((typeof theSpell.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(theSpell.flags['items-with-spells-5e']['parent-item']).name + ']' : '') || "");
+                this.setCalculated(`spell_school_${spellIndex}`, theSpell.system.school || "");
+                this.setCalculated(`spell_level_${spellIndex}`, theSpell.system.level || 0);
+                this.setCalculated(`spell_description_${spellIndex}`, (function (h) {
+                    const d = document.createElement("div");
+                    d.innerHTML = h;
+                    return d.textContent || d.innerText || "";
+                })(theSpell.system.description.value || ""));
+                this.setCalculated(`spell_verbal_${spellIndex}`, theSpell.system.properties.has('vocal') || 0);
+                this.setCalculated(`spell_somatic_${spellIndex}`, theSpell.system.properties.has('somatic') || 0);
+                this.setCalculated(`spell_material_${spellIndex}`, theSpell.system.properties.has('material') || 0);
+                this.setCalculated(`spell_ritual_${spellIndex}`, theSpell.system.properties.has('ritual') || 0);
+                this.setCalculated(`spell_concentration_${spellIndex}`, theSpell.system.properties.has('concentration') || 0);
+                this.setCalculated(`spell_range_${spellIndex}`, (theSpell.system.range?.value != null ? theSpell.system.range.value + " " : "") + theSpell.system.range.units || "");
+                this.setCalculated(`spell_casting_${spellIndex}`, (theSpell.system.activation?.cost != null ? theSpell.system.activation?.cost + " " : "") + theSpell.system.activation.type || "");
+                this.setCalculated(`spell_duration_${spellIndex}`, theSpell.system.duration?.value + " " + theSpell.system.duration.units || "");
+            }
+        }
+    
+        mapEquipment() {
+            this.setGlobalValue("equipment_extended", this.actor.items.filter(i => ['weapon', 'equipment', 'tool', 'consumable', 'loot', 'backpack'].includes(i.type)).map(i => `${i.name} (${i.system.quantity}): \n${((h) => {
                 const d = document.createElement("div");
                 d.innerHTML = h;
                 return d.textContent || d.innerText || "";
-            })(theSpell.system.description.value || ""));
-            this.setCalculated(`spell_verbal_${spellIndex}`, theSpell.system.properties.has('vocal') || 0);
-            this.setCalculated(`spell_somatic_${spellIndex}`, theSpell.system.properties.has('somatic') || 0);
-            this.setCalculated(`spell_material_${spellIndex}`, theSpell.system.properties.has('material') || 0);
-            this.setCalculated(`spell_ritual_${spellIndex}`, theSpell.system.properties.has('ritual') || 0);
-            this.setCalculated(`spell_concentration_${spellIndex}`, theSpell.system.properties.has('concentration') || 0);
-            this.setCalculated(`spell_range_${spellIndex}`, (theSpell.system.range?.value != null ? theSpell.system.range.value + " " : "") + theSpell.system.range.units || "");
-            this.setCalculated(`spell_casting_${spellIndex}`, (theSpell.system.activation?.cost != null ? theSpell.system.activation?.cost + " " : "") + theSpell.system.activation.type || "");
-            this.setCalculated(`spell_duration_${spellIndex}`, theSpell.system.duration?.value + " " + theSpell.system.duration.units || "");
+            })(i.system.description.value)}\n`).join("\n"));
+    
+            this.setCalculated("equipment_extended1", this.getGlobalValue("equipment_extended", 0, 2500));
+            this.setCalculated("equipment_extended2", this.getGlobalValue("equipment_extended", 2500, 5000));
+            this.setCalculated("equipment_extended3", this.getGlobalValue("equipment_extended", 5000, 7500));
+            this.setCalculated("equipment_extended4", this.getGlobalValue("equipment_extended", 7500, 10000));
+    
         }
-    }
-
-    mapEquipment() {
-        this.setGlobalValue("equipment_extended", this.actor.items.filter(i => ['weapon', 'equipment', 'tool', 'consumable', 'loot', 'backpack'].includes(i.type)).map(i => `${i.name} (${i.system.quantity}): \n${((h) => {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(i.system.description.value)}\n`).join("\n"));
-
-        this.setCalculated("equipment_extended1", this.getGlobalValue("equipment_extended", 0, 2500));
-        this.setCalculated("equipment_extended2", this.getGlobalValue("equipment_extended", 2500, 5000));
-        this.setCalculated("equipment_extended3", this.getGlobalValue("equipment_extended", 5000, 7500));
-        this.setCalculated("equipment_extended4", this.getGlobalValue("equipment_extended", 7500, 10000));
-
-    }
-*/
+    */
     getPrimaryClassObj() {
         const allClasses = this.actor.items.filter(i => i.type === 'class').map(i => i);
         if (allClasses.length > 1) {
@@ -513,20 +514,34 @@ class MappingClass extends baseMapping {
         return item ? game.i18n.localize(item?.name) : '';
     }
 
-    traitsLangs() {
+    async traitsLangs() {
+        console.log(this.actor)
+        console.log(game.dnd5e.config.weaponProficiencies)
+        console.log(game.packs.get("dnd5e.items").index)
+        console.log(game.dnd5e.config.weaponIds)
         let s = "";
-        let a = this.actor.system.traits.weaponProf.value.map(x => game.dnd5e.config.weaponProficiencies[x]
-            || game.packs.get("dnd5e.items").index.get(game.dnd5e.config.weaponIds[x])?.name).first();
+        let a = await Promise.all(await this.actor.system.traits.weaponProf.value.map(async (x) => {
+            console.log(x)
+            console.log(game.dnd5e.config.weaponProficiencies[x])
+            console.log(game.dnd5e.config.weaponIds[x])
+            console.log(await fromUuid(game.dnd5e.config.weaponIds[x]))
+            console.log(game.packs.get("dnd5e.items").index.get(game.dnd5e.config.weaponIds[x])?.name)
+            let itemComp = await fromUuid(game.dnd5e.config.weaponIds[x])
+            console.log(game.dnd5e.config.weaponProficiencies[x] || itemComp?.name)
+            return game.dnd5e.config.weaponProficiencies[x] || itemComp?.name
+        }));
         let b = this.actor.system.traits.weaponProf.custom.split(";").filter(x => String(x) && x?.length);
-
+        console.log(a)
         if (a?.length > 0) { s = `${s}Weapons: ${a} ${b.join(', ')}\n`; }
         a = this.actor.system.traits.armorProf.value.map(x => game.dnd5e.config.armorProficiencies[x]
             || game.packs.get("dnd5e.items").index.get(game.dnd5e.config.armorIds[x])?.name).first();
         b = this.actor.system.traits.armorProf.custom.split(";").filter(x => String(x) && x?.length);
         if (a?.length > 0) { s = `${s}Armor: ${a} ${b.join(', ')}\n`; }
-        a = Object.keys(this.actor.system.tools).map(x => game.dnd5e.config.toolProficiencies[x]
-            || game.packs.get("dnd5e.items").index.get(game.dnd5e.config.toolIds[x])?.name).join(",");
-        if (a?.length > 0) { s = `${s}Tools: ${a} \n`; }
+        a = await Promise.all(Object.keys(this.actor.system.tools).map(async (x) => {
+            let toolComp = await fromUuid(game.dnd5e.config.toolIds[x])
+            return game.dnd5e.config.toolProficiencies[x] || toolComp?.name
+        }));
+        if (a?.length > 0) { s = `${s}Tools: ${a.join(', ')} \n`; }
         let traitLang = Array.from(this.actor.system.traits.languages.value);
         let confLang = Object.keys(flattenObject(game.dnd5e.config.languages))
         let actorLang = [];
@@ -582,6 +597,26 @@ class MappingClass extends baseMapping {
                 },
                 Transmutation: {
                     path: "/modules/sheet-export/mappings/dnd5e/Transmutation.webp",
+                    width: 24,
+                    height: 24
+                },
+                Divination: {
+                    path: "/modules/sheet-export/mappings/dnd5e/Divination.webp",
+                    width: 24,
+                    height: 24
+                },
+                Enchantment: {
+                    path: "/modules/sheet-export/mappings/dnd5e/Enchantment.webp",
+                    width: 24,
+                    height: 24
+                },
+                Illusion: {
+                    path: "/modules/sheet-export/mappings/dnd5e/Illusion.webp",
+                    width: 24,
+                    height: 24
+                },
+                Abjuration: {
+                    path: "/modules/sheet-export/mappings/dnd5e/Abjuration.webp",
                     width: 24,
                     height: 24
                 },

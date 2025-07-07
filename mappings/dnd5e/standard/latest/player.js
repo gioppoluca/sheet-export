@@ -14,7 +14,7 @@ class MappingClass extends baseMapping {
 
 
     // override createMappings method from base class
-    createMappings() {
+    async createMappings() {
         this.systemName = "dnd5e";
         // Set the PDF files to use - MIND that the order of the files is important!
         this.pdfFiles.push({
@@ -100,32 +100,48 @@ class MappingClass extends baseMapping {
         this.setCalculated("Athletics", this.actor.system.skills.ath.total);
         this.setCalculated("Deception", this.actor.system.skills.dec.total);
         this.setCalculated("History", this.actor.system.skills.his.total);
-        this.setCalculated("Wpn Name", this.localizedItemName(this.actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[0]) || "");
+        console.log("before weapon start");
+        console.log(this.actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack))
+        this.setCalculated("Wpn Name", this.localizedItemName(this.actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack)[0]) || "");
+        console.log(this.localizedItemName(this.actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack)[0]) || "");
+        console.log("before weapon atkbonus");
         this.setCalculated("Wpn1 AtkBonus", (function (actor) {
-            const theWeapon = actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[0];
+            const theWeapon = actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack)[0];
+            console.log(theWeapon);
             //theWeapon?.prepareFinalAttributes();
             return theWeapon?.labels?.toHit?.replace(/^\+ $/, "0") || ""
         })(this.actor)
         );
+        console.log("before weapon damage");
         this.setCalculated("Wpn1 Damage", (function (actor) {
-            const dda = Array.from(actor.itemTypes.weapon.filter(i => i.system.equipped && i.hasAttack && i.hasDamage))?.[0]?.labels.derivedDamage;
-            return !dda ? "" : dda.map(dd => `${dd.formula || ""} ${game.dnd5e.config.damageTypes[dd.damageType]}`).join('\n');
+            const dda = Array.from(actor.itemTypes.weapon.filter(i => i.system.equipped && i.hasAttack))?.[0]?.labels?.damages[0]?.label;
+            return !dda ? "" : dda;
         })(this.actor)
         );
         this.setCalculated("Insight", this.actor.system.skills.ins.total);
         this.setCalculated("Intimidation", this.actor.system.skills.itm.total);
-        this.setCalculated("Wpn Name 2", this.actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[1]?.name || "");
+        this.setCalculated("Wpn Name 2", this.actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack)[1]?.name || "");
         this.setCalculated("Wpn2 AtkBonus", (function (actor) {
-            const theWeapon = actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[1];
+            const theWeapon = actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack)[1];
             //theWeapon?.prepareFinalAttributes();
             return theWeapon?.labels?.toHit?.replace(/^\+ $/, "0") || ""
         })(this.actor)
         );
-        this.setCalculated("Wpn Name 3", this.actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[2]?.name || "");
+        this.setCalculated("Wpn2 Damage", (function (actor) {
+            const dda = Array.from(actor.itemTypes.weapon.filter(i => i.system.equipped && i.hasAttack))?.[1]?.labels?.damages[0]?.label;
+            return !dda ? "" : dda;
+        })(this.actor)
+        );
+        this.setCalculated("Wpn Name 3", this.actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack)[2]?.name || "");
         this.setCalculated("Wpn3 AtkBonus", (function (actor) {
-            const theWeapon = actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[2];
+            const theWeapon = actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack)[2];
             //theWeapon?.prepareFinalAttributes();
             return theWeapon?.labels?.toHit?.replace(/^\+ $/, "0") || ""
+        })(this.actor)
+        );
+        this.setCalculated("Wpn3 Damage", (function (actor) {
+            const dda = Array.from(actor.itemTypes.weapon.filter(i => i.system.equipped && i.hasAttack))?.[2]?.labels?.damages[0]?.label;
+            return !dda ? "" : dda;
         })(this.actor)
         );
         this.setCalculated("Check Box 11", this.actor.system.abilities.str.proficient);
@@ -135,11 +151,6 @@ class MappingClass extends baseMapping {
         this.setCalculated("Check Box 21", this.actor.system.abilities.wis.proficient);
         this.setCalculated("Check Box 22", this.actor.system.abilities.cha.proficient);
         this.setCalculated("INTmod", this.actor.system.abilities.int.mod);
-        this.setCalculated("Wpn2 Damage", (function (actor) {
-            const dda = Array.from(actor.itemTypes.weapon.filter(i => i.system.equipped && i.hasAttack && i.hasDamage))?.[1]?.labels.derivedDamage;
-            return !dda ? "" : dda.map(dd => `${dd.formula || ""} ${game.dnd5e.config.damageTypes[dd.damageType]}`).join('\n');
-        })(this.actor)
-        );
         this.setCalculated("Investigation", this.actor.system.skills.inv.total);
         this.setCalculated("WIS", this.actor.system.abilities.wis.value);
         this.setCalculated("Arcana", this.actor.system.skills.arc.total);
@@ -173,32 +184,27 @@ class MappingClass extends baseMapping {
         this.setCalculated("HPMax", this.actor.system.attributes.hp.max);
         this.setCalculated("HPCurrent", this.actor.system.attributes.hp.value);
         this.setCalculated("HPTemp", this.actor.system.attributes.hp.temp);
-        this.setCalculated("Wpn3 Damage", (function (actor) {
-            const dda = Array.from(actor.itemTypes.weapon.filter(i => i.system.equipped && i.hasAttack && i.hasDamage))?.[2]?.labels.derivedDamage;
-            return !dda ? "" : dda.map(dd => `${dd.formula || ""} ${game.dnd5e.config.damageTypes[dd.damageType]}`).join('\n');
-        })(this.actor)
-        );
         this.setCalculated("SleightofHand", this.actor.system.skills.slt.total);
         this.setCalculated("CHamod", this.actor.system.abilities.cha.mod);
         this.setCalculated("Survival", this.actor.system.skills.sur.total);
         this.setCalculated("AttacksSpellcasting", "");
         this.setCalculated("Passive", this.actor.system.skills.prc.passive);
         this.setCalculated("CP", this.actor.system.currency.cp || "");
-        this.setCalculated("ProficienciesLang", this.traitsLangs());
+        this.setCalculated("ProficienciesLang", await this.traitsLangs());
         this.setCalculated("SP", this.actor.system.currency.sp || "");
         this.setCalculated("EP", this.actor.system.currency.ep || "");
         this.setCalculated("GP", this.actor.system.currency.gp || "");
         this.setCalculated("PP", this.actor.system.currency.pp || "");
-        
+
         this.setCalculated("Equipment", this.actor.items.filter(i => ['weapon', 'equipment', 'tool'].includes(i.type)).map(i => (i.system.quantity <= 1) ? i.name : `${i.name} (${i.system.quantity})`).join(', '));
         this.setCalculated("Features and Traits", this.getFeatsAndTraits());
         this.setCalculated("CharacterName 2", this.actor.name || "");
-        this.setCalculated("Age", this.actor.flags["tidy5e-sheet"]?.age || "");
-        this.setCalculated("Height", this.actor.flags["tidy5e-sheet"]?.height || "");
-        this.setCalculated("Weight", this.actor.flags["tidy5e-sheet"]?.weight || "");
-        this.setCalculated("Eyes", this.actor.flags["tidy5e-sheet"]?.eyes || "");
-        this.setCalculated("Skin", this.actor.flags["tidy5e-sheet"]?.skin || "");
-        this.setCalculated("Hair", this.actor.flags["tidy5e-sheet"]?.hair || "");
+        this.setCalculated("Age", this.actor.system?.details?.age || "");
+        this.setCalculated("Height", this.actor.system?.details?.height || "");
+        this.setCalculated("Weight", this.actor.system?.details?.weight || "");
+        this.setCalculated("Eyes", this.actor.system?.details?.eyes || "");
+        this.setCalculated("Skin", this.actor.system?.details?.skin || "");
+        this.setCalculated("Hair", this.actor.system?.details?.hair || "");
         this.setCalculated("Faction Symbol Image", "");
         this.setCalculated("Allies", "");
         this.setCalculated("FactionName", "");
@@ -438,12 +444,12 @@ class MappingClass extends baseMapping {
     }
 
     getLocalizedClassAndSubclass(classItem) {
-        const sc = classItem.system.subclass;
-        return sc ? game.i18n.localize(classItem.name) + "/" + game.i18n.localize(sc) : game.i18n.localize(classItem.name);
+        const sc = classItem?.system?.subclass;
+        return sc ? game.i18n.localize(classItem?.name) + "/" + game.i18n.localize(sc) : game.i18n.localize(classItem?.name);
     }
 
     getLocalizedClassAndSubclassAndLevel(classItem) {
-        return `${this.getLocalizedClassAndSubclass(classItem)} ${classItem.system.levels}`;
+        return `${this.getLocalizedClassAndSubclass(classItem)} ${classItem?.system?.levels}`;
     }
 
     getFeatsAndTraits() {
@@ -466,20 +472,34 @@ class MappingClass extends baseMapping {
         return item ? game.i18n.localize(item?.name) : '';
     }
 
-    traitsLangs() {
+    async traitsLangs() {
+        console.log(this.actor)
+        console.log(game.dnd5e.config.weaponProficiencies)
+        console.log(game.packs.get("dnd5e.items").index)
+        console.log(game.dnd5e.config.weaponIds)
         let s = "";
-        let a = this.actor.system.traits.weaponProf.value.map(x => game.dnd5e.config.weaponProficiencies[x]
-            || game.packs.get("dnd5e.items").index.get(game.dnd5e.config.weaponIds[x])?.name).first();
+        let a = await Promise.all(await this.actor.system.traits.weaponProf.value.map(async (x) => {
+            console.log(x)
+            console.log(game.dnd5e.config.weaponProficiencies[x])
+            console.log(game.dnd5e.config.weaponIds[x])
+            console.log(await fromUuid(game.dnd5e.config.weaponIds[x]))
+            console.log(game.packs.get("dnd5e.items").index.get(game.dnd5e.config.weaponIds[x])?.name)
+            let itemComp = await fromUuid(game.dnd5e.config.weaponIds[x])
+            console.log(game.dnd5e.config.weaponProficiencies[x] || itemComp?.name)
+            return game.dnd5e.config.weaponProficiencies[x] || itemComp?.name
+        }));
         let b = this.actor.system.traits.weaponProf.custom.split(";").filter(x => String(x) && x?.length);
-
+        console.log(a)
         if (a?.length > 0) { s = `${s}Weapons: ${a} ${b.join(', ')}\n`; }
         a = this.actor.system.traits.armorProf.value.map(x => game.dnd5e.config.armorProficiencies[x]
             || game.packs.get("dnd5e.items").index.get(game.dnd5e.config.armorIds[x])?.name).first();
         b = this.actor.system.traits.armorProf.custom.split(";").filter(x => String(x) && x?.length);
         if (a?.length > 0) { s = `${s}Armor: ${a} ${b.join(', ')}\n`; }
-        a = Object.keys(this.actor.system.tools).map(x => game.dnd5e.config.toolProficiencies[x]
-            || game.packs.get("dnd5e.items").index.get(game.dnd5e.config.toolIds[x])?.name).join(",");
-        if (a?.length > 0) { s = `${s}Tools: ${a} \n`; }
+        a = await Promise.all(Object.keys(this.actor.system.tools).map(async (x) => {
+            let toolComp = await fromUuid(game.dnd5e.config.toolIds[x])
+            return game.dnd5e.config.toolProficiencies[x] || toolComp?.name
+        }));
+        if (a?.length > 0) { s = `${s}Tools: ${a.join(', ')} \n`; }
         let traitLang = Array.from(this.actor.system.traits.languages.value);
         let confLang = Object.keys(flattenObject(game.dnd5e.config.languages))
         let actorLang = [];
