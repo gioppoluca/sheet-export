@@ -372,6 +372,7 @@ class SheetExportconfig extends FormApplication {
 		var mappingClass = null;
 		try {
 			mappingClass = new MappingClass(this.actor, this.sheetType, this.sheet);
+			await mappingClass.createMappings();
 		} catch (error) {
 			ui.notifications.error("error in loading mapping:" + error.message);
 			console.log(error);
