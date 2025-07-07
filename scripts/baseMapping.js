@@ -40,7 +40,7 @@ class baseMapping {
         this.embeddedImages = new Map();
         this.embeddedFonts = new Map(); // key: fontName, value: { font, path }
 
-        this.createMappings();
+        // this.createMappings();
     }
 
     log(severity, message, options) {
@@ -152,7 +152,7 @@ class baseMapping {
         this.imageMappings[pdfId].push({ "path": path, "page": page, "pos_x": pos_x, "pos_y": pos_y, "width": width, "height": height });
 
     }
-    createMappings() {
+    async createMappings() {
         this.fieldMappings = [];
     }
 

@@ -11,7 +11,7 @@ class MappingClass extends baseMapping {
         },
     ];
     // override createMappings method from base class
-    createMappings() {
+    async createMappings() {
         super.createMappings();
 
         // Set the PDF files to use - MIND that the order of the files is important!

@@ -12,7 +12,7 @@ class MappingClass extends baseMapping {
     ];
 
     // override createMappings method from base class
-    createMappings() {
+    async createMappings() {
         super.createMappings();
 
         let BLOOD_POTENCY_TEXT = [

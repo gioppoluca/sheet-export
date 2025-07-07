@@ -20,7 +20,7 @@ class MappingClass extends baseMapping {
         this.pdfFiles.push({
             pdfUrl: '/modules/sheet-export/mappings/dnd5e/5E_CharacterSheet_Fillable.pdf',
             nameDownload: `${this.actor.name ?? "character"}.pdf`,
-            name: "5E_CharacterSheet_Fillable.pdf",
+            name: "Extended character sheet 5e.pdf",
         });
 
         // Set Player image
@@ -100,16 +100,21 @@ class MappingClass extends baseMapping {
         this.setCalculated("Athletics", this.actor.system.skills.ath.total);
         this.setCalculated("Deception", this.actor.system.skills.dec.total);
         this.setCalculated("History", this.actor.system.skills.his.total);
+        console.log("before weapon start");
         this.setCalculated("Wpn Name", this.localizedItemName(this.actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[0]) || "");
+        console.log(this.localizedItemName(this.actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[0]) || "");
+        console.log("before weapon atkbonus");
         this.setCalculated("Wpn1 AtkBonus", (function (actor) {
             const theWeapon = actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[0];
-            theWeapon?.prepareFinalAttributes();
+            console.log(theWeapon);
+            //theWeapon?.prepareFinalAttributes();
             return theWeapon?.labels?.toHit?.replace(/^\+ $/, "0") || ""
         })(this.actor)
         );
+        console.log("before weapon damage");
         this.setCalculated("Wpn1 Damage", (function (actor) {
-            const dda = Array.from(actor.itemTypes.weapon.filter(i => i.system.equipped && i.hasAttack && i.hasDamage))?.[0]?.labels.derivedDamage;
-            return !dda ? "" : dda.map(dd => `${dd.formula || ""} ${game.dnd5e.config.damageTypes[dd.damageType]}`).join('\n');
+            const dda = Array.from(actor.itemTypes.weapon.filter(i => i.system.equipped && i.hasAttack && i.hasDamage))?.[0]?.labels?.damages[0]?.label;
+            return !dda ? "" : dda;
         })(this.actor)
         );
         this.setCalculated("Insight", this.actor.system.skills.ins.total);
@@ -117,14 +122,14 @@ class MappingClass extends baseMapping {
         this.setCalculated("Wpn Name 2", this.actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[1]?.name || "");
         this.setCalculated("Wpn2 AtkBonus", (function (actor) {
             const theWeapon = actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[1];
-            theWeapon?.prepareFinalAttributes();
+            //theWeapon?.prepareFinalAttributes();
             return theWeapon?.labels?.toHit?.replace(/^\+ $/, "0") || ""
         })(this.actor)
         );
         this.setCalculated("Wpn Name 3", this.actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[2]?.name || "");
         this.setCalculated("Wpn3 AtkBonus", (function (actor) {
             const theWeapon = actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack && i.hasDamage)[2];
-            theWeapon?.prepareFinalAttributes();
+            //theWeapon?.prepareFinalAttributes();
             return theWeapon?.labels?.toHit?.replace(/^\+ $/, "0") || ""
         })(this.actor)
         );
@@ -136,8 +141,8 @@ class MappingClass extends baseMapping {
         this.setCalculated("Check Box 22", this.actor.system.abilities.cha.proficient);
         this.setCalculated("INTmod", this.actor.system.abilities.int.mod);
         this.setCalculated("Wpn2 Damage", (function (actor) {
-            const dda = Array.from(actor.itemTypes.weapon.filter(i => i.system.equipped && i.hasAttack && i.hasDamage))?.[1]?.labels.derivedDamage;
-            return !dda ? "" : dda.map(dd => `${dd.formula || ""} ${game.dnd5e.config.damageTypes[dd.damageType]}`).join('\n');
+            const dda = Array.from(actor.itemTypes.weapon.filter(i => i.system.equipped && i.hasAttack && i.hasDamage))?.[1]?.labels?.damages[0]?.label;
+            return !dda ? "" : dda;
         })(this.actor)
         );
         this.setCalculated("Investigation", this.actor.system.skills.inv.total);
@@ -174,8 +179,8 @@ class MappingClass extends baseMapping {
         this.setCalculated("HPCurrent", this.actor.system.attributes.hp.value);
         this.setCalculated("HPTemp", this.actor.system.attributes.hp.temp);
         this.setCalculated("Wpn3 Damage", (function (actor) {
-            const dda = Array.from(actor.itemTypes.weapon.filter(i => i.system.equipped && i.hasAttack && i.hasDamage))?.[2]?.labels.derivedDamage;
-            return !dda ? "" : dda.map(dd => `${dd.formula || ""} ${game.dnd5e.config.damageTypes[dd.damageType]}`).join('\n');
+            const dda = Array.from(actor.itemTypes.weapon.filter(i => i.system.equipped && i.hasAttack && i.hasDamage))?.[2]?.labels?.damages[0]?.label;
+            return !dda ? "" : dda;
         })(this.actor)
         );
         this.setCalculated("SleightofHand", this.actor.system.skills.slt.total);
@@ -189,16 +194,16 @@ class MappingClass extends baseMapping {
         this.setCalculated("EP", this.actor.system.currency.ep || "");
         this.setCalculated("GP", this.actor.system.currency.gp || "");
         this.setCalculated("PP", this.actor.system.currency.pp || "");
-        
+
         this.setCalculated("Equipment", this.actor.items.filter(i => ['weapon', 'equipment', 'tool'].includes(i.type)).map(i => (i.system.quantity <= 1) ? i.name : `${i.name} (${i.system.quantity})`).join(', '));
         this.setCalculated("Features and Traits", this.getFeatsAndTraits());
         this.setCalculated("CharacterName 2", this.actor.name || "");
-        this.setCalculated("Age", this.actor.flags["tidy5e-sheet"]?.age || "");
-        this.setCalculated("Height", this.actor.flags["tidy5e-sheet"]?.height || "");
-        this.setCalculated("Weight", this.actor.flags["tidy5e-sheet"]?.weight || "");
-        this.setCalculated("Eyes", this.actor.flags["tidy5e-sheet"]?.eyes || "");
-        this.setCalculated("Skin", this.actor.flags["tidy5e-sheet"]?.skin || "");
-        this.setCalculated("Hair", this.actor.flags["tidy5e-sheet"]?.hair || "");
+        this.setCalculated("Age", this.actor.system?.details?.age || "");
+        this.setCalculated("Height", this.actor.system?.details?.height || "");
+        this.setCalculated("Weight", this.actor.system?.details?.weight || "");
+        this.setCalculated("Eyes", this.actor.system?.details?.eyes || "");
+        this.setCalculated("Skin", this.actor.system?.details?.skin || "");
+        this.setCalculated("Hair", this.actor.system?.details?.hair || "");
         this.setCalculated("Faction Symbol Image", "");
         this.setCalculated("Allies", "");
         this.setCalculated("FactionName", "");
@@ -424,8 +429,50 @@ class MappingClass extends baseMapping {
         this.setCalculated("Check Box 3081", this.actor.items.filter(i => i.type === 'spell' && i.system.level === 9)[4]?.system.preparation.prepared || "");
         this.setCalculated("Check Box 3082", this.actor.items.filter(i => i.type === 'spell' && i.system.level === 9)[5]?.system.preparation.prepared || "");
         this.setCalculated("Check Box 3083", this.actor.items.filter(i => i.type === 'spell' && i.system.level === 9)[6]?.system.preparation.prepared || "");
+//        this.mapCompleteSpells();
+//        this.mapEquipment();
     }
 
+/*
+    mapCompleteSpells() {
+        let orderedSpells = this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) })
+        const maxSpells = orderedSpells.length < 80 ? orderedSpells.length : 80;
+        for (let index = 0; index < maxSpells; index++) {
+            const theSpell = orderedSpells[index];
+            const spellIndex = (index + 1).toLocaleString('en-US', { minimumIntegerDigits: 2, useGrouping: false });
+            this.setCalculated(`spell_name_${spellIndex}`, theSpell.name + ((typeof theSpell.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(theSpell.flags['items-with-spells-5e']['parent-item']).name + ']' : '') || "");
+            this.setCalculated(`spell_school_${spellIndex}`, theSpell.system.school || "");
+            this.setCalculated(`spell_level_${spellIndex}`, theSpell.system.level || 0);
+            this.setCalculated(`spell_description_${spellIndex}`, (function (h) {
+                const d = document.createElement("div");
+                d.innerHTML = h;
+                return d.textContent || d.innerText || "";
+            })(theSpell.system.description.value || ""));
+            this.setCalculated(`spell_verbal_${spellIndex}`, theSpell.system.properties.has('vocal') || 0);
+            this.setCalculated(`spell_somatic_${spellIndex}`, theSpell.system.properties.has('somatic') || 0);
+            this.setCalculated(`spell_material_${spellIndex}`, theSpell.system.properties.has('material') || 0);
+            this.setCalculated(`spell_ritual_${spellIndex}`, theSpell.system.properties.has('ritual') || 0);
+            this.setCalculated(`spell_concentration_${spellIndex}`, theSpell.system.properties.has('concentration') || 0);
+            this.setCalculated(`spell_range_${spellIndex}`, (theSpell.system.range?.value != null ? theSpell.system.range.value + " " : "") + theSpell.system.range.units || "");
+            this.setCalculated(`spell_casting_${spellIndex}`, (theSpell.system.activation?.cost != null ? theSpell.system.activation?.cost + " " : "") + theSpell.system.activation.type || "");
+            this.setCalculated(`spell_duration_${spellIndex}`, theSpell.system.duration?.value + " " + theSpell.system.duration.units || "");
+        }
+    }
+
+    mapEquipment() {
+        this.setGlobalValue("equipment_extended", this.actor.items.filter(i => ['weapon', 'equipment', 'tool', 'consumable', 'loot', 'backpack'].includes(i.type)).map(i => `${i.name} (${i.system.quantity}): \n${((h) => {
+            const d = document.createElement("div");
+            d.innerHTML = h;
+            return d.textContent || d.innerText || "";
+        })(i.system.description.value)}\n`).join("\n"));
+
+        this.setCalculated("equipment_extended1", this.getGlobalValue("equipment_extended", 0, 2500));
+        this.setCalculated("equipment_extended2", this.getGlobalValue("equipment_extended", 2500, 5000));
+        this.setCalculated("equipment_extended3", this.getGlobalValue("equipment_extended", 5000, 7500));
+        this.setCalculated("equipment_extended4", this.getGlobalValue("equipment_extended", 7500, 10000));
+
+    }
+*/
     getPrimaryClassObj() {
         const allClasses = this.actor.items.filter(i => i.type === 'class').map(i => i);
         if (allClasses.length > 1) {
@@ -438,12 +485,12 @@ class MappingClass extends baseMapping {
     }
 
     getLocalizedClassAndSubclass(classItem) {
-        const sc = classItem.system.subclass;
-        return sc ? game.i18n.localize(classItem.name) + "/" + game.i18n.localize(sc) : game.i18n.localize(classItem.name);
+        const sc = classItem?.system?.subclass;
+        return sc ? game.i18n.localize(classItem?.name) + "/" + game.i18n.localize(sc) : game.i18n.localize(classItem?.name);
     }
 
     getLocalizedClassAndSubclassAndLevel(classItem) {
-        return `${this.getLocalizedClassAndSubclass(classItem)} ${classItem.system.levels}`;
+        return `${this.getLocalizedClassAndSubclass(classItem)} ${classItem?.system?.levels}`;
     }
 
     getFeatsAndTraits() {
@@ -497,6 +544,300 @@ class MappingClass extends baseMapping {
         return s;
     }
 
+    // this is the override of the function to define the layout of the spell cards
+    getCardLayoutConfig() {
+        return super.getCardLayoutConfig({
+            page: {
+                width: 595.28,
+                height: 841.89,
+                margin: 0,
+                backgroundImage: {
+                    background: {
+                        path: "/modules/sheet-export/mappings/dnd5e/SpellCardPage.png",
+                        width: 24,
+                        height: 24
+                    }
+                }
+            },
+            card: {
+                width: 297.64,
+                height: 420.945
+            },
+            rows: 2,
+            columns: 2,
+            fonts: {
+                TitleFont: "/modules/sheet-export/mappings/dnd5e/BLKCHCRY.TTF",
+                BodyFont: "/modules/sheet-export/mappings/dnd5e/Roboto-Regular.ttf"
+            },
+            images: {
+                Evocation: {
+                    path: "/modules/sheet-export/mappings/dnd5e/Evocation.webp",
+                    width: 24,
+                    height: 24
+                },
+                Conjuration: {
+                    path: "/modules/sheet-export/mappings/dnd5e/Conjuration.webp",
+                    width: 24,
+                    height: 24
+                },
+                Transmutation: {
+                    path: "/modules/sheet-export/mappings/dnd5e/Transmutation.webp",
+                    width: 24,
+                    height: 24
+                },
+                Divination: {
+                    path: "/modules/sheet-export/mappings/dnd5e/Divination.webp",
+                    width: 24,
+                    height: 24
+                },
+                Enchantment: {
+                    path: "/modules/sheet-export/mappings/dnd5e/Enchantment.webp",
+                    width: 24,
+                    height: 24
+                },
+                Illusion: {
+                    path: "/modules/sheet-export/mappings/dnd5e/Illusion.webp",
+                    width: 24,
+                    height: 24
+                },
+                Abjuration: {
+                    path: "/modules/sheet-export/mappings/dnd5e/Abjuration.webp",
+                    width: 24,
+                    height: 24
+                },
+                Necromancy: {
+                    path: "/modules/sheet-export/mappings/dnd5e/Necromancy.webp",
+                    width: 24,
+                    height: 24
+                }
+            }
+        });
+    }
+
+
+    // this is override of the card template
+    getCardTemplate() {
+        return super.getCardTemplate({
+            fields: [
+                {
+                    key: "title",
+                    type: "text",
+                    fontName: "TitleFont",
+                    size: 12,
+                    center: true,
+                    color: "#550000",
+                    width: 211.2,
+                    height: 16.8,
+                    x: 13.2,
+                    y: 387.545
+                    //                    y: 803.49
+                },
+                {
+                    key: "level",
+                    type: "text",
+                    fontName: "BodyFont",
+                    size: 15,
+                    color: "#e0b710",
+                    x: 248.8,
+                    y: 383
+                },
+                {
+                    key: "school",
+                    type: "imageRef",
+                    width: 24,
+                    height: 24,
+                    x: 241.7,
+                    y: 353
+                },
+                {
+                    key: "school",
+                    type: "text",
+                    fontName: "BodyFont",
+                    size: 6,
+                    center: true,
+                    color: "#e0b710",
+                    width: 38.4,
+                    height: 10,
+                    x: 234.24,
+                    y: 340
+                },
+                {
+                    key: "casting",
+                    type: "text",
+                    fontName: "BodyFont",
+                    size: 9,
+                    color: "#222222",
+                    x: 12,
+                    y: 357
+                },
+                {
+                    key: "range",
+                    type: "text",
+                    fontName: "BodyFont",
+                    size: 9,
+                    color: "#222222",
+                    x: 86,
+                    y: 357
+                },
+                {
+                    key: "duration",
+                    type: "text",
+                    fontName: "BodyFont",
+                    size: 9,
+                    color: "#222222",
+                    x: 160,
+                    y: 357
+                },
+                {
+                    key: "description",
+                    type: "text",
+                    fontName: "BodyFont",
+                    wrap: true,
+                    size: 9,
+                    color: "#222222",
+                    width: 273.6,
+                    height: 312,
+                    x: 12,
+                    y: 12.945
+                    //                    y: 433.89
+                }
+            ],
+            checkboxes: [{
+                key: "ritual",
+                x: 38.2,
+                y: 328.5
+            },
+            {
+                key: "concentration",
+                x: 91.3,
+                y: 328.5
+            },
+            {
+                key: "verbal",
+                x: 135,
+                y: 328.5
+            },
+            {
+                key: "somatic",
+                x: 175.5,
+                y: 328.5
+            },
+            {
+                key: "material",
+                x: 218.55,
+                y: 328.5
+            }
+            ]
+        });
+    }
+
+
+    getCardDataArray() {
+        const spells = this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) })
+        console.log(spells)
+        return spells.map(spell => ({
+            title: spell.name,
+            description: this.htmlToText(spell.system.description?.value || ""),
+            range: spell.labels.range,
+            casting: spell.labels.activation,
+            duration: spell.labels.duration,
+            verbal: spell.system.properties.has("verbal"),
+            somatic: spell.system.properties.has("somatic"),
+            material: spell.system.properties.has("mgc"),
+            ritual: spell.system.ritual === true,
+            level: spell.system.level,
+            concentration: spell.system.properties.has("concentration"),
+            school: spell.labels.school // must match image key in layoutConfig
+        }));
+    }
+
+    getCardItemLayoutConfig() {
+        return super.getCardLayoutConfig({
+            page: {
+                width: 595.28,
+                height: 841.89,
+                margin: 0,
+                backgroundImage: {
+                    background: {
+                        path: "/modules/sheet-export/mappings/dnd5e/ItemCardPage.png",
+                        width: 24,
+                        height: 24
+                    }
+                }
+            },
+            card: {
+                width: 297.64,
+                height: 210.472
+            },
+            rows: 4,
+            columns: 2,
+            fonts: {
+                TitleFont: "/modules/sheet-export/mappings/dnd5e/BLKCHCRY.TTF",
+                BodyFont: "/modules/sheet-export/mappings/dnd5e/Roboto-Regular.ttf"
+            },
+            images: {
+            }
+        });
+    }
+
+    getCardItemTemplate() {
+        return super.getCardTemplate({
+            fields: [
+                {
+                    key: "title",
+                    type: "text",
+                    fontName: "TitleFont",
+                    size: 12,
+                    center: true,
+                    color: "#550000",
+                    width: 211.2,
+                    height: 16.8,
+                    x: 13.2,
+                    y: 177.073
+                    //                    y: 803.49
+                },
+                {
+                    key: "description",
+                    type: "text",
+                    fontName: "BodyFont",
+                    wrap: true,
+                    size: 7,
+                    color: "#222222",
+                    width: 273.6,
+                    height: 144.96,
+                    x: 12,
+                    y: 7
+                    //                    y: 12.945
+                    //                    y: 433.89
+                }
+            ]
+        });
+    }
+
+    getCardItemDataArray() {
+        //const spells = this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) })
+        const items = this.actor.items.filter(i => ['weapon', 'equipment', 'tool', 'consumable', 'loot', 'backpack'].includes(i.type));
+        console.log(items)
+        return items.map(item => ({
+            title: item.name,
+            description: this.htmlToText(item.system.description?.value || ""),
+        }));
+    }
+
+    getCardSections() {
+        return [
+            {
+                layoutConfig: this.getCardItemLayoutConfig(),
+                cardTemplate: this.getCardItemTemplate(),
+                cardDataArray: this.getCardItemDataArray()  // e.g., monster abilities
+            },
+            {
+                layoutConfig: this.getCardLayoutConfig(),
+                cardTemplate: this.getCardTemplate(),
+                cardDataArray: this.getCardDataArray()   // e.g., player spells
+            }
+        ];
+    }
 }
 
 export default MappingClass;
