@@ -20,7 +20,7 @@ class MappingClass extends baseMapping {
             nameDownload: `${this.actor.name ?? "character"}.pdf`,
             name: "SWADE_Character_Sheet.pdf",
         });
-
+console.log(this.actor);
         this.setCalculated("Name", this.actor.name);
         this.setCalculated("Race", this.actor.system.details.species.name);
         this.setCalculated("Bennies", this.actor.system.bennies.max);
@@ -34,7 +34,7 @@ class MappingClass extends baseMapping {
         this.setCalculated("Strength Mod", this.actor.system.attributes.strength.die.modifier);
         this.setCalculated("Vigor Die", "d" + this.actor.system.attributes.vigor.die.sides);
         this.setCalculated("Vigor Mod", this.actor.system.attributes.vigor.die.modifier);
-        this.setCalculated("Pace", this.actor.system.stats.speed.adjusted);
+        this.setCalculated("Pace", this.actor.system.pace.default);
         this.setCalculated("Parry", this.actor.system.stats.parry.value);
         this.setCalculated("Toughness", this.actor.system.stats.toughness.value + "(" + this.actor.system.stats.toughness.armor + ")");
         this.setCalculated("Skills 1", this.actor.items.filter(item => item.type === "skill")[0]?.name ?? '');
