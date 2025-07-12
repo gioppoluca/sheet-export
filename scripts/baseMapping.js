@@ -178,7 +178,8 @@ class baseMapping {
             .replaceAll(/<li[^>]*>/gms, "• ")
             .replaceAll(/<\/li>/gms, "\n")
             .replaceAll(/<[^>]*>/gms, "")
-            .replaceAll(/\u00a0/g, "");
+            .replaceAll(/\u00a0/g, "")
+            .replace(/@UUID\[.*?\]\{([^}]+)\}/g, '$1');
     }
 
     getValueByDottedKeys(obj, strKey) {
