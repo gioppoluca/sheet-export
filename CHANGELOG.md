@@ -1,4 +1,12 @@
 
+## [0.13.5] - 2025-07-12
+### :sparkles: New Features
+- [`381968c`](https://github.com/gioppoluca/sheet-export/commit/381968c89fccdc2cdb07be997309463727ba863f) - added pages for feats so they are readable *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+### :bug: Bug Fixes
+- [`db058c7`](https://github.com/gioppoluca/sheet-export/commit/db058c76022d1110574affcd66339809f90041a6) - parsed UUID and removed from text *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+
 ## [0.13.4] - 2025-07-07
 ### :bug: Bug Fixes
 - [`9904e8d`](https://github.com/gioppoluca/sheet-export/commit/9904e8daab056077cf923e126ec8ae291f50d954) - refactoring for having async in createMapping *(commit by [@gioppoluca](https://github.com/gioppoluca))*
@@ -260,3 +268,4 @@
 [0.13.2]: https://github.com/gioppoluca/sheet-export/compare/0.13.1...0.13.2
 [0.13.3]: https://github.com/gioppoluca/sheet-export/compare/0.13.2...0.13.3
 [0.13.4]: https://github.com/gioppoluca/sheet-export/compare/0.13.3...0.13.4
+[0.13.5]: https://github.com/gioppoluca/sheet-export/compare/0.13.4...0.13.5
