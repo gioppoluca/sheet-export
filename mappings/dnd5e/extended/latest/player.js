@@ -839,12 +839,92 @@ class MappingClass extends baseMapping {
         }));
     }
 
+    getCardFeatLayoutConfig() {
+        return super.getCardLayoutConfig({
+            page: {
+                width: 595.28,
+                height: 841.89,
+                margin: 0,
+                backgroundImage: {
+                    background: {
+                        path: "/modules/sheet-export/mappings/dnd5e/ItemCardPage.png",
+                        width: 24,
+                        height: 24
+                    }
+                }
+            },
+            card: {
+                width: 297.64,
+                height: 210.472
+            },
+            rows: 4,
+            columns: 2,
+            fonts: {
+                TitleFont: "/modules/sheet-export/mappings/dnd5e/BLKCHCRY.TTF",
+                BodyFont: "/modules/sheet-export/mappings/dnd5e/Roboto-Regular.ttf"
+            },
+            images: {
+            }
+        });
+    }
+
+    getCardFeatTemplate() {
+        return super.getCardTemplate({
+            fields: [
+                {
+                    key: "title",
+                    type: "text",
+                    fontName: "TitleFont",
+                    size: 12,
+                    center: true,
+                    color: "#550000",
+                    width: 211.2,
+                    height: 16.8,
+                    x: 13.2,
+                    y: 177.073
+                    //                    y: 803.49
+                },
+                {
+                    key: "description",
+                    type: "text",
+                    fontName: "BodyFont",
+                    wrap: true,
+                    size: 7,
+                    color: "#222222",
+                    width: 273.6,
+                    height: 144.96,
+                    x: 12,
+                    y: 7
+                    //                    y: 12.945
+                    //                    y: 433.89
+                }
+            ]
+        });
+    }
+
+    getCardFeatDataArray() {
+        //const spells = this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) })
+        //const items = this.actor.items.filter(i => ['weapon', 'equipment', 'tool', 'consumable', 'loot', 'backpack'].includes(i.type));
+        const feats = this.actor.items.filter(i => ['feat', 'trait'].includes(i.type))
+        console.log(feats)
+        return feats.map(feat => ({
+            title: feat.name,
+            description: this.htmlToText(feat.system.description?.value || ""),
+        }));
+    }
+
+
     getCardSections() {
         return [
             {
+                layoutConfig: this.getCardFeatLayoutConfig(),
+                cardTemplate: this.getCardFeatTemplate(),
+                cardDataArray: this.getCardFeatDataArray()
+            },
+            {
                 layoutConfig: this.getCardItemLayoutConfig(),
                 cardTemplate: this.getCardItemTemplate(),
-                cardDataArray: this.getCardItemDataArray()  // e.g., monster abilities
+                cardDataArray: this.getCardItemDataArray()
             },
             {
                 layoutConfig: this.getCardLayoutConfig(),

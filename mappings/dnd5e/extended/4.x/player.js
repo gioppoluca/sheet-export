@@ -429,50 +429,50 @@ class MappingClass extends baseMapping {
         this.setCalculated("Check Box 3081", this.actor.items.filter(i => i.type === 'spell' && i.system.level === 9)[4]?.system.preparation.prepared || "");
         this.setCalculated("Check Box 3082", this.actor.items.filter(i => i.type === 'spell' && i.system.level === 9)[5]?.system.preparation.prepared || "");
         this.setCalculated("Check Box 3083", this.actor.items.filter(i => i.type === 'spell' && i.system.level === 9)[6]?.system.preparation.prepared || "");
-//        this.mapCompleteSpells();
-//        this.mapEquipment();
+        //        this.mapCompleteSpells();
+        //        this.mapEquipment();
     }
 
-/*
-    mapCompleteSpells() {
-        let orderedSpells = this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) })
-        const maxSpells = orderedSpells.length < 80 ? orderedSpells.length : 80;
-        for (let index = 0; index < maxSpells; index++) {
-            const theSpell = orderedSpells[index];
-            const spellIndex = (index + 1).toLocaleString('en-US', { minimumIntegerDigits: 2, useGrouping: false });
-            this.setCalculated(`spell_name_${spellIndex}`, theSpell.name + ((typeof theSpell.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(theSpell.flags['items-with-spells-5e']['parent-item']).name + ']' : '') || "");
-            this.setCalculated(`spell_school_${spellIndex}`, theSpell.system.school || "");
-            this.setCalculated(`spell_level_${spellIndex}`, theSpell.system.level || 0);
-            this.setCalculated(`spell_description_${spellIndex}`, (function (h) {
+    /*
+        mapCompleteSpells() {
+            let orderedSpells = this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) })
+            const maxSpells = orderedSpells.length < 80 ? orderedSpells.length : 80;
+            for (let index = 0; index < maxSpells; index++) {
+                const theSpell = orderedSpells[index];
+                const spellIndex = (index + 1).toLocaleString('en-US', { minimumIntegerDigits: 2, useGrouping: false });
+                this.setCalculated(`spell_name_${spellIndex}`, theSpell.name + ((typeof theSpell.flags['items-with-spells-5e'] !== 'undefined') ? '[' + fromUuidSync(theSpell.flags['items-with-spells-5e']['parent-item']).name + ']' : '') || "");
+                this.setCalculated(`spell_school_${spellIndex}`, theSpell.system.school || "");
+                this.setCalculated(`spell_level_${spellIndex}`, theSpell.system.level || 0);
+                this.setCalculated(`spell_description_${spellIndex}`, (function (h) {
+                    const d = document.createElement("div");
+                    d.innerHTML = h;
+                    return d.textContent || d.innerText || "";
+                })(theSpell.system.description.value || ""));
+                this.setCalculated(`spell_verbal_${spellIndex}`, theSpell.system.properties.has('vocal') || 0);
+                this.setCalculated(`spell_somatic_${spellIndex}`, theSpell.system.properties.has('somatic') || 0);
+                this.setCalculated(`spell_material_${spellIndex}`, theSpell.system.properties.has('material') || 0);
+                this.setCalculated(`spell_ritual_${spellIndex}`, theSpell.system.properties.has('ritual') || 0);
+                this.setCalculated(`spell_concentration_${spellIndex}`, theSpell.system.properties.has('concentration') || 0);
+                this.setCalculated(`spell_range_${spellIndex}`, (theSpell.system.range?.value != null ? theSpell.system.range.value + " " : "") + theSpell.system.range.units || "");
+                this.setCalculated(`spell_casting_${spellIndex}`, (theSpell.system.activation?.cost != null ? theSpell.system.activation?.cost + " " : "") + theSpell.system.activation.type || "");
+                this.setCalculated(`spell_duration_${spellIndex}`, theSpell.system.duration?.value + " " + theSpell.system.duration.units || "");
+            }
+        }
+    
+        mapEquipment() {
+            this.setGlobalValue("equipment_extended", this.actor.items.filter(i => ['weapon', 'equipment', 'tool', 'consumable', 'loot', 'backpack'].includes(i.type)).map(i => `${i.name} (${i.system.quantity}): \n${((h) => {
                 const d = document.createElement("div");
                 d.innerHTML = h;
                 return d.textContent || d.innerText || "";
-            })(theSpell.system.description.value || ""));
-            this.setCalculated(`spell_verbal_${spellIndex}`, theSpell.system.properties.has('vocal') || 0);
-            this.setCalculated(`spell_somatic_${spellIndex}`, theSpell.system.properties.has('somatic') || 0);
-            this.setCalculated(`spell_material_${spellIndex}`, theSpell.system.properties.has('material') || 0);
-            this.setCalculated(`spell_ritual_${spellIndex}`, theSpell.system.properties.has('ritual') || 0);
-            this.setCalculated(`spell_concentration_${spellIndex}`, theSpell.system.properties.has('concentration') || 0);
-            this.setCalculated(`spell_range_${spellIndex}`, (theSpell.system.range?.value != null ? theSpell.system.range.value + " " : "") + theSpell.system.range.units || "");
-            this.setCalculated(`spell_casting_${spellIndex}`, (theSpell.system.activation?.cost != null ? theSpell.system.activation?.cost + " " : "") + theSpell.system.activation.type || "");
-            this.setCalculated(`spell_duration_${spellIndex}`, theSpell.system.duration?.value + " " + theSpell.system.duration.units || "");
+            })(i.system.description.value)}\n`).join("\n"));
+    
+            this.setCalculated("equipment_extended1", this.getGlobalValue("equipment_extended", 0, 2500));
+            this.setCalculated("equipment_extended2", this.getGlobalValue("equipment_extended", 2500, 5000));
+            this.setCalculated("equipment_extended3", this.getGlobalValue("equipment_extended", 5000, 7500));
+            this.setCalculated("equipment_extended4", this.getGlobalValue("equipment_extended", 7500, 10000));
+    
         }
-    }
-
-    mapEquipment() {
-        this.setGlobalValue("equipment_extended", this.actor.items.filter(i => ['weapon', 'equipment', 'tool', 'consumable', 'loot', 'backpack'].includes(i.type)).map(i => `${i.name} (${i.system.quantity}): \n${((h) => {
-            const d = document.createElement("div");
-            d.innerHTML = h;
-            return d.textContent || d.innerText || "";
-        })(i.system.description.value)}\n`).join("\n"));
-
-        this.setCalculated("equipment_extended1", this.getGlobalValue("equipment_extended", 0, 2500));
-        this.setCalculated("equipment_extended2", this.getGlobalValue("equipment_extended", 2500, 5000));
-        this.setCalculated("equipment_extended3", this.getGlobalValue("equipment_extended", 5000, 7500));
-        this.setCalculated("equipment_extended4", this.getGlobalValue("equipment_extended", 7500, 10000));
-
-    }
-*/
+    */
     getPrimaryClassObj() {
         const allClasses = this.actor.items.filter(i => i.type === 'class').map(i => i);
         if (allClasses.length > 1) {
@@ -824,12 +824,93 @@ class MappingClass extends baseMapping {
         }));
     }
 
+
+    getCardFeatLayoutConfig() {
+        return super.getCardLayoutConfig({
+            page: {
+                width: 595.28,
+                height: 841.89,
+                margin: 0,
+                backgroundImage: {
+                    background: {
+                        path: "/modules/sheet-export/mappings/dnd5e/ItemCardPage.png",
+                        width: 24,
+                        height: 24
+                    }
+                }
+            },
+            card: {
+                width: 297.64,
+                height: 210.472
+            },
+            rows: 4,
+            columns: 2,
+            fonts: {
+                TitleFont: "/modules/sheet-export/mappings/dnd5e/BLKCHCRY.TTF",
+                BodyFont: "/modules/sheet-export/mappings/dnd5e/Roboto-Regular.ttf"
+            },
+            images: {
+            }
+        });
+    }
+
+    getCardFeatTemplate() {
+        return super.getCardTemplate({
+            fields: [
+                {
+                    key: "title",
+                    type: "text",
+                    fontName: "TitleFont",
+                    size: 12,
+                    center: true,
+                    color: "#550000",
+                    width: 211.2,
+                    height: 16.8,
+                    x: 13.2,
+                    y: 177.073
+                    //                    y: 803.49
+                },
+                {
+                    key: "description",
+                    type: "text",
+                    fontName: "BodyFont",
+                    wrap: true,
+                    size: 7,
+                    color: "#222222",
+                    width: 273.6,
+                    height: 144.96,
+                    x: 12,
+                    y: 7
+                    //                    y: 12.945
+                    //                    y: 433.89
+                }
+            ]
+        });
+    }
+
+    getCardFeatDataArray() {
+        //const spells = this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) })
+        //const items = this.actor.items.filter(i => ['weapon', 'equipment', 'tool', 'consumable', 'loot', 'backpack'].includes(i.type));
+        const feats = this.actor.items.filter(i => ['feat', 'trait'].includes(i.type))
+        console.log(feats)
+        return feats.map(feat => ({
+            title: feat.name,
+            description: this.htmlToText(feat.system.description?.value || ""),
+        }));
+    }
+
+
     getCardSections() {
         return [
             {
+                layoutConfig: this.getCardFeatLayoutConfig(),
+                cardTemplate: this.getCardFeatTemplate(),
+                cardDataArray: this.getCardFeatDataArray()
+            },
+            {
                 layoutConfig: this.getCardItemLayoutConfig(),
                 cardTemplate: this.getCardItemTemplate(),
-                cardDataArray: this.getCardItemDataArray()  // e.g., monster abilities
+                cardDataArray: this.getCardItemDataArray()
             },
             {
                 layoutConfig: this.getCardLayoutConfig(),
