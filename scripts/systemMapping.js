@@ -34,7 +34,10 @@ const systemMapping = function () {
         },
         "cyphersystem":{
             "player": "PC"
-        }
+        },
+		"cosmere-rpg":{
+			"player": "character"
+		},
 
     }
 }
@@ -79,7 +82,10 @@ const systemMappingSheet = function () {
         },
         "cyphersystem":{
             "PC": "player",
-        }
+        },
+		"cosmere-rpg":{
+			"character": "player",
+		},
 
     }
 }
