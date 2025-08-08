@@ -1,4 +1,10 @@
 
+## [0.13.6] - 2025-08-08
+### :bug: Bug Fixes
+- [`02ce991`](https://github.com/gioppoluca/sheet-export/commit/02ce991069fd62d0db85c0a1090c13a16a02c269) - error in spells for extended on dnd 3.x *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+- [`032a521`](https://github.com/gioppoluca/sheet-export/commit/032a5218b21406da7146e4b503857f8f5182dafe) - added some more debug log *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+
 ## [0.13.5] - 2025-07-12
 ### :sparkles: New Features
 - [`381968c`](https://github.com/gioppoluca/sheet-export/commit/381968c89fccdc2cdb07be997309463727ba863f) - added pages for feats so they are readable *(commit by [@gioppoluca](https://github.com/gioppoluca))*
@@ -269,3 +275,4 @@
 [0.13.3]: https://github.com/gioppoluca/sheet-export/compare/0.13.2...0.13.3
 [0.13.4]: https://github.com/gioppoluca/sheet-export/compare/0.13.3...0.13.4
 [0.13.5]: https://github.com/gioppoluca/sheet-export/compare/0.13.4...0.13.5
+[0.13.6]: https://github.com/gioppoluca/sheet-export/compare/0.13.5...0.13.6
