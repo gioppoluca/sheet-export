@@ -57,6 +57,7 @@ function getSheetTypeFromActor(actor, mappingChoice = "", mappingRelease = "") {
 			sheetType = systemMappingsSheet[game.system.id][actor.type];
 		} else {
 			console.log("the sheet for PC Type should be supported but mapping is not present for this release");
+			console.log(`${game.system.id}/${mappingChoice}/${mappingRelease}/${systemMappingsSheet[game.system.id][actor.type]}.js`)
 			return;
 		}
 	} else {
