@@ -77,7 +77,7 @@ class MappingClass extends baseMapping {
             // Handle Lores
             if (skill.lore) {
                 if (loreCount > 2) //Sheet only has 2 lore fields
-                    extraLore += skill;
+                    extraLores += skill;
                 skillSlug = `lore${loreCount}`;
                 this.setCalculated(`${skillSlug}_subcategory`, skill.label);
                 loreCount++;
@@ -111,7 +111,7 @@ class MappingClass extends baseMapping {
         extraLores.forEach((lore) => {
             const rank = ['U', 'T', 'E', 'M', 'L'][lore.rank];
             const value = this.formatModifier(lore.mod);
-            skillNotes += '${lore.label}(${lore.rank}) ${value}\n';
+            skillNotes += `${lore.label}(${rank}) ${value}\n`;
         });
 
         this.setCalculated('skill_notes', skillNotes);
