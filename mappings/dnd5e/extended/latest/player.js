@@ -27,7 +27,7 @@ class MappingClass extends baseMapping {
         this.setImage(this.actor.img, 1, 30, 440, 160, 220);
 
         //        this.setCalculated("ClassLevel", this.actor.items.filter(i => i.type === 'class').map(i => `${i.name} ${i.system.levels}`).join(' / '));
-        this.setCalculated("ClassLevel", this.getLocalizedClassAndSubclassAndLevel(this.getPrimaryClassObj()));
+        this.setCalculated("ClassLevel", this.getClassLevel());
 
         this.setCalculated("Background", (this.actor.system.details.background ? this.actor.system.details.background : (this.actor.items.find((item) => item.type === 'background')?.name ? this.actor.items.find((item) => item.type === 'background')?.name : "")));
         this.setCalculated("PlayerName", Object.entries(this.actor.ownership).filter(entry => entry[1] === 3).map(entry => entry[0]).map(id => !game.users.get(id)?.isGM ? game.users.get(id)?.name : null).filter(x => x).join(", "));
@@ -474,15 +474,14 @@ class MappingClass extends baseMapping {
     
         }
     */
-    getPrimaryClassObj() {
+
+    getClassLevel() {
         const allClasses = this.actor.items.filter(i => i.type === 'class').map(i => i);
-        if (allClasses.length > 1) {
-            const primary = allClasses.filter(i => i.flags?.srd5e?.isPrimaryClass);
-            if (primary.length >= 1) {
-                return primary[0];
-            }
-        }
-        return allClasses[0];
+        let arrClass = []
+        allClasses.forEach(i => {
+            arrClass.push(this.getLocalizedClassAndSubclassAndLevel(i))
+        });
+        return arrClass.join(", ")
     }
 
     getLocalizedClassAndSubclass(classItem) {
