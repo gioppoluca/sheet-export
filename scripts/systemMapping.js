@@ -38,6 +38,9 @@ const systemMapping = function () {
 		"cosmere-rpg":{
 			"player": "character"
 		},
+		"a5e":{
+			"player": "character"
+		},
 
     }
 }
@@ -84,6 +87,9 @@ const systemMappingSheet = function () {
             "PC": "player",
         },
 		"cosmere-rpg":{
+			"character": "player",
+		},
+		"a5e":{
 			"character": "player",
 		},
 
