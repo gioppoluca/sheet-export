@@ -1,4 +1,13 @@
 
+## [0.13.7] - 2025-09-21
+### :sparkles: New Features
+- [`1070643`](https://github.com/gioppoluca/sheet-export/commit/10706433242d3f1ff4c520e622d42b6e284915f6) - autosize for fields *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+- [`5f28e0b`](https://github.com/gioppoluca/sheet-export/commit/5f28e0b07043eaba0e54ac594d8ee17409b1a997) - added Level Up system draft compatibility *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+### :bug: Bug Fixes
+- [`8533e4e`](https://github.com/gioppoluca/sheet-export/commit/8533e4ea981576f784d3bac608e808bddaf825b7) - missing author info *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+
 ## [0.13.6] - 2025-08-08
 ### :bug: Bug Fixes
 - [`02ce991`](https://github.com/gioppoluca/sheet-export/commit/02ce991069fd62d0db85c0a1090c13a16a02c269) - error in spells for extended on dnd 3.x *(commit by [@gioppoluca](https://github.com/gioppoluca))*
@@ -276,3 +285,4 @@
 [0.13.4]: https://github.com/gioppoluca/sheet-export/compare/0.13.3...0.13.4
 [0.13.5]: https://github.com/gioppoluca/sheet-export/compare/0.13.4...0.13.5
 [0.13.6]: https://github.com/gioppoluca/sheet-export/compare/0.13.5...0.13.6
+[0.13.7]: https://github.com/gioppoluca/sheet-export/compare/0.13.6...0.13.7
