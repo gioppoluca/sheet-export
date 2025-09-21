@@ -111,7 +111,7 @@ export class MappingEdit extends FormApplication {
 
         let field_list = [];
         fields.forEach(field => {
-            let new_field = `        this.setCalculated("${field.getName().trim()}", this.actor.SOMETHING);`
+            let new_field = `        this.setCalculated("${field.getName().trim()}", this.actor.SOMETHING+"${field.getName().trim()}");`
             field_list.push(new_field);
         });
         let all_mapping = field_list.join("\n");
