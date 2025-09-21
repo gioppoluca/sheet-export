@@ -5,9 +5,9 @@ class MappingClass extends baseMapping {
 
     authors = [
         {
-            name: 'YOUR_NAME',
-            url: '',
-            github: '',
+            name: 'gioppoluca',
+            url: 'https://github.com/gioppoluca',
+            github: 'https://github.com/gioppoluca',
         },
     ];
     // override createMappings method from base class
