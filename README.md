@@ -28,7 +28,8 @@ At the moment the module manages:
 | vtme5           | standard   | latest  | Vampire, Werewolf     |                                       | The Vampire and Werewolf PDF for World of Darkness - Vampire the Masquerade                                                                  |
 | black-flag           | standard   | latest  | PC     |                                       | The PC PDF for Black Flag - Tales of the Valiant                                                                  |
 | cosmere-rpg           | standard   | latest  | PC     |   [boxfriend](https://github.com/boxfriend)             | The PC PDF for Cosmere RPG                                                                  |
-| dragonbame           | standard   | latest  | PC     |               | The PC PDF for Dragonbane (draft)                                                          |
+| dragonbane           | standard   | latest  | PC     |               | The PC PDF for Dragonbane (draft)                                                          |
+| a5e           | standard   | latest  | PC     |               | The PC PDF for Level UP (draft)                                                          |
 
 If you want to become a mantainer of a game system, please contact me.
 
@@ -45,15 +46,16 @@ If you want to become a mantainer of a game system, please contact me.
 
 ### Export
 
-As seen in the image below in the actor sidebar menu on  the right click there is the  **Export to PDF** button
+As seen in the image below in the actor sidebar menu on  the **right click of the mouse**, in the appearing menu, there is the  **Sheet Export** button
 
 ![Menu](img/menu.png)
 
 By pressing it you can choose to either use the default PDF that comes with the module (by pressing **Apply**) or to upload your own PDF (by choosing the button **Override mapping's PDF**).
+Mind that the Overridden PDF **MUST** have the same fields name or the export will **NOT WORK**.
 
 ![Export to PDF](img/export.png)
 
-Applying the data to the PDF could require some time so wait until it is finished and presents the following content:
+Applying the data to the PDF could require some time so wait until it is finished and presents the similar content:
 
 ![Alt text](img/export-applyed.png)
 
