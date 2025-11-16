@@ -38,8 +38,8 @@ class MappingClass extends baseMapping {
             d.innerHTML = h;
             return d.textContent || d.innerText || "";
         })(this.actor.system.headers.touchstones));
-        this.setCalculated("totalxp", this.actor.system.derivedXP.totalXP);
-        this.setCalculated("spentxp", (this.actor.system.derivedXP.totalXP - this.actor.system.derivedXP.remainingXP));
+        this.setCalculated("totalxp", this.actor.system?.derivedXP?.totalXP);
+        this.setCalculated("spentxp", (this.actor.system?.derivedXP?.totalXP - this.actor.system?.derivedXP?.remainingXP));
 
 
         Object.keys(this.actor.system.attributes).forEach(element => {
@@ -100,7 +100,36 @@ class MappingClass extends baseMapping {
             this.setCalculated(`wd${index}`, this.actor.system.renown.wisdom.value >= index ? "X" : "");
         }
 
+// Gifts
+    let pdfIndex = 1;
+    const gifts = this.actor.system.gifts;
+    const ownedGifts = Object.entries(gifts)
+        .filter(([key, gift]) => gift.powers && gift.powers.length > 0);
 
+    ownedGifts.forEach(([giftKey, gift]) => {
+        const powers = gift.powers || [];
+        
+        powers.forEach(pow => {
+            // Extract dice pool information safely
+            let pool = "";
+            if (pow.system?.dicepool) {
+                const dpElements = Object.entries(pow.system.dicepool);
+                if (dpElements.length >= 2) {
+                    const attr1 = dpElements[0][1]?.path?.split('.')[1] || '';
+                    const attr2 = dpElements[1][1]?.path?.split('.')[1] || '';
+                    pool = attr1 && attr2 ? `${attr1}+${attr2}` : '';
+                }
+            }
+            
+            this.setCalculated(`Gifts-${pdfIndex}`, pow.name || '');
+            this.setCalculated(`GiftsC${pdfIndex}`, pow.system?.cost || '');
+            this.setCalculated(`GiftsP${pdfIndex}`, pool);
+            this.setCalculated(`GiftsN${pdfIndex}`, this.htmlToText(pow.system?.description || ''));
+            
+            pdfIndex++;
+        });
+    });
+    /*
         let giftIndex = 1
         let pdfIndex = 1;
         const gifts = this.actor.system.gifts
@@ -142,6 +171,7 @@ class MappingClass extends baseMapping {
             giftIndex++
             pdfIndex++
         })
+            */
 
         let adflows = this.actor.items.filter(item => { return (item.type === 'feature' && (item.system.featuretype === 'flaw' || item.system.featuretype === 'merit' || item.system.featuretype === 'background')) })
         console.log(adflows);
