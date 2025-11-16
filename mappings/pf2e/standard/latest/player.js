@@ -30,7 +30,7 @@ class MappingClass extends baseMapping {
 
         // Set the PDF files to use - MIND that the order of the files is important!
         this.pdfFiles.push({
-            pdfUrl: '/modules/sheet-export/mappings/pf2e/remastered/latest/pf2e-remastered.pdf',
+            pdfUrl: '/modules/sheet-export/mappings/pf2e/standard/latest/pf2e-remastered.pdf',
             nameDownload: `${this.actor.name ?? "character"}.pdf`,
             name: "pf2e-remastered.pdf",
         });
