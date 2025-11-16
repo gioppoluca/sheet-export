@@ -29,7 +29,7 @@ At the moment the module manages:
 | black-flag           | standard   | latest  | PC     |                                       | The PC PDF for Black Flag - Tales of the Valiant                                                                  |
 | cosmere-rpg           | standard   | latest  | PC     |   [boxfriend](https://github.com/boxfriend)             | The PC PDF for Cosmere RPG                                                                  |
 | dragonbane           | standard   | latest  | PC     |               | The PC PDF for Dragonbane (draft)                                                          |
-| forbidden-lands           | standard   | latest  | PC     |               | The PC PDF for Forbidden Lands (draft)                                                          |
+| forbidden-lands           | standard   | latest  | PC     |               | The PC PDF for Forbidden Lands (draft)  thanks johndoe1972        |
 | a5e           | standard   | latest  | PC     |               | The PC PDF for Level UP (draft)                                                          |
 
 If you want to become a mantainer of a game system, please contact me.
