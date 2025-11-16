@@ -1,4 +1,15 @@
 
+## [0.13.8] - 2025-11-16
+### :sparkles: New Features
+- [`47b9ea5`](https://github.com/gioppoluca/sheet-export/commit/47b9ea52a89109c77586021d49f415b10b8b952e) - added forbidden lands compatibility *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+### :bug: Bug Fixes
+- [`c095bfd`](https://github.com/gioppoluca/sheet-export/commit/c095bfdee655f06d69b46632da0a19583c97eac4) - missing multiclass string on dnd5e *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+- [`5199705`](https://github.com/gioppoluca/sheet-export/commit/519970576deeffbffcd749dc85f958c3cb34b2ce) - dnd5e multiclass string fix *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+- [`ad7d6e2`](https://github.com/gioppoluca/sheet-export/commit/ad7d6e2e37a4adb0774da7d6f066e9bb0b5038d0) - saving throws and spellcasting *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+- [`94a9e02`](https://github.com/gioppoluca/sheet-export/commit/94a9e02cfd624bfb2b7ac38d4402f65b5dc7eeda) - fixed werewolf sheet *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+
 ## [0.13.7] - 2025-09-21
 ### :sparkles: New Features
 - [`1070643`](https://github.com/gioppoluca/sheet-export/commit/10706433242d3f1ff4c520e622d42b6e284915f6) - autosize for fields *(commit by [@gioppoluca](https://github.com/gioppoluca))*
@@ -286,3 +297,4 @@
 [0.13.5]: https://github.com/gioppoluca/sheet-export/compare/0.13.4...0.13.5
 [0.13.6]: https://github.com/gioppoluca/sheet-export/compare/0.13.5...0.13.6
 [0.13.7]: https://github.com/gioppoluca/sheet-export/compare/0.13.6...0.13.7
+[0.13.8]: https://github.com/gioppoluca/sheet-export/compare/0.13.7...0.13.8
