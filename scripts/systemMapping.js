@@ -38,6 +38,9 @@ const systemMapping = function () {
 		"cosmere-rpg":{
 			"player": "character"
 		},
+		"forbidden-lands":{
+			"player": "character"
+		},
 		"a5e":{
 			"player": "character"
 		},
@@ -87,6 +90,9 @@ const systemMappingSheet = function () {
             "PC": "player",
         },
 		"cosmere-rpg":{
+			"character": "player",
+		},
+		"forbidden-lands":{
 			"character": "player",
 		},
 		"a5e":{
