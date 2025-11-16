@@ -57,8 +57,8 @@ class MappingClass extends baseMapping {
             return d.textContent || d.innerText || "";
         })(this.actor.system.details.trait)
         );
-        this.setCalculated("STRmod", this.actor.system.abilities.str.mod);
-        this.setCalculated("ST Strength", this.actor.system.abilities.str.save);
+        this.setCalculated("STRmod", String(this.actor.system.abilities.str.mod));
+        this.setCalculated("ST Strength", String(this.actor.system.abilities.str.save.value));
         this.setCalculated("DEX", this.actor.system.abilities.dex.value);
         this.setCalculated("Ideals", (function (h) {
             const d = document.createElement("div");
@@ -66,7 +66,7 @@ class MappingClass extends baseMapping {
             return d.textContent || d.innerText || "";
         })(this.actor.system.details.ideal)
         );
-        this.setCalculated("DEXmod", this.actor.system.abilities.dex.mod);
+        this.setCalculated("DEXmod", String(this.actor.system.abilities.dex.mod));
         this.setCalculated("Bonds", (function (h) {
             const d = document.createElement("div");
             d.innerHTML = h;
@@ -78,7 +78,7 @@ class MappingClass extends baseMapping {
         this.setCalculated("Check Box 12", this.actor.system.attributes.death.success);
         this.setCalculated("Check Box 13", this.actor.system.attributes.death.success);
         this.setCalculated("Check Box 14", this.actor.system.attributes.death.success);
-        this.setCalculated("CONmod", this.actor.system.abilities.con.mod);
+        this.setCalculated("CONmod", String(this.actor.system.abilities.con.mod));
         this.setCalculated("Check Box 15", this.actor.system.attributes.death.failure);
         this.setCalculated("Check Box 16", this.actor.system.attributes.death.failure);
         this.setCalculated("Check Box 17", this.actor.system.attributes.death.failure);
@@ -90,11 +90,11 @@ class MappingClass extends baseMapping {
         })(this.actor.system.details.flaw)
         );
         this.setCalculated("INT", this.actor.system.abilities.int.value);
-        this.setCalculated("ST Dexterity", this.actor.system.abilities.dex.save);
-        this.setCalculated("ST Constitution", this.actor.system.abilities.con.save);
-        this.setCalculated("ST Intelligence", this.actor.system.abilities.int.save);
-        this.setCalculated("ST Wisdom", this.actor.system.abilities.wis.save);
-        this.setCalculated("ST Charisma", this.actor.system.abilities.cha.save);
+        this.setCalculated("ST Dexterity", String(this.actor.system.abilities.dex.save.value));
+        this.setCalculated("ST Constitution", String(this.actor.system.abilities.con.save.value));
+        this.setCalculated("ST Intelligence", String(this.actor.system.abilities.int.save.value));
+        this.setCalculated("ST Wisdom", String(this.actor.system.abilities.wis.save.value));
+        this.setCalculated("ST Charisma", String(this.actor.system.abilities.cha.save.value));
         this.setCalculated("Acrobatics", this.actor.system.skills.acr.total);
         this.setCalculated("Animal", this.actor.system.skills.ani.total);
         this.setCalculated("Athletics", this.actor.system.skills.ath.total);
@@ -150,12 +150,12 @@ class MappingClass extends baseMapping {
         this.setCalculated("Check Box 20", this.actor.system.abilities.int.proficient);
         this.setCalculated("Check Box 21", this.actor.system.abilities.wis.proficient);
         this.setCalculated("Check Box 22", this.actor.system.abilities.cha.proficient);
-        this.setCalculated("INTmod", this.actor.system.abilities.int.mod);
+        this.setCalculated("INTmod", String(this.actor.system.abilities.int.mod));
         this.setCalculated("Investigation", this.actor.system.skills.inv.total);
         this.setCalculated("WIS", this.actor.system.abilities.wis.value);
         this.setCalculated("Arcana", this.actor.system.skills.arc.total);
         this.setCalculated("Perception", this.actor.system.skills.prc.total);
-        this.setCalculated("WISmod", this.actor.system.abilities.wis.mod);
+        this.setCalculated("WISmod", String(this.actor.system.abilities.wis.mod));
         this.setCalculated("CHA", this.actor.system.abilities.cha.value);
         this.setCalculated("Nature", this.actor.system.skills.nat.total);
         this.setCalculated("Performance", this.actor.system.skills.per.total);
@@ -185,9 +185,9 @@ class MappingClass extends baseMapping {
         this.setCalculated("HPCurrent", this.actor.system.attributes.hp.value);
         this.setCalculated("HPTemp", this.actor.system.attributes.hp.temp);
         this.setCalculated("SleightofHand", this.actor.system.skills.slt.total);
-        this.setCalculated("CHamod", this.actor.system.abilities.cha.mod);
+        this.setCalculated("CHamod", String(this.actor.system.abilities.cha.mod));
         this.setCalculated("Survival", this.actor.system.skills.sur.total);
-        this.setCalculated("AttacksSpellcasting", "");
+        this.setCalculated("AttacksSpellcasting", "");  // the central area for attacks and spellcasting is not mapped
         this.setCalculated("Passive", this.actor.system.skills.prc.passive);
         this.setCalculated("CP", this.actor.system.currency.cp || "");
         this.setCalculated("ProficienciesLang", await this.traitsLangs());
@@ -218,8 +218,8 @@ class MappingClass extends baseMapping {
         this.setCalculated("Treasure", this.actor.items.filter(i => ['backpack', 'consumable', 'loot'].includes(i.type)).map(i => (i.system.quantity <= 1) ? i.name : `${i.name} (${i.system.quantity})`).join(', '));
         this.setCalculated("Spellcasting Class 2", this.actor.items.filter(i => i.type === 'class').map(i => `${i.name}`).join(' / '));
         this.setCalculated("SpellcastingAbility 2", this.actor.system.attributes.spellcasting.capitalize() || "");
-        this.setCalculated("SpellSaveDC  2", this.actor.system.attributes.spelldc || "");
-        this.setCalculated("SpellAtkBonus 2", "+" + String(this.actor.system.attributes.spelldc - 8));
+        this.setCalculated("SpellSaveDC  2", this.actor.system.attributes.spell.dc || "");
+        this.setCalculated("SpellAtkBonus 2", "+" + String(this.actor.system.attributes.spell.attack));
         this.setCalculated("SlotsTotal 19", this.actor.system.spells.spell1.max || "");
         this.setCalculated("SlotsRemaining 19", this.actor.system.spells.spell1.value || "");
         this.setCalculated("SlotsTotal 20", this.actor.system.spells.spell2.max || "");
