@@ -289,7 +289,9 @@ class MappingClass extends baseMapping {
         this.setCalculated("Craft 3", this.actor.system.skills.crf.subSkills.crf3?.name || "");
         this.setCalculated("Total Bonus 7", (this.actor.system.skills.crf.subSkills.crf3?.name) ? this.actor.system.skills.crf.subSkills.crf3.mod : "");
         this.setCalculated("Ranks 7", (this.actor.system.skills.crf.subSkills.crf3?.name) ? this.actor.system.skills.crf.subSkills.crf3.rank : "");
-        //this.setCalculated("Languages Line 1", [this.actor.system.traits.languages.value.filter(String).map(l => l.capitalize()).sort().join(", "), this.actor.system.traits.languages.custom,].filter(String).join(", "));
+//		LANGUAGES; pf1e stores official langs as lowercase and unspaced so three exeptions occur and are handled
+		var rslt = await this.actor.system.traits.languages.base.map(l => l.capitalize()).sort().toString().replaceAll(',', ', ').replace('Ancientosiriani', 'Ancient Osiriani').replace('Drowsignlanguage', 'Drow Sign Language').replace('Shadowtongue', 'Shadow Tongue');
+		await this.setCalculated("Languages Line 1", rslt);
         //this.setCalculated("Conditional Modifiers Line 1", [this.actor.system.traits.weaponProf.total.filter(String).map(l => l.capitalize()).join(", "), this.actor.system.traits.weaponProf.custom, this.actor.system.traits.armorProf.total.filter(String).map(l => l.capitalize()).join(", "), this.actor.system.traits.armorProf.custom,].filter(String).join(", "));
         /*
         this.setCalculated("Damage Slot 1", this.actor.items.filter(i => i.type === "weapon" && i.system.equipped && i.hasAttack && i.hasDamage)[0]?.data?.data?.damage?.parts[0][0]?.replace(/sizeRoll\((?<count>[0-9]*), ?(?<size>[0-9]*), ?\u0040size\)/, "$<count>d$<size>") || "");
