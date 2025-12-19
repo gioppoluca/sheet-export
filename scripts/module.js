@@ -421,6 +421,7 @@ class SheetExportconfig extends FormApplication {
 			rowPdfTitle.prepend(pdfTitle);
 
 			inputForm.appendChild(rowPdfTitle);
+			const font = await pdf.embedFont(StandardFonts.Helvetica);
 
 			var i = 0;
 			fields.forEach(field => {
@@ -479,6 +480,7 @@ class SheetExportconfig extends FormApplication {
 							}
 							field.setText(fieldMapping ? (fieldMapping.calculated ? fieldMapping.calculated.toString() : "") : "");
 							field.markAsClean();
+							field.updateAppearances(font);
 							break;
 						case "PDFCheckBox":
 							input.setAttribute("type", "checkbox");
@@ -504,6 +506,7 @@ class SheetExportconfig extends FormApplication {
 
 				i++;
 			})
+			form.updateFieldAppearances(font);
 			// TODO HERE the code to add pages
 			console.log(pdf);
 			console.log("Before adding:", pdf.getPageCount());
@@ -514,8 +517,10 @@ class SheetExportconfig extends FormApplication {
 				console.log(`Page ${i}: ${size.width}x${size.height}`);
 			}
 			// TODO this has to be an array
+			// TODO can flatten here if needed ... will have to add a settings at the moment commented out
+			// form.flatten();
 			console.log(pdfFile);
-			this.filledPdf.push({ file: await pdf.save(), name: pdfFile.name, nameDownload: this.actor.name + ".pdf" });
+			this.filledPdf.push({ file: await pdf.save({ updateFieldAppearances: true }), name: pdfFile.name, nameDownload: this.actor.name + ".pdf" });
 
 		}
 		document.getElementById("sheet-export-header").setAttribute("style", "display: none");
