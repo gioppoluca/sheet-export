@@ -1,4 +1,9 @@
 
+## [0.13.10] - 2025-12-19
+### :bug: Bug Fixes
+- [`a5321b3`](https://github.com/gioppoluca/sheet-export/commit/a5321b3ae8a2e4705d36cd4f227af149cef9c8ad) - text sometimes not showing on the fields *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+
 ## [0.13.9] - 2025-12-18
 ### :bug: Bug Fixes
 - [`5c1ecae`](https://github.com/gioppoluca/sheet-export/commit/5c1ecaee9dac4f2570e7ae2a6ddf1e9894c5991b) - updated a2e player *(commit by [@gioppoluca](https://github.com/gioppoluca))*
@@ -305,3 +310,4 @@
 [0.13.7]: https://github.com/gioppoluca/sheet-export/compare/0.13.6...0.13.7
 [0.13.8]: https://github.com/gioppoluca/sheet-export/compare/0.13.7...0.13.8
 [0.13.9]: https://github.com/gioppoluca/sheet-export/compare/0.13.8...0.13.9
+[0.13.10]: https://github.com/gioppoluca/sheet-export/compare/0.13.9...0.13.10
