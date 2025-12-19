@@ -1,4 +1,10 @@
 
+## [0.13.9] - 2025-12-18
+### :bug: Bug Fixes
+- [`5c1ecae`](https://github.com/gioppoluca/sheet-export/commit/5c1ecaee9dac4f2570e7ae2a6ddf1e9894c5991b) - updated a2e player *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+- [`67a8c8d`](https://github.com/gioppoluca/sheet-export/commit/67a8c8d768be1c8d142f23f491547c365659d18b) - small fix on pf1 *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+
 ## [0.13.8] - 2025-11-16
 ### :sparkles: New Features
 - [`47b9ea5`](https://github.com/gioppoluca/sheet-export/commit/47b9ea52a89109c77586021d49f415b10b8b952e) - added forbidden lands compatibility *(commit by [@gioppoluca](https://github.com/gioppoluca))*
@@ -298,3 +304,4 @@
 [0.13.6]: https://github.com/gioppoluca/sheet-export/compare/0.13.5...0.13.6
 [0.13.7]: https://github.com/gioppoluca/sheet-export/compare/0.13.6...0.13.7
 [0.13.8]: https://github.com/gioppoluca/sheet-export/compare/0.13.7...0.13.8
+[0.13.9]: https://github.com/gioppoluca/sheet-export/compare/0.13.8...0.13.9
