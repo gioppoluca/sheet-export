@@ -28,8 +28,8 @@ class MappingClass extends baseMapping {
 
         //        this.setCalculated("ClassLevel", this.actor.items.filter(i => i.type === 'class').map(i => `${i.name} ${i.system.levels}`).join(' / '));
         this.setCalculated("ClassLevel", this.getClassLevel());
-
-        this.setCalculated("Background", (this.actor.system.details.background ? this.actor.system.details.background : (this.actor.items.find((item) => item.type === 'background')?.name ? this.actor.items.find((item) => item.type === 'background')?.name : "")));
+        let bkground = this.actor.system.details.background ? this.actor.system.details.background : (this.actor.items.find((item) => item.type === 'background')?.name ? this.actor.items.find((item) => item.type === 'background')?.name : "")
+        this.setCalculated("Background", bkground);
         this.setCalculated("PlayerName", Object.entries(this.actor.ownership).filter(entry => entry[1] === 3).map(entry => entry[0]).map(id => !game.users.get(id)?.isGM ? game.users.get(id)?.name : null).filter(x => x).join(", "));
         this.setCalculated("CharacterName", this.actor.name);
         this.setCalculated("Race", this.actor.system.details.race);
@@ -208,13 +208,14 @@ class MappingClass extends baseMapping {
         this.setCalculated("Faction Symbol Image", "");
         this.setCalculated("Allies", "");
         this.setCalculated("FactionName", "");
-        this.setCalculated("Backstory", (function (h) {
+        let backstory = (function (h) {
             const d = document.createElement("div");
             d.innerHTML = h;
             return d.textContent || d.innerText || "";
-        })(this.actor.system.details.biography.value)
-        );
-        this.setCalculated("Feat+Traits", this.actor.items.filter(i => ['feat', 'trait'].includes(i.type)).slice(16).map(i => `${i.name} - ${i.system.source}`).join('\n'));
+        })(this.actor.system.details.biography.value);
+        console.log("Backstory raw:", backstory); 
+        this.setCalculated("Backstory", this.htmlToText(backstory));
+        this.setCalculated("Feat+Traits", this.actor.items.filter(i => ['feat', 'trait'].includes(i.type)).slice(16).map(i => `${i.name}`).join(', '));
         this.setCalculated("Treasure", this.actor.items.filter(i => ['backpack', 'consumable', 'loot'].includes(i.type)).map(i => (i.system.quantity <= 1) ? i.name : `${i.name} (${i.system.quantity})`).join(', '));
         this.setCalculated("Spellcasting Class 2", this.actor.items.filter(i => i.type === 'class').map(i => `${i.name}`).join(' / '));
         this.setCalculated("SpellcastingAbility 2", this.actor.system.attributes.spellcasting.capitalize() || "");
