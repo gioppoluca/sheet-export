@@ -1,4 +1,10 @@
 
+## [0.13.11] - 2025-12-31
+### :bug: Bug Fixes
+- [`3e05a19`](https://github.com/gioppoluca/sheet-export/commit/3e05a19461e2fc033bbe25a1040ce4b438cdfc4d) - solved @Compendium not decoded *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+- [`15fea04`](https://github.com/gioppoluca/sheet-export/commit/15fea04da2a6f06e846727d8c2f1736e259af189) - missing html2text on background and wrong mapping ont feat+traits *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+
 ## [0.13.10] - 2025-12-19
 ### :bug: Bug Fixes
 - [`a5321b3`](https://github.com/gioppoluca/sheet-export/commit/a5321b3ae8a2e4705d36cd4f227af149cef9c8ad) - text sometimes not showing on the fields *(commit by [@gioppoluca](https://github.com/gioppoluca))*
@@ -311,3 +317,4 @@
 [0.13.8]: https://github.com/gioppoluca/sheet-export/compare/0.13.7...0.13.8
 [0.13.9]: https://github.com/gioppoluca/sheet-export/compare/0.13.8...0.13.9
 [0.13.10]: https://github.com/gioppoluca/sheet-export/compare/0.13.9...0.13.10
+[0.13.11]: https://github.com/gioppoluca/sheet-export/compare/0.13.10...0.13.11
