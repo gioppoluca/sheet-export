@@ -1,4 +1,12 @@
 
+## [0.13.12] - 2026-01-06
+### :sparkles: New Features
+- [`2c6ea86`](https://github.com/gioppoluca/sheet-export/commit/2c6ea86e75f5a7127600e418066724b377871e83) - added 2024 dnd5e char sheet *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+### :bug: Bug Fixes
+- [`f76f249`](https://github.com/gioppoluca/sheet-export/commit/f76f249ae3904f86c7716a09c6ce1d6b4c0257c3) - changed way field appear *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+
 ## [0.13.11] - 2025-12-31
 ### :bug: Bug Fixes
 - [`3e05a19`](https://github.com/gioppoluca/sheet-export/commit/3e05a19461e2fc033bbe25a1040ce4b438cdfc4d) - solved @Compendium not decoded *(commit by [@gioppoluca](https://github.com/gioppoluca))*
@@ -318,3 +326,4 @@
 [0.13.9]: https://github.com/gioppoluca/sheet-export/compare/0.13.8...0.13.9
 [0.13.10]: https://github.com/gioppoluca/sheet-export/compare/0.13.9...0.13.10
 [0.13.11]: https://github.com/gioppoluca/sheet-export/compare/0.13.10...0.13.11
+[0.13.12]: https://github.com/gioppoluca/sheet-export/compare/0.13.11...0.13.12
