@@ -14,9 +14,9 @@ At the moment the module manages:
 
 | Game System     | Version    | Release | Sheets | Mantainer                             | Description                                                                           |
 | ----------------- | ------------ | --------- | -------- | --------------------------------------- | --------------------------------------------------------------------------------------- |
-| dnd5e           | standard   | latest  | PC     |                                       | The classical PC PDF from WotC for the PC for latest release                          |
+| dnd5e           | standard   | latest  | PC     |                                       | The classical PC PDF from WotC for the PC for latest release (both 2014 and 2024)                      |
 |                 |            |         | NPC    |                                       | a custom PDF for NPC for latest release                                               |
-|                 | extended   | latest  | PC     |                                       | A union of the classical WotC with extended pages for equipment and spells            |
+|                 | extended   | latest  | PC     |                                       | A union of the classical WotC with extended pages for equipment and spells (both 2014 and 2024)      |
 |                 |            |         | NPC    |                                       | a custom PDF for NPC                                                                  |
 |                 | BR         | latest  | PC     |                                       | The Brazilian version of the classical PC PDF from WotC for the PC for latest release |
 | pf1             | standard   | latest  | PC     |                                       | The remastered PC PDF for Pathfinder 1° Edition                                      |
