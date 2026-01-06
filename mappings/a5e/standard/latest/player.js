@@ -21,6 +21,9 @@ class MappingClass extends baseMapping {
             name: "Level_Up_CharSheet.pdf",
         });
 
+
+        this.setImage(this.actor.img, 2, 30, 510, 260, 120);
+
         const sys = this.actor.system ?? {};
         const det = sys.details ?? {};
         const attr = sys.attributes ?? {};
@@ -54,15 +57,15 @@ class MappingClass extends baseMapping {
             const list = Array.isArray(arr) ? arr : [];
             for (let i = 0; i < Math.min(list.length, maxCount); i++) {
                 let decoded = findLabelByKey(data, list[i]);
-                    this.setCalculated(`${labelPrefix} ${startIdx + i}`, `${decoded}`);
+                this.setCalculated(`${labelPrefix} ${startIdx + i}`, `${decoded}`);
             }
             // blank out the rest (optional)
         };
 
-        const heritage = (this.actor.items ?? []).find(i => i.type === 'heritage')?.name ?? '';
-        this.setCalculated("Maximum Hit Points", sys.attributes.hp.baseMax ?? 0);
+
+        this.setCalculated("Maximum Hit Points", sys.attributes.hp.value ?? 0);
         this.setCalculated("Current Hit Points", sys.attributes.hp.value ?? 0);
-        this.setCalculated("Temporary Hit Points", sys.attributes.hp.temp ?? 0);
+        this.setCalculated("Temporary Hit Points", String(sys.attributes.hp.temp ?? 0));
         const maneuvers = (this.actor.items ?? []).filter(it => it.type === 'maneuver');
         const MAX_MAN = 11; // adjust to your PDF’s capacity
         for (let i = 0; i < MAX_MAN; i++) {
@@ -76,30 +79,15 @@ class MappingClass extends baseMapping {
             const actString = it?.actions?.default?.activation?.type ? `${it.actions.default.activation.cost} ${game.a5e.config.abilityActivationTypes[it.actions.default.activation.type]}` : "";
             this.setCalculated(actLabel, it ? actString : "");
         }
-        /*
-        this.setCalculated("pg 1", this.actor.SOMETHING + "pg 1");
-        this.setCalculated("pg 2", this.actor.SOMETHING + "pg 2");
-        this.setCalculated("pg 3", this.actor.SOMETHING + "pg 3");
-        this.setCalculated("pg 4", this.actor.SOMETHING + "pg 4");
-        this.setCalculated("pg 5", this.actor.SOMETHING + "pg 5");
-        this.setCalculated("pg 6", this.actor.SOMETHING + "pg 6");
-        this.setCalculated("pg 7", this.actor.SOMETHING + "pg 7");
-        this.setCalculated("pg 8", this.actor.SOMETHING + "pg 8");
-        this.setCalculated("pg 9", this.actor.SOMETHING + "pg 9");
-        this.setCalculated("pg 10", this.actor.SOMETHING + "pg 10");
-        this.setCalculated("pg 11", this.actor.SOMETHING + "pg 11");
-        this.setCalculated("Exploration Knacks 1", this.actor.SOMETHING + "Exploration Knacks 1");
-        this.setCalculated("Exploration Knacks 2", this.actor.SOMETHING + "Exploration Knacks 2");
-        this.setCalculated("Exploration Knacks 3", this.actor.SOMETHING + "Exploration Knacks 3");
-        this.setCalculated("Exploration Knacks 4", this.actor.SOMETHING + "Exploration Knacks 4");
-        this.setCalculated("Exploration Knacks 5", this.actor.SOMETHING + "Exploration Knacks 5");
-        this.setCalculated("Exploration Knacks 6", this.actor.SOMETHING + "Exploration Knacks 6");
-        */
         this.setCalculated("Character Name", this.actor.name ?? "");
+        const heritage = (this.actor.items ?? []).find(i => i.type === 'heritage')?.name ?? '';
         this.setCalculated("Heritage", heritage);
-        this.setCalculated("Background", sys.details.background ?? "");
-        this.setCalculated("Culture", sys.details.culture ?? "");
-        this.setCalculated("Destiny", sys.details.destiny ?? "");
+        const background = (this.actor.items ?? []).find(i => i.type === 'background')?.name ?? '';
+        this.setCalculated("Background", background);
+        const culture = (this.actor.items ?? []).find(i => i.type === 'culture')?.name ?? '';
+        this.setCalculated("Culture", culture);
+        const destiny = (this.actor.items ?? []).find(i => i.type === 'destiny');
+        this.setCalculated("Destiny", destiny ? destiny.name : "");
         this.setCalculated("Experience Points", sys.details.xp ?? 0);
 
         const classesObj = this.actor.classes ?? {};    // authoritative source (user request)
@@ -109,8 +97,10 @@ class MappingClass extends baseMapping {
             const name = c?.name ?? "";
             const levels = Number(c?.classLevels)
             const archetype = c?.archetype?.name ?? "";
+            const slug = c.slug;
+            const hd = c.hitDice;
 
-            return { name, levels, archetype };
+            return { name, levels, archetype, hd, slug };
         });
         const classLevelString = entries.map(e => `${e.name} ${e.levels} ${e.archetype}`).join(' / ');
         this.setCalculated("Class, Level & Archetyoe", classLevelString);
@@ -155,7 +145,9 @@ class MappingClass extends baseMapping {
         this.setCalculated("Speed", getWalkSpeed());
 
         this.setCalculated("Total HD", this.actor.HitDiceManager.max);
-        this.setCalculated("Hit Die", this.actor.SOMETHING + "Hit Die");
+        console.log(entries)
+        const hdString = entries.map(e => `d${e.hd.size}`).join(' / ');
+        this.setCalculated("Hit Die", hdString);
         this.setCalculated("STR Save Prof", sys.abilities.str.save.proficient);
         this.setCalculated("DEX Save Prof", sys.abilities.dex.save.proficient);
         this.setCalculated("CON Save Prof", sys.abilities.con.save.proficient);
@@ -177,29 +169,26 @@ class MappingClass extends baseMapping {
         this.setCalculated("Fatigue 6", (sys.attributes.fatigue ?? 0) >= 6 ? 1 : 0);
         this.setCalculated("Fatigue 7", (sys.attributes.fatigue ?? 0) >= 7 ? 1 : 0);
         this.setCalculated("Supply", sys.supply);
-        this.setCalculated("Max Carried", this.actor.SOMETHING + "Max Carried");
-        this.setCalculated("Inspiration Feature", this.actor.SOMETHING + "Inspiration Feature");
+        //this.setCalculated("Max Carried", this.actor.SOMETHING + "Max Carried");
+        this.setCalculated("Inspiration Feature", "");
 
-        this.setCalculated("Passive Insight", sys.skills.ins.bonuses.passive ?? 0);
-        this.setCalculated("Passive Perception", sys.skills.prc.bonuses.passive ?? 0);
-        this.setCalculated("Passive Stealth", sys.skills.ste.bonuses.passive ?? 0);
+        this.setCalculated("Passive Insight", String(sys.skills.ins.passive ?? 0));
+        this.setCalculated("Passive Perception", String(sys.skills.prc.passive ?? 0));
+        this.setCalculated("Passive Stealth", String(sys.skills.ste.passive ?? 0));
         this.setCalculated("Passive Skill", "");
         this.setCalculated("New Passive Skill", "");
 
         const SKILL_LABELS = game.a5e.config.skills;
         const expDice = game.a5e.config.expertiseDiceSidesMap;
         const skills = this.actor.system.skills ?? {};
-        const joinSpecs = (a) => (Array.isArray(a) ? a.join(", ") : "");
         for (const [key, label] of Object.entries(SKILL_LABELS)) {
             const k = skills[key] ?? {};
             const modBonus = abl[k.ability]?.mod ?? 0;
-            const expString = expDice[k.expertiseDice] > 0 ? `${k.mod + modBonus}+d${expDice[k.expertiseDice]}` : `${k.mod + modBonus}`;
-            // Example field names you already have in your PDF mapping:
+            const expDie = expDice[k.expertiseDice] > 0 ? `d${expDice[k.expertiseDice]}` : "";
+
             this.setCalculated(`${label} Skill Proficiency`, k.proficient);
-            this.setCalculated(`${label} Expertise Die`, expString);
-            this.setCalculated(`${label} Specialty`, joinSpecs(k.specialties));
-            // If you also map passives per skill on the PDF:
-            // this.setCalculated(`Passive ${label}`, k.bonuses?.passive ?? 0);
+            this.setCalculated(`${label} Expertise Die`, expDie);
+            this.setCalculated(`${label} Specialty`, `${k.mod + modBonus}`);
         }
         setListDecoded("Tool Proficiencies", profs.tools ?? [], 1, 6, game.a5e.config.tools);
         this.setCalculated("Strife 1", (sys.attributes.strife ?? 0) >= 1 ? 1 : 0);
@@ -221,14 +210,10 @@ class MappingClass extends baseMapping {
 
 
         // --- Destiny & Inspiration ---
-        const destiny = (this.actor.items ?? []).find(i => i.type === 'destiny');
-        this.setCalculated("Source of Inspiration", destiny ? destiny.name : "");
-        // If you want the specific text for inspiration source:
-        // this.setCalculated("Source of Inspiration", destiny ? destiny.system.description : "");
 
-        // The fulfillment feature is often a linked item, but we can try to get the name if available
-        // or just use the destiny name as a placeholder.
-        this.setCalculated("Fulfillment Feature", destiny ? "See Destiny" : "");
+        this.setCalculated("Source of Inspiration", "");
+
+        this.setCalculated("Fulfillment Feature", "");
 
         // --- Class & Combat Resources ---
         this.setCalculated("Traditions Known", (sys.proficiencies?.traditions ?? []).join(", "));
@@ -237,16 +222,16 @@ class MappingClass extends baseMapping {
         const maneuverCount = (this.actor.items ?? []).filter(i => i.type === 'maneuver').length;
         this.setCalculated("Maneuvers Known", maneuverCount);
 
-        this.setCalculated("Exertion Points", sys.attributes.exertion?.max ?? 0);
+        this.setCalculated("Exertion Points", String(attr.prof * 2));
 
         // --- Exploration Knacks ---
         // Assuming knacks are features with 'knack' in the name or specific type. 
         // Adjust filter as needed for A5e specific Knack types.
         const knacks = (this.actor.items ?? []).filter(i => i.type === 'feature' && i.name.toLowerCase().includes('knack'));
         for (let i = 0; i < 6; i++) {
-            this.setCalculated(`Exploration Knacks ${i + 1}`, knacks[i] ? knacks[i].name : "");
+//            this.setCalculated(`Exploration Knacks ${i + 1}`, knacks[i] ? knacks[i].name : "");
             // If there is a description field:
-            this.setCalculated(`Knack Description ${i + 1}`, knacks[i] ? knacks[i].system.description : "");
+//            this.setCalculated(`Knack Description ${i + 1}`, knacks[i] ? knacks[i].system.description : "");
         }
         // Appearance / bio bits
         this.setCalculated("Age", sys.details.age ?? "");
@@ -255,7 +240,7 @@ class MappingClass extends baseMapping {
         this.setCalculated("Eyes", sys.details.eyeColor ?? "");
         this.setCalculated("Skin", sys.details.skinColor ?? "");
         this.setCalculated("Hair", sys.details.hairColor ?? "");
-        this.setCalculated("Character Backstory", sys.details.bio ?? "");
+        this.setCalculated("Character Backstory", this.htmlToText(sys.details.bio ?? ""));
         /*
         this.setCalculated("Character Appearance_af_image", this.actor.SOMETHING + "Character Appearance_af_image");
         this.setCalculated("Name 1", this.actor.SOMETHING + "Name 1");
@@ -286,15 +271,14 @@ class MappingClass extends baseMapping {
         this.setCalculated("Treasure", this.actor.SOMETHING + "Treasure");
         this.setCalculated("Treasure 2", this.actor.SOMETHING + "Treasure 2");
         */
-        this.setCalculated("CP", sys.currency.cp);
-        this.setCalculated("SP", sys.currency.sp);
-        this.setCalculated("EP", sys.currency.ep);
-        this.setCalculated("GP", sys.currency.gp);
-        this.setCalculated("PP", sys.currency.pp);
-
+        this.setCalculated("CP", String(sys.currency.cp));
+        this.setCalculated("SP", String(sys.currency.sp));
+        this.setCalculated("EP", String(sys.currency.ep));
+        this.setCalculated("GP", String(sys.currency.gp));
+        this.setCalculated("PP", String(sys.currency.pp));
         //this.setCalculated("Spellcasting Class", this.actor.SOMETHING + "Spellcasting Class");
         this.setCalculated("Casting Ability", sys.attributes.spellcasting);
-        //this.setCalculated("Maneuver Save DC", this.actor.SOMETHING + "Maneuver Save DC");
+        this.setCalculated("Maneuver Save DC", `${8 + attr.prof + sys.abilities.str.save.mod}/${8 + attr.prof + sys.abilities.dex.save.mod}`);
         this.setCalculated("Spell Save DC", sys.attributes.spellDC);
         let spellAttack = attr.prof + (sys.abilities[sys.attributes.spellcasting]?.mod ?? 0);
         this.setCalculated("Spell Attack Bonus", spellAttack);
@@ -317,13 +301,25 @@ class MappingClass extends baseMapping {
         this.setCalculated("page # 0-7", this.actor.SOMETHING + "page # 0-7");
         this.setCalculated("page # 0-8", this.actor.SOMETHING + "page # 0-8");
         */
+        //let spell_slot = game.a5e.config.SPELL_SLOT_TABLE[]
         for (let lvl = 1; lvl <= 9; lvl++) {
             const slots = sys.spellResources?.slots?.[lvl]?.max ?? 0;
             const used = (sys.spellResources?.slots?.[lvl]?.max ?? 0) - (sys.spellResources?.slots?.[lvl]?.current ?? 0);
-            this.setCalculated(`${lvl} Slots`, slots);
-            this.setCalculated(`${lvl} Expended`, used);
+            this.setCalculated(`${lvl} Slots`, String(slots));
+            this.setCalculated(`${lvl} Expended`, String(used));
             // Known/Prepared counts aren’t directly stored at top level; leave “Known” blank unless you track it elsewhere
             // this.setCalculated(`${lvl} Known`, "");
+            // TODO this will work for warlock but probably not for all casters
+            console.log(entries)
+            if (entries.some(e => e.slug === "warlock")) {
+                const warlockSlots = sys.spellResources?.slots?.pact?.max ?? 0;
+                const warlockUsed = (sys.spellResources?.slots?.pact?.max ?? 0) - (sys.spellResources?.slots?.pact?.current ?? 0);
+                this.setCalculated(`${lvl} Known`, "cost: " + game.a5e.config.spellLevelCost[lvl]);
+                //                this.setCalculated(`${lvl} Prepared`, String(warlockUsed));
+            } else {
+                this.setCalculated(`${lvl} Known`, "");
+                this.setCalculated(`${lvl} Prepared`, "");
+            }
         }
         // --- Attacks & Weapons ---
         // Filter for weapons. You might also want to include items with an attack roll.
@@ -454,7 +450,7 @@ class MappingClass extends baseMapping {
             if (item) {
                 this.setCalculated(`Item ${idx}`, item.name);
                 this.setCalculated(`Wt ${idx}`, item.system.weight ?? 0);
-                this.setCalculated(`Type ${idx}`, item.system.objectType ?? "");
+//                this.setCalculated(`Type ${idx}`, item.system.objectType ?? "");
 
                 // Map Rarity or Weapon Properties to "Properties"
                 let props = item.system.rarity ?? "";
