@@ -1,4 +1,9 @@
 
+## [0.13.13] - 2026-01-06
+### :bug: Bug Fixes
+- [`d91cdeb`](https://github.com/gioppoluca/sheet-export/commit/d91cdeb6bc3b28ed44fbadc75ca05bfdaa78044c) - levelup char sheet almost working *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+
 ## [0.13.12] - 2026-01-06
 ### :sparkles: New Features
 - [`2c6ea86`](https://github.com/gioppoluca/sheet-export/commit/2c6ea86e75f5a7127600e418066724b377871e83) - added 2024 dnd5e char sheet *(commit by [@gioppoluca](https://github.com/gioppoluca))*
@@ -327,3 +332,4 @@
 [0.13.10]: https://github.com/gioppoluca/sheet-export/compare/0.13.9...0.13.10
 [0.13.11]: https://github.com/gioppoluca/sheet-export/compare/0.13.10...0.13.11
 [0.13.12]: https://github.com/gioppoluca/sheet-export/compare/0.13.11...0.13.12
+[0.13.13]: https://github.com/gioppoluca/sheet-export/compare/0.13.12...0.13.13
