@@ -42,6 +42,7 @@ If you want to become a mantainer of a game system, please contact me.
 4. Generate mapping file from PDF form by uploading PDF
 5. Allow to code the mapping in a dedicated class with the option of creating own functions to help the work
 6. Override PDF (it has to have the same mapping attributes to work)
+7. Configure the default font for managing different character set: Chinese, Japanese, Arabic, Greek etc.
 
 ## Documentation
 
