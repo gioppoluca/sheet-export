@@ -1,4 +1,9 @@
 
+## [0.13.15] - 2026-01-07
+### :sparkles: New Features
+- [`e5ca094`](https://github.com/gioppoluca/sheet-export/commit/e5ca094c34100808303af3c8f4d6df03ab477b9e) - managing different font types since one cannot map all unicode characters needed *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+
 ## [0.13.14] - 2026-01-07
 ### :sparkles: New Features
 - [`b2a2b52`](https://github.com/gioppoluca/sheet-export/commit/b2a2b52bfea193b9a78f13a13fd9f9213846b024) - solved unicode chars not printed closes [#36](https://github.com/gioppoluca/sheet-export/pull/36), closes [#26](https://github.com/gioppoluca/sheet-export/pull/26) *(commit by [@gioppoluca](https://github.com/gioppoluca))*
@@ -339,3 +344,4 @@
 [0.13.12]: https://github.com/gioppoluca/sheet-export/compare/0.13.11...0.13.12
 [0.13.13]: https://github.com/gioppoluca/sheet-export/compare/0.13.12...0.13.13
 [0.13.14]: https://github.com/gioppoluca/sheet-export/compare/0.13.13...0.13.14
+[0.13.15]: https://github.com/gioppoluca/sheet-export/compare/0.13.14...0.13.15
