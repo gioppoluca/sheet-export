@@ -421,9 +421,13 @@ class SheetExportconfig extends FormApplication {
 			rowPdfTitle.prepend(pdfTitle);
 
 			inputForm.appendChild(rowPdfTitle);
-			const fontUtfUrl = foundry.utils.getRoute("/modules/sheet-export/mappings/NotoSansSC-Regular.ttf");
-                const fontUtfBuffer = await fetch(fontUtfUrl).then(res => res.arrayBuffer());
-                const font = await pdf.embedFont(fontUtfBuffer);
+			const fontUtf = game.settings.get("sheet-export", "defaultFontFamily");
+			const fonUtfUrl = `/modules/sheet-export/mappings/${fontUtf}`;
+
+			const fontUtfUrl = foundry.utils.getRoute(fonUtfUrl);
+			const fontUtfBuffer = await fetch(fontUtfUrl).then(res => res.arrayBuffer());
+			const font = await pdf.embedFont(fontUtfBuffer);
+			console.log(font, fontUtfUrl);
 
 			//const font = await pdf.embedFont(StandardFonts.Helvetica);
 

@@ -18,7 +18,7 @@ export const registerSettings = function () {
 				inner.dirs.forEach(innerName => {
 
 					// Create the option
-					var option = releaseName+"-"+innerName.split("/").pop();
+					var option = releaseName + "-" + innerName.split("/").pop();
 					console.log(option);
 					mappingOptions[option] = option;
 				});
@@ -43,9 +43,9 @@ export const registerSettings = function () {
 		requiresReload: true,
 		onChange: value => { // value is the new value of the setting
 			console.log(value)
-			game.settings.set(modulename,'mapping-version', value.split("-")[0]);
-			game.settings.set(modulename,'mapping-release', value.split("-")[1]);
-		  },
+			game.settings.set(modulename, 'mapping-version', value.split("-")[0]);
+			game.settings.set(modulename, 'mapping-release', value.split("-")[1]);
+		},
 	});
 
 	game.settings.register(modulename, "mapping-version", {
@@ -62,7 +62,7 @@ export const registerSettings = function () {
 		type: String,
 		requiresReload: true,
 	});
-	
+
 	game.settings.registerMenu(modulename, 'mappingEdit', {
 		name: game.i18n.localize(`${modulename}.settings.mappingEdit.Name`),
 		label: game.i18n.localize(`${modulename}.settings.mappingEdit.Name`),
@@ -70,6 +70,24 @@ export const registerSettings = function () {
 		icon: 'fas fa-desktop',
 		restricted: true,
 		type: MappingEdit,
+	});
+
+	game.settings.register("sheet-export", "defaultFontFamily", {
+		name: "Default PDF font",
+		hint: "Choose which Noto font family to embed when exporting character sheets to PDF.",
+		scope: "world",
+		config: true,
+		requiresReload: true,
+		type: String,
+		choices: {
+			"NotoSans-Regular.ttf": "Latin + extended (Noto Sans)",
+			"NotoSansSC-Regular.ttf": "Chinese (Simplified) + Latin (Noto Sans SC)",
+			"NotoSansArabic-Regular.ttf": "Arabic + basic Latin (Noto Sans Arabic)",
+			"NotoSansHebrew-Regular.ttf": "Hebrew + basic Latin (Noto Sans Hebrew)",
+			"NotoSansDevanagari-Regular.ttf": "Hindi / Devanagari",
+			"NotoSansThai-Regular.ttf": "Thai"
+		},
+		default: "NotoSans-Regular.ttf"
 	});
 
 	/*
