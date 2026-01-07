@@ -315,10 +315,10 @@ class baseMapping {
                 this.logWarning(`Image "${name}" has no path.`);
                 continue;
             }
-//            this.logWarning(`Image path "${def?.path}"`);
+            //            this.logWarning(`Image path "${def?.path}"`);
 
             const imgPath = foundry.utils.getRoute(def.path);
-//            this.logWarning(`Image imgPath "${imgPath}"`);
+            //            this.logWarning(`Image imgPath "${imgPath}"`);
             let buffer, type;
 
             try {
@@ -542,7 +542,7 @@ class baseMapping {
             const drawArea = {
                 x: originX + x,
                 y: originY + y,
-//                y: originY - y - (height ?? 20),
+                //                y: originY - y - (height ?? 20),
                 width: width ?? 100,
                 height: height ?? 20,
                 font: fontEntry.font,

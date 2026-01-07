@@ -421,7 +421,11 @@ class SheetExportconfig extends FormApplication {
 			rowPdfTitle.prepend(pdfTitle);
 
 			inputForm.appendChild(rowPdfTitle);
-			const font = await pdf.embedFont(StandardFonts.Helvetica);
+			const fontUtfUrl = foundry.utils.getRoute("/modules/sheet-export/mappings/NotoSansSC-Regular.ttf");
+                const fontUtfBuffer = await fetch(fontUtfUrl).then(res => res.arrayBuffer());
+                const font = await pdf.embedFont(fontUtfBuffer);
+
+			//const font = await pdf.embedFont(StandardFonts.Helvetica);
 
 			var i = 0;
 			fields.forEach(field => {
