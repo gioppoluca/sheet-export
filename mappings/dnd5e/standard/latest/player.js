@@ -39,7 +39,7 @@ class MappingClass extends baseMapping {
         this.setCalculated("STR", this.actor.system.abilities.str.value);
         this.setCalculated("ProfBonus", this.actor.system.attributes.prof);
         this.setCalculated("AC", this.actor.system.attributes.ac.value);
-        this.setCalculated("Initiative", this.actor.system.attributes.init.total);
+        this.setCalculated("Initiative", String(this.actor.system.attributes.init.total));
         this.setCalculated("Speed", (function (actor) {
             const mo = actor.system.attributes.movement;
             const mt = Object.entries(game.dnd5e.config.movementTypes).map(e => e[0]);
@@ -95,11 +95,11 @@ class MappingClass extends baseMapping {
         this.setCalculated("ST Intelligence", String(this.actor.system.abilities.int.save.value));
         this.setCalculated("ST Wisdom", String(this.actor.system.abilities.wis.save.value));
         this.setCalculated("ST Charisma", String(this.actor.system.abilities.cha.save.value));
-        this.setCalculated("Acrobatics", this.actor.system.skills.acr.total);
-        this.setCalculated("Animal", this.actor.system.skills.ani.total);
-        this.setCalculated("Athletics", this.actor.system.skills.ath.total);
-        this.setCalculated("Deception", this.actor.system.skills.dec.total);
-        this.setCalculated("History", this.actor.system.skills.his.total);
+        this.setCalculated("Acrobatics", String(this.actor.system.skills.acr.total));
+        this.setCalculated("Animal", String(this.actor.system.skills.ani.total));
+        this.setCalculated("Athletics", String(this.actor.system.skills.ath.total));
+        this.setCalculated("Deception", String(this.actor.system.skills.dec.total));
+        this.setCalculated("History", String(this.actor.system.skills.his.total));
         console.log("before weapon start");
         console.log(this.actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack))
         this.setCalculated("Wpn Name", this.localizedItemName(this.actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack)[0]) || "");
@@ -118,8 +118,8 @@ class MappingClass extends baseMapping {
             return !dda ? "" : dda;
         })(this.actor)
         );
-        this.setCalculated("Insight", this.actor.system.skills.ins.total);
-        this.setCalculated("Intimidation", this.actor.system.skills.itm.total);
+        this.setCalculated("Insight", String(this.actor.system.skills.ins.total));
+        this.setCalculated("Intimidation", String(this.actor.system.skills.itm.total));
         this.setCalculated("Wpn Name 2", this.actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack)[1]?.name || "");
         this.setCalculated("Wpn2 AtkBonus", (function (actor) {
             const theWeapon = actor.items.filter(i => i.type === 'weapon' && i.system.equipped && i.hasAttack)[1];
@@ -151,17 +151,17 @@ class MappingClass extends baseMapping {
         this.setCalculated("Check Box 21", this.actor.system.abilities.wis.proficient);
         this.setCalculated("Check Box 22", this.actor.system.abilities.cha.proficient);
         this.setCalculated("INTmod", String(this.actor.system.abilities.int.mod));
-        this.setCalculated("Investigation", this.actor.system.skills.inv.total);
+        this.setCalculated("Investigation", String(this.actor.system.skills.inv.total));
         this.setCalculated("WIS", this.actor.system.abilities.wis.value);
-        this.setCalculated("Arcana", this.actor.system.skills.arc.total);
-        this.setCalculated("Perception", this.actor.system.skills.prc.total);
+        this.setCalculated("Arcana", String(this.actor.system.skills.arc.total));
+        this.setCalculated("Perception", String(this.actor.system.skills.prc.total));
         this.setCalculated("WISmod", String(this.actor.system.abilities.wis.mod));
         this.setCalculated("CHA", this.actor.system.abilities.cha.value);
-        this.setCalculated("Nature", this.actor.system.skills.nat.total);
-        this.setCalculated("Performance", this.actor.system.skills.per.total);
-        this.setCalculated("Medicine", this.actor.system.skills.med.total);
-        this.setCalculated("Religion", this.actor.system.skills.rel.total);
-        this.setCalculated("Stealth", this.actor.system.skills.ste.total);
+        this.setCalculated("Nature", String(this.actor.system.skills.nat.total));
+        this.setCalculated("Performance", String(this.actor.system.skills.per.total));
+        this.setCalculated("Medicine", String(this.actor.system.skills.med.total));
+        this.setCalculated("Religion", String(this.actor.system.skills.rel.total));
+        this.setCalculated("Stealth", String(this.actor.system.skills.ste.total));
         this.setCalculated("Check Box 23", this.actor.system.skills.acr.value);
         this.setCalculated("Check Box 24", this.actor.system.skills.ani.value);
         this.setCalculated("Check Box 25", this.actor.system.skills.arc.value);
@@ -180,13 +180,13 @@ class MappingClass extends baseMapping {
         this.setCalculated("Check Box 38", this.actor.system.skills.slt.value);
         this.setCalculated("Check Box 39", this.actor.system.skills.ste.value);
         this.setCalculated("Check Box 40", this.actor.system.skills.sur.value);
-        this.setCalculated("Persuasion", this.actor.system.skills.per.total);
+        this.setCalculated("Persuasion", String(this.actor.system.skills.per.total));
         this.setCalculated("HPMax", this.actor.system.attributes.hp.max);
         this.setCalculated("HPCurrent", this.actor.system.attributes.hp.value);
         this.setCalculated("HPTemp", this.actor.system.attributes.hp.temp);
-        this.setCalculated("SleightofHand", this.actor.system.skills.slt.total);
+        this.setCalculated("SleightofHand", String(this.actor.system.skills.slt.total));
         this.setCalculated("CHamod", String(this.actor.system.abilities.cha.mod));
-        this.setCalculated("Survival", this.actor.system.skills.sur.total);
+        this.setCalculated("Survival", String(this.actor.system.skills.sur.total));
         this.setCalculated("AttacksSpellcasting", "");  // the central area for attacks and spellcasting is not mapped
         this.setCalculated("Passive", this.actor.system.skills.prc.passive);
         this.setCalculated("CP", this.actor.system.currency.cp || "");
