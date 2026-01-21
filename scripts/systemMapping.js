@@ -41,6 +41,9 @@ const systemMapping = function () {
 		"forbidden-lands":{
 			"player": "character"
 		},
+		"shadowdark":{
+			"player": "Player"
+		},
 		"a5e":{
 			"player": "character"
 		},
@@ -94,6 +97,9 @@ const systemMappingSheet = function () {
 		},
 		"forbidden-lands":{
 			"character": "player",
+		},
+		"shadowdark":{
+			"Player": "player",
 		},
 		"a5e":{
 			"character": "player",
