@@ -1,4 +1,12 @@
 
+## [0.13.16] - 2026-01-21
+### :sparkles: New Features
+- [`b2ac205`](https://github.com/gioppoluca/sheet-export/commit/b2ac20519fcb0a3837e5ffab7399ef50d6a76089) - shadowdark PC sheet - beta *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+### :bug: Bug Fixes
+- [`ec80604`](https://github.com/gioppoluca/sheet-export/commit/ec80604013fb9ab3d1392eb4a20b69723cf31d23) - missing 0 around the sheet *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+
 ## [0.13.15] - 2026-01-07
 ### :sparkles: New Features
 - [`e5ca094`](https://github.com/gioppoluca/sheet-export/commit/e5ca094c34100808303af3c8f4d6df03ab477b9e) - managing different font types since one cannot map all unicode characters needed *(commit by [@gioppoluca](https://github.com/gioppoluca))*
@@ -345,3 +353,4 @@
 [0.13.13]: https://github.com/gioppoluca/sheet-export/compare/0.13.12...0.13.13
 [0.13.14]: https://github.com/gioppoluca/sheet-export/compare/0.13.13...0.13.14
 [0.13.15]: https://github.com/gioppoluca/sheet-export/compare/0.13.14...0.13.15
+[0.13.16]: https://github.com/gioppoluca/sheet-export/compare/0.13.15...0.13.16
