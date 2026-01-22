@@ -37,26 +37,59 @@ class MappingClass extends baseMapping {
         this.setCalculated("Armor Class", this.actor.system.attributes.ac.value);
         this.setCalculated("Hit Points", this.actor.system.attributes.hp.max);
         this.setCalculated("Name", this.actor.name);
-        this.setCalculated("Race", this.actor.system.ancestry);
-        this.setCalculated("Class", this.actor.system.class);
-        this.setCalculated("Level", this.actor.system.level);
+        let ancestry = await fromUuid(this.actor.system.ancestry);
+        this.setCalculated("Race", ancestry.name);
+        const className = await fromUuid(this.actor.system.class);
+        console.log(className);
+        this.setCalculated("Class", className.name);
+        this.setCalculated("Level", this.actor.system.level.value);
         this.setCalculated("XP Current", this.actor.system.level.xp);
         //this.setCalculated("XP Target", this.actor.system.xp.target);
-        this.setCalculated("Title", this.actor.system.ancestry);
+        const title = this.getShadowdarkTitle({
+            classItem: className,
+            level: this.actor.system.level.value,
+            alignment: this.actor.system.alignment,
+        });
+        this.setCalculated("Title", title);
         this.setCalculated("Alignment", this.actor.system.alignment);
-        this.setCalculated("Background", this.actor.system.background);
-        this.setCalculated("Deity", this.actor.system.deity.toString());
-        this.setCalculated("Talents / Spells", this.actor.system.talentsSpells);
+        const background = await fromUuid(this.actor.system.background);
+        this.setCalculated("Background", background.name);
+        let deity = await fromUuid(this.actor.system.deity);
+        this.setCalculated("Deity", deity.name);
+        let spellAndTalentList = "";
+        this.actor.items.filter(i => ['Talent', 'Spell'].includes(i.type)).map(i => i).forEach(i => {
+            spellAndTalentList += `${i.name}\n`;
+        });
+        this.setCalculated("Talents / Spells", spellAndTalentList);
         this.setCalculated("Gold Pieces", this.actor.system.coins.gp);
         this.setCalculated("Silver Pieces", this.actor.system.coins.sp);
         this.setCalculated("Copper Pieces", this.actor.system.coins.cp);
-        const gear = this.actor.items?._source ?? [];
+        const gear = this.actor.items.filter(i => ['Basic', 'Weapon', 'Armor', 'Potion'].includes(i.type));
         for (let i = 0; i < 20; i++) {
             this.setCalculated(`Gear ${i + 1}`, gear[i]?.name ?? "");
         }
         //this.setCalculated("Free To Carry", this.actor.system.attributes.freeToCarry);
 
     }
+
+    getShadowdarkTitle({ classItem, level, alignment }) {
+        const titles = classItem?.system?.titles;
+        if (!Array.isArray(titles) || titles.length === 0) return "";
+
+
+        const lvl = Number(level ?? 0);
+
+        // find matching title range
+        const entry = titles.find(t => lvl >= Number(t.from) && lvl <= Number(t.to));
+
+        if (!entry) {
+            // fallback: try last entry if level is higher than table
+            return "";
+        }
+
+        return (entry?.[alignment]).toString();
+    }
 }
+
 export default MappingClass;
 
