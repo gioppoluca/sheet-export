@@ -1,4 +1,9 @@
 
+## [0.13.19] - 2026-01-23
+### :sparkles: New Features
+- [`e07a24c`](https://github.com/gioppoluca/sheet-export/commit/e07a24ced210f3208c5e58cd922b366df723b20d) - added the capability to give the user the control to hide fields that are frequently edited *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+
 ## [0.13.18] - 2026-01-23
 ### :bug: Bug Fixes
 - [`23d1024`](https://github.com/gioppoluca/sheet-export/commit/23d1024a6a8c49693b44592c443958df0ec1a92f) - trying to fix forge bug *(commit by [@gioppoluca](https://github.com/gioppoluca))*
@@ -366,3 +371,4 @@
 [0.13.16]: https://github.com/gioppoluca/sheet-export/compare/0.13.15...0.13.16
 [0.13.17]: https://github.com/gioppoluca/sheet-export/compare/0.13.16...0.13.17
 [0.13.18]: https://github.com/gioppoluca/sheet-export/compare/0.13.17...0.13.18
+[0.13.19]: https://github.com/gioppoluca/sheet-export/compare/0.13.18...0.13.19
