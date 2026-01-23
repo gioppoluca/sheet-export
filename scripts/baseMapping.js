@@ -40,6 +40,8 @@ class baseMapping {
         this.embeddedImages = new Map();
         this.embeddedFonts = new Map(); // key: fontName, value: { font, path }
 
+        this.omitChangeable = game.settings.get("sheet-export", "omitChangeable");
+
         // this.createMappings();
     }
 
@@ -123,9 +125,10 @@ class baseMapping {
     }
     */
 
-    setCalculated(fieldName, value, pdfId = 0) {
-        fieldName = fieldName.trim();
-        this.updateMapping(fieldName, { "calculated": value }, pdfId);
+    setCalculated(fieldName, value, omitChangeable = false, pdfId = 0) {
+        //    fieldName = fieldName.trim();
+        let shownValue = omitChangeable ? "" : value;
+        this.updateMapping(fieldName, { "calculated": shownValue }, pdfId);
     }
 
     setFont(fieldName, fontName = undefined, fontSize = undefined) {

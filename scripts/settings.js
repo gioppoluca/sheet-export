@@ -72,7 +72,7 @@ export const registerSettings = function () {
 		type: MappingEdit,
 	});
 
-	game.settings.register("sheet-export", "defaultFontFamily", {
+	game.settings.register(modulename, "defaultFontFamily", {
 		name: "Default PDF font",
 		hint: "Choose which Noto font family to embed when exporting character sheets to PDF.",
 		scope: "world",
@@ -89,6 +89,15 @@ export const registerSettings = function () {
 		},
 		default: "NotoSans-Regular.ttf"
 	});
+
+	game.settings.register(modulename, "omitChangeable", {
+            scope: "world",
+            config: true,
+            type: Boolean,
+            default: false,
+            name: game.i18n.localize(`${modulename}.settings.omitChangeable.Name`),
+            hint: game.i18n.localize(`${modulename}.settings.omitChangeable.Hint`)
+        });
 
 	/*
 	game.settings.registerMenu(modulename, 'setCustomMapping', {
