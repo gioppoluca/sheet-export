@@ -1,4 +1,9 @@
 
+## [0.13.18] - 2026-01-23
+### :bug: Bug Fixes
+- [`23d1024`](https://github.com/gioppoluca/sheet-export/commit/23d1024a6a8c49693b44592c443958df0ec1a92f) - trying to fix forge bug *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+
 ## [0.13.17] - 2026-01-22
 ### :bug: Bug Fixes
 - [`1f42c52`](https://github.com/gioppoluca/sheet-export/commit/1f42c52efb36fed77d9780b22fe19e0a9410ba57) - completed shadowdark player sheet *(commit by [@gioppoluca](https://github.com/gioppoluca))*
@@ -360,3 +365,4 @@
 [0.13.15]: https://github.com/gioppoluca/sheet-export/compare/0.13.14...0.13.15
 [0.13.16]: https://github.com/gioppoluca/sheet-export/compare/0.13.15...0.13.16
 [0.13.17]: https://github.com/gioppoluca/sheet-export/compare/0.13.16...0.13.17
+[0.13.18]: https://github.com/gioppoluca/sheet-export/compare/0.13.17...0.13.18
