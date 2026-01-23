@@ -3,6 +3,7 @@ import fontkit from './lib/fontkit.es.js';
 import { registerSettings } from "./settings.js";
 import { getPdf, getSheetType, getSheetTypeFromActor } from "./sheet-export-api.js";
 import { detectImageType } from './lib/image-type-detector.js';
+import { asFoundryRoute } from './pdf-utils.js';
 
 Hooks.once('ready', async function () {
 	console.log("---------------GIOPPO--------------")
@@ -277,7 +278,7 @@ class SheetExportconfig extends FormApplication {
 			console.log(images[i].height / images[i].width)
 			// Usage example:
 			let coords = null;
-			await this.getMeta(foundry.utils.getRoute(img_path)).then(img => {
+			await this.getMeta(asFoundryRoute(img_path)).then(img => {
 				console.log("IMG dimensions")
 				console.log(img.naturalHeight + ' ' + img.naturalWidth);
 				console.log(img.naturalHeight / img.naturalWidth);
@@ -291,13 +292,13 @@ class SheetExportconfig extends FormApplication {
 			console.log(images[i]);
 			// let img_ext = img_path.split('.').pop();
 			//let url = new URL(img_path, window.location.origin);
-			const imageType = await detectImageType(foundry.utils.getRoute(img_path));
+			const imageType = await detectImageType(asFoundryRoute(img_path));
 			console.log(`Detected image type: ${imageType}`);
 
 			//let pathname = url.pathname;
 			//let img_ext = pathname.split('.').pop().toLowerCase();
 			//console.log(img_ext);
-			const arrayBuffer = await fetch(foundry.utils.getRoute(img_path)).then(res => res.arrayBuffer())
+			const arrayBuffer = await fetch(asFoundryRoute(img_path)).then(res => res.arrayBuffer())
 			let embedding_image = null;
 			switch (imageType) {
 				case "png":

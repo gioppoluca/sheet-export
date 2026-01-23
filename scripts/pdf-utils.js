@@ -265,7 +265,7 @@ export function drawTopLeftAlignedParagraph(
   }
 
   // Try sizes: maxSize -> minSize in `step` decrements
-//  let size = maxSize;
+  //  let size = maxSize;
   let wrappedLines = wrapParagraph(text, size);
   let fits = false;
 
@@ -316,4 +316,15 @@ export function drawTopLeftAlignedParagraph(
     linesDrawn: linesToDraw.length,
     truncated: !fits,
   };
+}
+
+
+export function asFoundryRoute(src) {
+  if (!src) return src;
+
+  // Already absolute or special URL schemes => don't touch
+  if (/^(?:https?:)?\/\//i.test(src) || /^(?:data|blob):/i.test(src)) return src;
+
+  // Ensure leading slash is fine either way; getRoute handles Foundry prefixes
+  return foundry.utils.getRoute(src.startsWith("/") ? src.slice(1) : src);
 }
