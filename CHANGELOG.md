@@ -1,4 +1,12 @@
 
+## [0.13.20] - 2026-02-15
+### :sparkles: New Features
+- [`4de3628`](https://github.com/gioppoluca/sheet-export/commit/4de36289890460c6eb076a5be8da465efff8b239) - dragonbane now complete *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+### :bug: Bug Fixes
+- [`8b87a4a`](https://github.com/gioppoluca/sheet-export/commit/8b87a4a3cf599be96419ff5c845b6b0721bde09c) - hardcoded string *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+
 ## [0.13.19] - 2026-01-23
 ### :sparkles: New Features
 - [`e07a24c`](https://github.com/gioppoluca/sheet-export/commit/e07a24ced210f3208c5e58cd922b366df723b20d) - added the capability to give the user the control to hide fields that are frequently edited *(commit by [@gioppoluca](https://github.com/gioppoluca))*
@@ -372,3 +380,4 @@
 [0.13.17]: https://github.com/gioppoluca/sheet-export/compare/0.13.16...0.13.17
 [0.13.18]: https://github.com/gioppoluca/sheet-export/compare/0.13.17...0.13.18
 [0.13.19]: https://github.com/gioppoluca/sheet-export/compare/0.13.18...0.13.19
+[0.13.20]: https://github.com/gioppoluca/sheet-export/compare/0.13.19...0.13.20
