@@ -35,7 +35,7 @@ class baseMapping {
         this.pdfFiles = [];
         this.globalValues = [];
         this.logPrefix = "Export Sheet";
-        this.systemName = "test";
+        this.systemName = game.system.id;
         // embeddedImages: Map<string, { image: PDFEmbeddedImage, width: number, height: number }>
         this.embeddedImages = new Map();
         this.embeddedFonts = new Map(); // key: fontName, value: { font, path }
