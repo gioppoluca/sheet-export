@@ -5,9 +5,9 @@ class MappingClass extends baseMapping {
 
     authors = [
         {
-            name: 'YOUR_NAME',
-            url: '',
-            github: '',
+            name: 'gioppoluca',
+            url: 'https://github.com/gioppoluca',
+            github: 'https://github.com/gioppoluca',
         },
     ];
     // override createMappings method from base class
@@ -21,152 +21,177 @@ class MappingClass extends baseMapping {
             name: "dragonbane_sv.pdf",
         });
 
-        this.setCalculated("Utseende", this.actor.system.attributes.str.value);
-        this.setCalculated("Alder", this.actor.SOMETHING);
-        this.setCalculated("Yrke", this.actor.SOMETHING);
-        this.setCalculated("FYS", this.actor.system.attributes.con.value);
-        this.setCalculated("SMI", this.actor.system.attributes.agl.value);
-        this.setCalculated("INT", this.actor.system.attributes.int.value);
-        this.setCalculated("PSY", this.actor.system.attributes.wil.value);
-        this.setCalculated("KAR", this.actor.system.attributes.cha.value);
-        this.setCalculated("Skadebonus STY", this.actor.SOMETHING);
-        this.setCalculated("Skadebonus SMI", this.actor.SOMETHING);
-        this.setCalculated("Forflyttning", this.actor.SOMETHING);
-        this.setCalculated("Formagor och Besvarjelser 1", this.actor.SOMETHING);
-        this.setCalculated("Formagor och Besvarjelser 2", this.actor.SOMETHING);
-        this.setCalculated("Formagor och Besvarjelser 6", this.actor.SOMETHING);
-        this.setCalculated("Formagor och Besvarjelser 4", this.actor.SOMETHING);
-        this.setCalculated("Formagor och Besvarjelser 3", this.actor.SOMETHING);
-        this.setCalculated("Formagor och Besvarjelser 5", this.actor.SOMETHING);
-        this.setCalculated("Formagor och Besvarjelser 7", this.actor.SOMETHING);
-        this.setCalculated("Formagor och Besvarjelser 8", this.actor.SOMETHING);
-        this.setCalculated("Formagor och Besvarjelser 9", this.actor.SOMETHING);
-        this.setCalculated("Formagor och Besvarjelser 10", this.actor.SOMETHING);
-        this.setCalculated("Formagor och Besvarjelser 11", this.actor.SOMETHING);
-        this.setCalculated("Formagor och Besvarjelser 12", this.actor.SOMETHING);
-        this.setCalculated("Formagor och Besvarjelser 13", this.actor.SOMETHING);
-        this.setCalculated("Formagor och Besvarjelser 14", this.actor.SOMETHING);
-        this.setCalculated("Formagor och Besvarjelser 15", this.actor.SOMETHING);
-        this.setCalculated("Barformaga", this.actor.SOMETHING);
-        this.setCalculated("Sekundar Fardighet 2", this.actor.SOMETHING);
-        this.setCalculated("Sekundar Fardighet 1", this.actor.SOMETHING);
-        this.setCalculated("Sekundar Fardighet 3", this.actor.SOMETHING);
-        this.setCalculated("Sekundar Fardighet 4", this.actor.SOMETHING);
-        this.setCalculated("Sekundar Fardighet 5", this.actor.SOMETHING);
-        this.setCalculated("Sekundar Fardighet 6", this.actor.SOMETHING);
-        this.setCalculated("Sekundar Fardighet 7", this.actor.SOMETHING);
-        this.setCalculated("Packning 2", this.actor.SOMETHING);
-        this.setCalculated("Packning 1", this.actor.SOMETHING);
-        this.setCalculated("Packning 4", this.actor.SOMETHING);
-        this.setCalculated("Packning 3", this.actor.SOMETHING);
-        this.setCalculated("Packning 5", this.actor.SOMETHING);
-        this.setCalculated("Packning 6", this.actor.SOMETHING);
-        this.setCalculated("Packning 7", this.actor.SOMETHING);
-        this.setCalculated("Packning 8", this.actor.SOMETHING);
-        this.setCalculated("Packning 9", this.actor.SOMETHING);
-        this.setCalculated("Packning 10", this.actor.SOMETHING);
-        this.setCalculated("Minnessak 1", this.actor.SOMETHING);
-        this.setCalculated("Minnessak 2", this.actor.SOMETHING);
-        this.setCalculated("Smasaker", this.actor.SOMETHING);
-        this.setCalculated("Viljepoang", this.actor.SOMETHING);
-        this.setCalculated("Kroppspoang", this.actor.SOMETHING);
-        this.setCalculated("Guldmynt", this.actor.SOMETHING);
-        this.setCalculated("Silvermynt", this.actor.SOMETHING);
-        this.setCalculated("Kopparmynt", this.actor.SOMETHING);
-        this.setCalculated("Rustning Huvud", this.actor.SOMETHING);
-        this.setCalculated("Skyddsvarde Huvud", this.actor.SOMETHING);
-        this.setCalculated("Vapen 1", this.actor.SOMETHING);
-        this.setCalculated("Vapen 2", this.actor.SOMETHING);
-        this.setCalculated("Vapen 3", this.actor.SOMETHING);
-        this.setCalculated("Vapen 1_2", this.actor.SOMETHING);
-        this.setCalculated("VapenGrepp 1", this.actor.SOMETHING);
-        this.setCalculated("VapenGrepp 2", this.actor.SOMETHING);
-        this.setCalculated("VapenGrepp 3", this.actor.SOMETHING);
-        this.setCalculated("VapenRackvidd 2", this.actor.SOMETHING);
-        this.setCalculated("VapenRackvidd 1", this.actor.SOMETHING);
-        this.setCalculated("VapenSkada 1", this.actor.SOMETHING);
-        this.setCalculated("VapenSkada 2", this.actor.SOMETHING);
-        this.setCalculated("VapenSkada 3", this.actor.SOMETHING);
-        this.setCalculated("VapenRackvidd 3", this.actor.SOMETHING);
-        this.setCalculated("VapenBV 1", this.actor.SOMETHING);
-        this.setCalculated("VapenBV 2", this.actor.SOMETHING);
-        this.setCalculated("VapenBrytvarde 3", this.actor.SOMETHING);
-        this.setCalculated("VapenEgenskaper 1", this.actor.SOMETHING);
-        this.setCalculated("VapenEgenskaper 2", this.actor.SOMETHING);
-        this.setCalculated("VapenEgenskaper 3", this.actor.SOMETHING);
-        this.setCalculated("Bluffa", this.actor.SOMETHING);
-        this.setCalculated("Fingerfardighet", this.actor.SOMETHING);
-        this.setCalculated("Finna Dolda Ting", this.actor.SOMETHING);
-        this.setCalculated("Frammande Sprak", this.actor.SOMETHING);
-        this.setCalculated("Hantverk", this.actor.SOMETHING);
-        this.setCalculated("Hoppa och Klattra", this.actor.SOMETHING);
-        this.setCalculated("Jakt och Fiske", this.actor.SOMETHING);
-        this.setCalculated("Kopsla", this.actor.SOMETHING);
-        this.setCalculated("Lakekonst", this.actor.SOMETHING);
-        this.setCalculated("Myter och Legender", this.actor.SOMETHING);
-        this.setCalculated("Rida", this.actor.SOMETHING);
-        this.setCalculated("Simma", this.actor.SOMETHING);
-        this.setCalculated("Sjokunnighet", this.actor.SOMETHING);
-        this.setCalculated("Smyga", this.actor.SOMETHING);
-        this.setCalculated("Undvika", this.actor.SOMETHING);
-        this.setCalculated("Upptrada", this.actor.SOMETHING);
-        this.setCalculated("Upptacka Fara", this.actor.SOMETHING);
-        this.setCalculated("Vildmarksvana", this.actor.SOMETHING);
-        this.setCalculated("Overtala", this.actor.SOMETHING);
-        this.setCalculated("Armborst", this.actor.SOMETHING);
-        this.setCalculated("Hammare", this.actor.SOMETHING);
-        this.setCalculated("Kniv", this.actor.SOMETHING);
-        this.setCalculated("Pilbage", this.actor.SOMETHING);
-        this.setCalculated("Slagsmal", this.actor.SOMETHING);
-        this.setCalculated("Slunga", this.actor.SOMETHING);
-        this.setCalculated("Spjut", this.actor.SOMETHING);
-        this.setCalculated("Stav", this.actor.SOMETHING);
-        this.setCalculated("Svard", this.actor.SOMETHING);
-        this.setCalculated("Yxa", this.actor.SOMETHING);
-        this.setCalculated("Sekundar Fardighet Varde 1", this.actor.SOMETHING);
-        this.setCalculated("Sekundar Fardighet Varde 2", this.actor.SOMETHING);
-        this.setCalculated("Sekundar Fardighet Varde 3", this.actor.SOMETHING);
-        this.setCalculated("Sekundar Fardighet Varde 4", this.actor.SOMETHING);
-        this.setCalculated("Sekundar Fardighet Varde 5", this.actor.SOMETHING);
-        this.setCalculated("Sekundar Fardighet Varde 6", this.actor.SOMETHING);
-        this.setCalculated("Sekundar Fardighet Varde 7", this.actor.SOMETHING);
-        this.setCalculated("Packning Antal 1", this.actor.SOMETHING);
-        this.setCalculated("Packning Vikt 1", this.actor.SOMETHING);
-        this.setCalculated("Nackdel Huvud", this.actor.SOMETHING);
-        this.setCalculated("Packning Antal 2", this.actor.SOMETHING);
-        this.setCalculated("Packning Vikt 2", this.actor.SOMETHING);
-        this.setCalculated("Packning Antal 3", this.actor.SOMETHING);
-        this.setCalculated("Packning Vikt 3", this.actor.SOMETHING);
-        this.setCalculated("Packning Antal 4", this.actor.SOMETHING);
-        this.setCalculated("Packning Vikt 4", this.actor.SOMETHING);
-        this.setCalculated("Packning Antal 5", this.actor.SOMETHING);
-        this.setCalculated("Packning Vikt 5", this.actor.SOMETHING);
-        this.setCalculated("Packning Antal 6", this.actor.SOMETHING);
-        this.setCalculated("Packning Vikt 6", this.actor.SOMETHING);
-        this.setCalculated("Packning Antal 7", this.actor.SOMETHING);
-        this.setCalculated("Packning Vikt 7", this.actor.SOMETHING);
-        this.setCalculated("Packning Antal 8", this.actor.SOMETHING);
-        this.setCalculated("Packning Vikt 8", this.actor.SOMETHING);
-        this.setCalculated("Packning Antal 9", this.actor.SOMETHING);
-        this.setCalculated("Packning Vikt 9", this.actor.SOMETHING);
-        this.setCalculated("Packning Antal 10", this.actor.SOMETHING);
-        this.setCalculated("Packning Vikt 10", this.actor.SOMETHING);
-        this.setCalculated("Svaghet", this.actor.SOMETHING);
-        this.setCalculated("STY", this.actor.SOMETHING);
-        this.setCalculated("Slakte", this.actor.SOMETHING);
-        this.setCalculated("Bestiologi", this.actor.SOMETHING);
-        this.setCalculated("Namn", this.actor.SOMETHING);
-        this.setCalculated("Spelare", this.actor.SOMETHING);
-        this.setCalculated("Rustning B#C3#A5l", this.actor.SOMETHING);
-        this.setCalculated("Rustning Armar", this.actor.SOMETHING);
-        this.setCalculated("Rustning Ben", this.actor.SOMETHING);
-        this.setCalculated("Skyddsvarde B#C3#A5l", this.actor.SOMETHING);
-        this.setCalculated("Skyddsvarde Armar", this.actor.SOMETHING);
-        this.setCalculated("Skyddsvarde Ben", this.actor.SOMETHING);
-        this.setCalculated("Nackdel B#C3#A5l", this.actor.SOMETHING);
-        this.setCalculated("Nackdel Armar", this.actor.SOMETHING);
-        this.setCalculated("Nackdel Ben", this.actor.SOMETHING);
-        this.setCalculated("Skador", this.actor.SOMETHING);
+
+        // Map Skills - Main combat and general skills
+        /*
+        const skillMapping = {
+            'Bluffa': 'Bluffa',
+            'Fingerfardighet': 'Fingerfärdighet',
+            'Finna Dolda Ting': 'Finna Dolda Ting',
+            'Frammande Sprak': 'Främmande språk',
+            'Hantverk': 'Hantverk',
+            'Hoppa och Klattra': 'Hoppa & Klättra',
+            'Jakt och Fiske': 'Jakt & Fiske',
+            'Kopsla': 'Köpslå',
+            'Lakekonst': 'Läkekonst',
+            'Myter och Legender': 'Myter & Legender',
+            'Rida': 'Rida',
+            'Simma': 'Simma',
+            'Sjokunnighet': 'Sjökunnighet',
+            'Smyga': 'Smyga',
+            'Undvika': 'Undvika',
+            'Upptrada': 'Uppträda',
+            'Upptacka Fara': 'Upptäcka fara',
+            'Vildmarksvana': 'Vildmarksvana',
+            'Overtala': 'Övertala',
+            'Bestiologi': 'Bestiologi',
+            'Armborst': 'Armborst',
+            'Hammare': 'Hammare',
+            'Kniv': 'Kniv',
+            'Pilbage': 'Pilbåge',
+            'Slagsmal': 'Slagsmål',
+            'Slunga': 'Slunga',
+            'Spjut': 'Spjut',
+            'Stav': 'Stav',
+            'Svard': 'Svärd',
+            'Yxa': 'Yxa'
+        };
+*/
+//        const abilMapping = { "str": "sty", "con": "fys", "agl": "smi", "int": "int", "wil": "psy", "cha": "kar" };
+        const abilMapping = { "str": "str", "con": "con", "agl": "agl", "int": "int", "wil": "wil", "cha": "cha" };
+        const skillMapping = {
+            "acrobatics": "Hoppa & Klättra",
+            "awareness": "Finna Dolda Ting",
+            "bartering": "Köpslå",
+            "axes": "Yxa",
+            "beast-lore": "Bestiologi",
+            "bluffing": "Bluffa",
+            "bushcraft": "Vildmarksvana",
+            "crafting": "Hantverk",
+            "evade": "Undvika",
+            "healing": "Läkekonst",
+            "hunting-and-fishing": "Jakt & Fiske",
+            "languages": "Främmande språk",
+            "myths-and-legends": "Myter & Legender",
+            "performance": "Upptrada",
+            "persuasion": "Övertala",
+            "riding": "Rida",
+            "seamanship": "Sjokunnighet",
+            "sleight-of-hand": "Fingerfärdighet",
+            "sneaking": "Smyga",
+            "spot-hidden": "Upptäcka fara",
+            "swimming": "Simma",
+            "bows": "Pilbåge",
+            "brawling": "Slagsmål",
+            "crossbows": "Armborst",
+            "hammers": "Hammare",
+            "slings": "Slunga",
+            "staves": "Stav",
+            "knives": "Kniv",
+            "spears": "Spjut",
+            "swords": "Svärd"
+        };
+
+        const weapons_in_hands = this.actor.items.filter(i => { return (i.type === 'weapon' && i.system.worn) }) || [];
+        const skills = this.actor.system.skills || [];
+        const secondarySkills = skills.filter(s => !Object.values(skillMapping).includes(s.name));
+        const gear = this.actor.items.filter(i => { return (['item', 'weapon', 'armor'].includes(i.type) && !i.system.memento) }) || [];
+        const abspells = this.actor.items.filter(i => ['spell', 'ability'].includes(i.type)) || [];
+        const memento = this.actor.items.filter(i => { return (i.type === 'item' && i.system.memento) }) || [];
+        const armor_worn = this.actor.items.filter(i => { return (i.type === 'armor' && i.system.worn) }) || [];
+
+
+
+        for (const [pdfField, abilKey] of Object.entries(abilMapping)) {
+            this.setCalculated(pdfField, this.actor.system.attributes[abilKey].value);
+            this.setCalculated(`${pdfField}_chk`, this.actor.system.conditions[abilKey].value);
+        }
+
+        for (const [pdfField, skillKey] of Object.entries(skillMapping)) {
+            const skill = skills.find(s => s.name === skillKey);
+            console.log(`Mapping skill ${pdfField}:`, skill, skillKey, skill?.system?.value);
+            this.setCalculated(pdfField, String(skill?.system.value || 0));
+
+            this.setCalculated(`${pdfField}_chk`, skill?.system?.advance);
+        }
+
+        console.log("Secondary skills:", secondarySkills);
+        for (let i = 0; i < 7; i++) {
+            const skill = secondarySkills[i];
+            this.setCalculated(`sec_skill${i + 1}`, skill?.name || "");
+            this.setCalculated(`sec_skill_ab${i + 1}`, String(skill?.system?.value || 0));
+            this.setCalculated(`sec_skill_chk${i + 1}`, skill?.system?.advance || 0);
+        }
+        this.setCalculated("name", this.actor.name || "");
+        this.setCalculated("player", game.user?.name || "");
+        this.setCalculated("kin", this.actor.system.kin.name || "");
+        this.setCalculated("age", this.actor.system.age || 0);
+        this.setCalculated("profession", this.actor.system.profession.name || "");
+        this.setCalculated("weakness", this.htmlToText(this.actor.system.weakness) || "");
+        this.setCalculated("appearance", this.htmlToText(this.actor.system.appearance) || "");
+
+        this.setCalculated("dam_bon_str", this.actor.system.damageBonus.str.value || "");
+        this.setCalculated("dam_bon_agl", this.actor.system.damageBonus.agl.value || "");
+        this.setCalculated("movement", this.actor.system.movement.value);
+        this.setCalculated("enc_limit", this.actor.system.encumbrance.limit || 0);
+        this.setCalculated("willpower", this.actor.system.willPoints.max || 0);
+        this.setCalculated("hp", this.actor.system.hitPoints.max);
+        this.setCalculated("gold", this.actor.system.currency.gc || 0);
+        this.setCalculated("silver", this.actor.system.currency.sc || 0);
+        this.setCalculated("copper", this.actor.system.currency.cc || 0);
+        // Map Weapons - up to 3 weapons
+        for (let i = 0; i < 3; i++) {
+            const weapon = weapons_in_hands[i];
+            console.log(`Mapping weapon ${i + 1}:`, weapon);
+            this.setCalculated(`weapon${i + 1}`, weapon?.name || "");
+            console.log(`Weapon ${i + 1} name:`, weapon?.system.grip.label);
+            this.setCalculated(`weapon_grip${i + 1}`, game.i18n.localize(weapon?.system?.grip.label) || "");
+            this.setCalculated(`weapon_range${i + 1}`, weapon?.system.range || "");
+            this.setCalculated(`weapon_dam${i + 1}`, weapon?.system.damage || "");
+            this.setCalculated(`weapon_dur${i + 1}`, weapon?.system.durability || "");
+            this.setCalculated(`weapon_feat${i + 1}`, weapon?.system.features || "");
+        }
+
+        //this.setCalculated("tiny_items", this.actor.SOMETHING + "tiny_items");
+
+        // Map Gear/Packing (Packning) - up to 10 items
+        for (let i = 0; i < 10; i++) {
+            const item = gear[i];
+            const quantity = item?.system.quantity || 0;
+            const name = item?.name || "";
+            this.setCalculated(`inventory${i + 1}`, `${quantity} ${name}`.trim());
+        }
+
+
+        // Map Mementos (Minnessak) - up to 2
+        let mem = ""
+        for (let i = 0; i < 2; i++) {
+            if (memento[i]) {
+                mem += memento[i]?.name + ",";
+            }
+        }
+        this.setCalculated("memento", mem);
+
+        for (let i = 0; i < 15; i++) {
+            const spell = abspells[i];
+            this.setCalculated(`ab_spells_${i + 1}`, spell?.name || "");
+        }
+        this.setCalculated("rest_round_chk", false);
+        this.setCalculated("rest_stretch_chk", false);
+        const armor = this.actor.system.equippedArmor;
+        const helm = this.actor.system.equippedHelmet;
+        console.log("Equipped armor:", armor);
+        console.log("Equipped helmet:", helm);
+        this.setCalculated("AR", armor?.system.rating || 0);
+        this.setCalculated("helm_AR", helm?.system.rating || 0);
+        this.setCalculated("AR_name", armor?.name || "");
+        this.setCalculated("helm_AR_name", helm?.name || "");
+        this.setCalculated("ar_bane_acro_chk", armor?.system.bane?.includes('Hoppa & Klättra') || false);
+        this.setCalculated("ar_bane_sneak_chk", armor?.system.bane?.includes('Smyga') || false);
+        this.setCalculated("ar_bane_evade_chk", armor?.system.bane?.includes('Undvika') || false);
+        this.setCalculated("helm_ar_awa_chk", helm?.system.bane?.includes('Finna Dolda Ting') || false);
+        this.setCalculated("helm_ar_rng_chk", helm?.system.bane?.includes('Pilbåge', "Armborst", "Slunga") || false);
+
 
     }
 }

@@ -28,7 +28,7 @@ At the moment the module manages:
 | vtme5           | standard   | latest  | Vampire, Werewolf     |                                       | The Vampire and Werewolf PDF for World of Darkness - Vampire the Masquerade                                                                  |
 | black-flag           | standard   | latest  | PC     |                                       | The PC PDF for Black Flag - Tales of the Valiant                                                                  |
 | cosmere-rpg           | standard   | latest  | PC     |   [boxfriend](https://github.com/boxfriend)             | The PC PDF for Cosmere RPG                                                                  |
-| dragonbane           | standard   | latest  | PC     |               | The PC PDF for Dragonbane (draft)                                                          |
+| dragonbane           | standard   | latest  | PC     |               | The PC PDF for Dragonbane English and Swedish                                                         |
 | forbidden-lands           | standard   | latest  | PC     |               | The PC PDF for Forbidden Lands (draft)  thanks johndoe1972        |
 | a5e           | standard   | latest  | PC     |               | The PC PDF for Level UP (draft)                                                          |
 
