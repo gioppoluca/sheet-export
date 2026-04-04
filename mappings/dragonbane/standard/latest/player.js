@@ -110,7 +110,11 @@ class MappingClass extends baseMapping {
             this.setCalculated(`weapon${i + 1}`, weapon?.name || "");
             console.log(`Weapon ${i + 1} name:`, weapon?.system.grip.label);
             this.setCalculated(`weapon_grip${i + 1}`, game.i18n.localize(weapon?.system?.grip.label) || "");
-            this.setCalculated(`weapon_range${i + 1}`, weapon?.system.range || "");
+            //this.setCalculated(`weapon_range${i + 1}`, weapon?.system.range || "");
+            this.setCalculated(
+                `weapon_range${i + 1}`,
+                String(this.resolveActorFormula(weapon?.system.range) ?? "")
+            );
             this.setCalculated(`weapon_dam${i + 1}`, weapon?.system.damage || "");
             this.setCalculated(`weapon_dur${i + 1}`, weapon?.system.durability || "");
             this.setCalculated(`weapon_feat${i + 1}`, weapon?.system.features || "");
@@ -128,12 +132,15 @@ class MappingClass extends baseMapping {
 
 
         // Map Mementos (Minnessak) - up to 2
+        /*
         let mem = ""
         for (let i = 0; i < 2; i++) {
             if (memento[i]) {
                 mem += memento[i]?.name + ",";
             }
         }
+            */
+        const mem = memento.slice(0, 2).map(m => m.name).join(", ");
         this.setCalculated("memento", mem);
 
         for (let i = 0; i < 15; i++) {
@@ -155,6 +162,21 @@ class MappingClass extends baseMapping {
         this.setCalculated("ar_bane_evade_chk", armor?.system.bane?.includes('Evade') || false);
         this.setCalculated("helm_ar_awa_chk", helm?.system.bane?.includes('Awareness') || false);
         this.setCalculated("helm_ar_rng_chk", helm?.system.bane?.includes('Bows', "Crossbows", "Slings") || false);
+    }
+
+    resolveActorFormula(value) {
+        if (value == null) return "";
+
+        if (typeof value !== "string") return value;
+
+        const trimmed = value.trim();
+
+        if (!trimmed.startsWith("@")) return trimmed;
+
+        const attrKey = trimmed.slice(1).trim();
+        if (!attrKey) return "";
+
+        return this.actor?.system?.attributes?.[attrKey]?.value ?? trimmed;
     }
 }
 export default MappingClass;

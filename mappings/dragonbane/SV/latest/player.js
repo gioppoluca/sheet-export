@@ -22,6 +22,8 @@ class MappingClass extends baseMapping {
         });
 
 
+
+
         // Map Skills - Main combat and general skills
         /*
         const skillMapping = {
@@ -57,11 +59,11 @@ class MappingClass extends baseMapping {
             'Yxa': 'Yxa'
         };
 */
-//        const abilMapping = { "str": "sty", "con": "fys", "agl": "smi", "int": "int", "wil": "psy", "cha": "kar" };
+        //        const abilMapping = { "str": "sty", "con": "fys", "agl": "smi", "int": "int", "wil": "psy", "cha": "kar" };
         const abilMapping = { "str": "str", "con": "con", "agl": "agl", "int": "int", "wil": "wil", "cha": "cha" };
         const skillMapping = {
             "acrobatics": "Hoppa & Klättra",
-            "awareness": "Finna Dolda Ting",
+            "awareness": "Upptäcka fara",
             "bartering": "Köpslå",
             "axes": "Yxa",
             "beast-lore": "Bestiologi",
@@ -73,13 +75,13 @@ class MappingClass extends baseMapping {
             "hunting-and-fishing": "Jakt & Fiske",
             "languages": "Främmande språk",
             "myths-and-legends": "Myter & Legender",
-            "performance": "Upptrada",
+            "performance": "Uppträda", // should have been "Uppträda" but the pdf has a typo, so need to match that
             "persuasion": "Övertala",
             "riding": "Rida",
-            "seamanship": "Sjokunnighet",
+            "seamanship": "Sjökunnighet", // should have been "Sjökunnighet" but the pdf has a typo, so need to match that
             "sleight-of-hand": "Fingerfärdighet",
             "sneaking": "Smyga",
-            "spot-hidden": "Upptäcka fara",
+            "spot-hidden": "Finna Dolda Ting",
             "swimming": "Simma",
             "bows": "Pilbåge",
             "brawling": "Slagsmål",
@@ -146,7 +148,11 @@ class MappingClass extends baseMapping {
             this.setCalculated(`weapon${i + 1}`, weapon?.name || "");
             console.log(`Weapon ${i + 1} name:`, weapon?.system.grip.label);
             this.setCalculated(`weapon_grip${i + 1}`, game.i18n.localize(weapon?.system?.grip.label) || "");
-            this.setCalculated(`weapon_range${i + 1}`, weapon?.system.range || "");
+            //this.setCalculated(`weapon_range${i + 1}`, weapon?.system.range || "");
+            this.setCalculated(
+                `weapon_range${i + 1}`,
+                String(this.resolveActorFormula(weapon?.system.range) ?? "")
+            );
             this.setCalculated(`weapon_dam${i + 1}`, weapon?.system.damage || "");
             this.setCalculated(`weapon_dur${i + 1}`, weapon?.system.durability || "");
             this.setCalculated(`weapon_feat${i + 1}`, weapon?.system.features || "");
@@ -164,13 +170,17 @@ class MappingClass extends baseMapping {
 
 
         // Map Mementos (Minnessak) - up to 2
+        /*
         let mem = ""
         for (let i = 0; i < 2; i++) {
             if (memento[i]) {
                 mem += memento[i]?.name + ",";
             }
         }
+            */
+        const mem = memento.slice(0, 2).map(m => m.name).join(", ");
         this.setCalculated("memento", mem);
+        
 
         for (let i = 0; i < 15; i++) {
             const spell = abspells[i];
@@ -190,9 +200,27 @@ class MappingClass extends baseMapping {
         this.setCalculated("ar_bane_sneak_chk", armor?.system.bane?.includes('Smyga') || false);
         this.setCalculated("ar_bane_evade_chk", armor?.system.bane?.includes('Undvika') || false);
         this.setCalculated("helm_ar_awa_chk", helm?.system.bane?.includes('Finna Dolda Ting') || false);
-        this.setCalculated("helm_ar_rng_chk", helm?.system.bane?.includes('Pilbåge', "Armborst", "Slunga") || false);
+        const helmetBane = helm?.system?.bane || [];
+        this.setCalculated(
+            "helm_ar_rng_chk",
+            ['Pilbåge', 'Armborst', 'Slunga'].some(b => helmetBane.includes(b))
+        );
 
+    }
 
+    resolveActorFormula(value) {
+        if (value == null) return "";
+
+        if (typeof value !== "string") return value;
+
+        const trimmed = value.trim();
+
+        if (!trimmed.startsWith("@")) return trimmed;
+
+        const attrKey = trimmed.slice(1).trim();
+        if (!attrKey) return "";
+
+        return this.actor?.system?.attributes?.[attrKey]?.value ?? trimmed;
     }
 }
 export default MappingClass;
