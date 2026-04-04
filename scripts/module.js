@@ -171,7 +171,7 @@ class SheetExportconfig extends FormApplication {
 
 	/** @override */
 	static get defaultOptions() {
-		return mergeObject(super.defaultOptions, {
+		return foundry.utils.mergeObject(super.defaultOptions, {
 			template: "modules/sheet-export/templates/module.hbs",
 			id: "sheet-export-form",
 			height: (window.innerHeight * 7) / 8,

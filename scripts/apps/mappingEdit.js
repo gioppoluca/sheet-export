@@ -61,7 +61,7 @@ export class MappingEdit extends FormApplication {
     }
 
     static get defaultOptions() {
-        return mergeObject(super.defaultOptions, {
+        return foundry.utils.mergeObject(super.defaultOptions, {
             id: "sheet-export-mappingedit",
             title: 'Edit Mappings',
             template: "./modules/sheet-export/templates/mappingEdit.hbs",

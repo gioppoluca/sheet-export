@@ -91,8 +91,8 @@ class MappingClass extends baseMapping {
         this.setCalculated("kin", this.actor.system.kin.name || "");
         this.setCalculated("age", this.actor.system.age || 0);
         this.setCalculated("profession", this.actor.system.profession.name || "");
-        this.setCalculated("weakness", this.htmlToText(this.actor.system.weakness) || "");
-        this.setCalculated("appearance", this.htmlToText(this.actor.system.appearance) || "");
+        this.setCalculated("weakness", await this.htmlToText(this.actor.system.weakness) || "");
+        this.setCalculated("appearance", await this.htmlToText(this.actor.system.appearance) || "");
 
         this.setCalculated("dam_bon_str", this.actor.system.damageBonus.str.value || "");
         this.setCalculated("dam_bon_agl", this.actor.system.damageBonus.agl.value || "");

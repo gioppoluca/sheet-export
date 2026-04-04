@@ -143,7 +143,7 @@ class MappingClass extends baseMapping {
                 }
                 classFea1 += " ###\n";
                 if (i.system?.description?.value) {
-                    classFea1 += this.htmlToText(i.system.description.value);
+                    classFea1 += await this.htmlToText(i.system.description.value);
                     classFea1 += "\n";
                 }
             } else {
@@ -153,7 +153,7 @@ class MappingClass extends baseMapping {
                 }
                 classFea2 += " ###\n";
                 if (i.system?.description?.value) {
-                    classFea2 += this.htmlToText(i.system.description.value);
+                    classFea2 += await this.htmlToText(i.system.description.value);
                     classFea2 += "\n";
                 }
             }
@@ -171,7 +171,7 @@ class MappingClass extends baseMapping {
             }
             spceTraits += " ###\n";
             if (i.system?.description?.value) {
-                spceTraits += this.htmlToText(i.system.description.value);
+                spceTraits += await this.htmlToText(i.system.description.value);
                 spceTraits += "\n";
             }
         });
@@ -195,7 +195,7 @@ class MappingClass extends baseMapping {
         });
 
         this.setCalculated("SPECIES TRAITS", spceTraits);
-        this.setCalculated("FEATS", this.getFeatsAndTraits());
+        this.setCalculated("FEATS", await this.getFeatsAndTraits());
         this.setCalculated("WEAPON PROF", await this.weapons());
         this.setCalculated("TOOL PROF", await this.traits());
         this.setCalculated("LANGUAGES", await this.languages());
@@ -216,7 +216,7 @@ class MappingClass extends baseMapping {
 
         let prepSpells = this.actor.items.filter(i => i.type === 'spell' && i.system.prepared).sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(spell => ({
             title: spell.name,
-            description: this.htmlToText(spell.system.description?.value || ""),
+            description: await this.htmlToText(spell.system.description?.value || ""),
             range: spell.labels.range,
             casting: spell.labels.activation,
             duration: spell.labels.duration,
@@ -276,9 +276,10 @@ class MappingClass extends baseMapping {
         return `${this.getLocalizedClassAndSubclass(classItem)} ${classItem?.system?.levels}`;
     }
 
-    getFeatsAndTraits() {
+    async getFeatsAndTraits() {
         let featsAndTraits = '';
-        this.actor.items.filter(i => ['feat', 'trait'].includes(i.type)).map(i => i).forEach(i => {
+        const items = this.actor.items.filter(i => ['feat', 'trait'].includes(i.type));
+        for (const i of items) {
             if (i.system?.type?.value === 'class') return; // skip class features
             if (i.system?.type?.value === 'race') return; // skip race features
             featsAndTraits += ("### " + i.name);
@@ -287,10 +288,10 @@ class MappingClass extends baseMapping {
             }
             featsAndTraits += " ###\n";
             if (i.system?.description?.value) {
-                featsAndTraits += this.htmlToText(i.system.description.value);
+                featsAndTraits += await this.htmlToText(i.system.description.value);
                 featsAndTraits += "\n";
             }
-        });
+        }
         return featsAndTraits;
     }
 

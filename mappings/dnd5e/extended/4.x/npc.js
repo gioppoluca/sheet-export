@@ -239,19 +239,20 @@ class MappingClass extends baseMapping {
         return `${this.getLocalizedClassAndSubclass(classItem)} ${classItem.system.levels}`;
     }
 
-    getFeatsAndTraits() {
+    async getFeatsAndTraits() {
         let featsAndTraits = '';
-        this.actor.items.filter(i => ['feat', 'trait'].includes(i.type)).map(i => i).forEach(i => {
+        const items = this.actor.items.filter(i => ['feat', 'trait'].includes(i.type));
+        for (const i of items) {
             featsAndTraits += ("### " + i.name);
             if (i.system?.source?.label) {
                 featsAndTraits += (" (" + i.system.source?.label + ")");
             }
             featsAndTraits += " ###\n";
             if (i.system?.description?.value) {
-                featsAndTraits += this.htmlToText(i.system.description.value);
+                featsAndTraits += await this.htmlToText(i.system.description.value);
                 featsAndTraits += "\n";
             }
-        });
+        }
         return featsAndTraits;
     }
 

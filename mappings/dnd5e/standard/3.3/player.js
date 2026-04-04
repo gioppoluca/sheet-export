@@ -191,7 +191,7 @@ class MappingClass extends baseMapping {
         this.setCalculated("PP", this.actor.system.currency.pp || "");
         
         this.setCalculated("Equipment", this.actor.items.filter(i => ['weapon', 'equipment', 'tool'].includes(i.type)).map(i => (i.system.quantity <= 1) ? i.name : `${i.name} (${i.system.quantity})`).join(', '));
-        this.setCalculated("Features and Traits", this.getFeatsAndTraits());
+        this.setCalculated("Features and Traits", await this.getFeatsAndTraits());
         this.setCalculated("CharacterName 2", this.actor.name || "");
         this.setCalculated("Age", this.actor.flags["tidy5e-sheet"]?.age || "");
         this.setCalculated("Height", this.actor.flags["tidy5e-sheet"]?.height || "");
@@ -446,19 +446,20 @@ class MappingClass extends baseMapping {
         return `${this.getLocalizedClassAndSubclass(classItem)} ${classItem.system.levels}`;
     }
 
-    getFeatsAndTraits() {
+    async getFeatsAndTraits() {
         let featsAndTraits = '';
-        this.actor.items.filter(i => ['feat', 'trait'].includes(i.type)).map(i => i).forEach(i => {
+        const items = this.actor.items.filter(i => ['feat', 'trait'].includes(i.type));
+        for (const i of items) {
             featsAndTraits += ("### " + i.name);
             if (i.system?.source?.label) {
                 featsAndTraits += (" (" + i.system.source?.label + ")");
             }
             featsAndTraits += " ###\n";
             if (i.system?.description?.value) {
-                featsAndTraits += this.htmlToText(i.system.description.value);
+                featsAndTraits += await this.htmlToText(i.system.description.value);
                 featsAndTraits += "\n";
             }
-        });
+        }
         return featsAndTraits;
     }
 

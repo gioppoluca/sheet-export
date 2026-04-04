@@ -4,7 +4,7 @@ import fontkit from '../lib/fontkit.es.js';
 
 export class CustomMapping extends FormApplication {
     static get defaultOptions() {
-        return mergeObject(super.defaultOptions, {
+        return foundry.utils.mergeObject(super.defaultOptions, {
             id: "sheet-export-customMapping",
             title: 'Custom Mappings',
             template: "./modules/sheet-export/templates/customMapping.hbs",

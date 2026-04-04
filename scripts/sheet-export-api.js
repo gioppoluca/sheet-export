@@ -4,21 +4,8 @@ import { systemMapping, systemMappingSheet } from './systemMapping.js';
 
 async function getMapping(mappingChoice, mappingRelease, mappingElement) {
 	console.log("get mapping");
-	/*
-	console.log(`/modules/sheet-export/mappings/${game.system.id}/${mappingChoice}/${mappingRelease}/${mappingElement}.json`);
-	console.log(getRoute(`/modules/sheet-export/mappings/${game.system.id}/${mappingChoice}/${mappingRelease}/${mappingElement}.json`));
-	const mapping = await fetch(getRoute(`/modules/sheet-export/mappings/${game.system.id}/${mappingChoice}/${mappingRelease}/${mappingElement}.json`)).then(response => response.text()
-	);
-	console.log(mapping);
-	try {
-		return JSON.parse(mapping);
-	} catch (err) {
-		console.error('Error parsing JSON:', err);
-		return {};
-	}
-*/
 	//let mappingClass;
-	const { default: mappingClass } = await import(getRoute(`/modules/sheet-export/mappings/${game.system.id}/${mappingChoice}/${mappingRelease}/${mappingElement}.js`));
+	const { default: mappingClass } = await import(foundry.utils.getRoute(`/modules/sheet-export/mappings/${game.system.id}/${mappingChoice}/${mappingRelease}/${mappingElement}.js`));
 	console.log(mappingClass);
 	var mc = new mappingClass(actor, this.sheetType, this.sheet);
 	console.log(mc);
@@ -31,11 +18,10 @@ async function getPdf(pdfUrl, buffer = null) {
 	console.log(pdfUrl);
 	let pdfBytes = null
 	if (buffer == null) {
-		pdfBytes = await fetch(getRoute(pdfUrl)).then((res) => res.arrayBuffer());
+		pdfBytes = await fetch(foundry.utils.getRoute(pdfUrl)).then((res) => res.arrayBuffer());
 	} else {
 		pdfBytes = buffer;
 	}
-	//	const formBytes = await fetch(getRoute(pdfUrl)).then((res) => res.arrayBuffer());
 
 	const pdfDoc = await PDFDocument.load(pdfBytes);
 	return pdfDoc;
@@ -51,7 +37,7 @@ function getSheetTypeFromActor(actor, mappingChoice = "", mappingRelease = "") {
 		console.log("there is a mapping for the actor type");
 		console.log(`/modules/sheet-export/mappings/${game.system.id}/${mappingChoice}/${mappingRelease}/${systemMappingsSheet[game.system.id][actor.type]}.js`);
 		const request = new XMLHttpRequest();
-		request.open("HEAD", getRoute(`/modules/sheet-export/mappings/${game.system.id}/${mappingChoice}/${mappingRelease}/${systemMappingsSheet[game.system.id][actor.type]}.js`), false); // `false` makes the request synchronous
+		request.open("HEAD", foundry.utils.getRoute(`/modules/sheet-export/mappings/${game.system.id}/${mappingChoice}/${mappingRelease}/${systemMappingsSheet[game.system.id][actor.type]}.js`), false); // `false` makes the request synchronous
 		request.send(null);
 		if (request.status === 200) {
 			sheetType = systemMappingsSheet[game.system.id][actor.type];
@@ -76,7 +62,7 @@ function getSheetType(actor, mappingChoice = "", mappingRelease = "") {
 		return;
 	} else if (systemMappings[game.system.id].player.includes(actor.type ?? actor.data.type)) {
 		const request = new XMLHttpRequest();
-		request.open("HEAD", getRoute(`/modules/sheet-export/mappings/${game.system.id}/${mappingChoice}/${mappingRelease}/player.js`), false); // `false` makes the request synchronous
+		request.open("HEAD", foundry.utils.getRoute(`/modules/sheet-export/mappings/${game.system.id}/${mappingChoice}/${mappingRelease}/player.js`), false); // `false` makes the request synchronous
 		request.send(null);
 		if (request.status === 200) {
 			sheetType = "player";
@@ -86,7 +72,7 @@ function getSheetType(actor, mappingChoice = "", mappingRelease = "") {
 		}
 	} else if (systemMappings[game.system.id].npc.includes(actor.type ?? actor.data.type)) {
 		const request = new XMLHttpRequest();
-		request.open("HEAD", getRoute(`/modules/sheet-export/mappings/${game.system.id}/${mappingChoice}/${mappingRelease}/npc.js`), false); // `false` makes the request synchronous
+		request.open("HEAD", foundry.utils.getRoute(`/modules/sheet-export/mappings/${game.system.id}/${mappingChoice}/${mappingRelease}/npc.js`), false); // `false` makes the request synchronous
 		request.send(null);
 		if (request.status === 200) {
 			sheetType = "npc";

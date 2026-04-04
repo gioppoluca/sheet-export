@@ -197,7 +197,7 @@ class MappingClass extends baseMapping {
         this.setCalculated("PP", this.actor.system.currency.pp || "");
 
         this.setCalculated("Equipment", this.actor.items.filter(i => ['weapon', 'equipment', 'tool'].includes(i.type)).map(i => (i.system.quantity <= 1) ? i.name : `${i.name} (${i.system.quantity})`).join(', '));
-        this.setCalculated("Features and Traits", this.getFeatsAndTraits());
+        this.setCalculated("Features and Traits", await this.getFeatsAndTraits());
         this.setCalculated("CharacterName 2", this.actor.name || "");
         this.setCalculated("Age", this.actor.system?.details?.age || "");
         this.setCalculated("Height", this.actor.system?.details?.height || "");
@@ -214,7 +214,7 @@ class MappingClass extends baseMapping {
             return d.textContent || d.innerText || "";
         })(this.actor.system.details.biography.value);
         console.log("Backstory raw:", backstory);
-        this.setCalculated("Backstory", this.htmlToText(backstory));
+        this.setCalculated("Backstory", await this.htmlToText(backstory));
         this.setCalculated("Feat+Traits", this.actor.items.filter(i => ['feat', 'trait'].includes(i.type)).slice(16).map(i => `${i.name}`).join(', '));
         this.setCalculated("Treasure", this.actor.items.filter(i => ['backpack', 'consumable', 'loot'].includes(i.type)).map(i => (i.system.quantity <= 1) ? i.name : `${i.name} (${i.system.quantity})`).join(', '));
         this.setCalculated("Spellcasting Class 2", this.actor.items.filter(i => i.type === 'class').map(i => `${i.name}`).join(' / '));
@@ -451,19 +451,20 @@ class MappingClass extends baseMapping {
         return `${this.getLocalizedClassAndSubclass(classItem)} ${classItem?.system?.levels}`;
     }
 
-    getFeatsAndTraits() {
+    async getFeatsAndTraits() {
         let featsAndTraits = '';
-        this.actor.items.filter(i => ['feat', 'trait'].includes(i.type)).map(i => i).forEach(i => {
+        const items = this.actor.items.filter(i => ['feat', 'trait'].includes(i.type));
+        for (const i of items) {
             featsAndTraits += ("### " + i.name);
             if (i.system?.source?.label) {
                 featsAndTraits += (" (" + i.system.source?.label + ")");
             }
             featsAndTraits += " ###\n";
             if (i.system?.description?.value) {
-                featsAndTraits += this.htmlToText(i.system.description.value);
+                featsAndTraits += await this.htmlToText(i.system.description.value);
                 featsAndTraits += "\n";
             }
-        });
+        }
         return featsAndTraits;
     }
 
@@ -500,7 +501,7 @@ class MappingClass extends baseMapping {
         }));
         if (a?.length > 0) { s = `${s}Tools: ${a.join(', ')} \n`; }
         let traitLang = Array.from(this.actor.system.traits.languages.value);
-        let confLang = Object.keys(flattenObject(game.dnd5e.config.languages))
+        let confLang = Object.keys(foundry.utils.flattenObject(game.dnd5e.config.languages))
         let actorLang = [];
         confLang.forEach(function myfunc(element) {
             //       console.log(this);

@@ -171,8 +171,10 @@ class baseMapping {
         return theItem ? game.i18n.localize(theItem?.name) : '';
     }
 
-    htmlToText(html) {
-        return !html ? '' : html.replaceAll("\n", "")
+    async htmlToText(html) {
+        let htmlCopy = await foundry.applications.ux.TextEditor.enrichHTML(html);
+        return !html ? '' : htmlCopy.replaceAll(/<section[^>]*class="[^"]*secret[^"]*"[^>]*>.*?<\/section>/gms, "")
+            .replaceAll("\n", "")
             .replaceAll(/<h1[>\s]([^<]*)<\/h1>/gms, "# $1\n")
             .replaceAll(/<h2[>\s]([^<]*)<\/h2>/gms, "## $1\n")
             .replaceAll(/<h3[>\s]([^<]*)<\/h3>/gms, "### $1\n")
@@ -418,7 +420,7 @@ class baseMapping {
      * @returns {Promise<void>}
      */
     async addCardPages(pdfDoc) {
-        const sections = this.getCardSections?.();
+        const sections = await this.getCardSections?.();
         if (Array.isArray(sections) && sections.length) {
             for (const section of sections) {
                 const { layoutConfig, cardTemplate, cardDataArray } = section;

@@ -196,7 +196,7 @@ class MappingClass extends baseMapping {
         this.setCalculated("PP", this.actor.system.currency.pp || "");
 
         this.setCalculated("Equipment", this.actor.items.filter(i => ['weapon', 'equipment', 'tool'].includes(i.type)).map(i => (i.system.quantity <= 1) ? i.name : `${i.name} (${i.system.quantity})`).join(', '));
-        this.setCalculated("Features and Traits", this.getFeatsAndTraits());
+        this.setCalculated("Features and Traits", await this.getFeatsAndTraits());
         this.setCalculated("CharacterName 2", this.actor.name || "");
         this.setCalculated("Age", this.actor.system?.details?.age || "");
         this.setCalculated("Height", this.actor.system?.details?.height || "");
@@ -491,19 +491,20 @@ class MappingClass extends baseMapping {
         return `${this.getLocalizedClassAndSubclass(classItem)} ${classItem?.system?.levels}`;
     }
 
-    getFeatsAndTraits() {
+    async getFeatsAndTraits() {
         let featsAndTraits = '';
-        this.actor.items.filter(i => ['feat', 'trait'].includes(i.type)).map(i => i).forEach(i => {
+        const items = this.actor.items.filter(i => ['feat', 'trait'].includes(i.type));
+        for (const i of items) {
             featsAndTraits += ("### " + i.name);
             if (i.system?.source?.label) {
                 featsAndTraits += (" (" + i.system.source?.label + ")");
             }
             featsAndTraits += " ###\n";
             if (i.system?.description?.value) {
-                featsAndTraits += this.htmlToText(i.system.description.value);
+                featsAndTraits += await this.htmlToText(i.system.description.value);
                 featsAndTraits += "\n";
             }
-        });
+        }
         return featsAndTraits;
     }
 
@@ -730,12 +731,12 @@ class MappingClass extends baseMapping {
     }
 
 
-    getCardDataArray() {
+    async getCardDataArray() {
         const spells = this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) })
         console.log(spells)
-        return spells.map(spell => ({
+        return Promise.all(spells.map(async spell => ({
             title: spell.name,
-            description: this.htmlToText(spell.system.description?.value || ""),
+            description: await this.htmlToText(spell.system.description?.value || ""),
             range: spell.labels.range,
             casting: spell.labels.activation,
             duration: spell.labels.duration,
@@ -746,7 +747,7 @@ class MappingClass extends baseMapping {
             level: spell.system.level,
             concentration: spell.system.properties.has("concentration"),
             school: spell.labels.school // must match image key in layoutConfig
-        }));
+        })));
     }
 
     getCardItemLayoutConfig() {
@@ -812,14 +813,14 @@ class MappingClass extends baseMapping {
         });
     }
 
-    getCardItemDataArray() {
+    async getCardItemDataArray() {
         //const spells = this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) })
         const items = this.actor.items.filter(i => ['weapon', 'equipment', 'tool', 'consumable', 'loot', 'backpack'].includes(i.type));
         console.log(items)
-        return items.map(item => ({
+        return Promise.all(items.map(async item => ({
             title: item.name,
-            description: this.htmlToText(item.system.description?.value || ""),
-        }));
+            description: await this.htmlToText(item.system.description?.value || ""),
+        })));
     }
 
 
@@ -886,34 +887,34 @@ class MappingClass extends baseMapping {
         });
     }
 
-    getCardFeatDataArray() {
+    async getCardFeatDataArray() {
         //const spells = this.actor.items.filter(i => i.type === 'spell').sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) })
         //const items = this.actor.items.filter(i => ['weapon', 'equipment', 'tool', 'consumable', 'loot', 'backpack'].includes(i.type));
         const feats = this.actor.items.filter(i => ['feat', 'trait'].includes(i.type))
         console.log(feats)
-        return feats.map(feat => ({
+        return Promise.all(feats.map(async feat => ({
             title: feat.name,
-            description: this.htmlToText(feat.system.description?.value || ""),
-        }));
+            description: await this.htmlToText(feat.system.description?.value || ""),
+        })));
     }
 
 
-    getCardSections() {
+    async getCardSections() {
         return [
             {
                 layoutConfig: this.getCardFeatLayoutConfig(),
                 cardTemplate: this.getCardFeatTemplate(),
-                cardDataArray: this.getCardFeatDataArray()
+                cardDataArray: await this.getCardFeatDataArray()
             },
             {
                 layoutConfig: this.getCardItemLayoutConfig(),
                 cardTemplate: this.getCardItemTemplate(),
-                cardDataArray: this.getCardItemDataArray()
+                cardDataArray: await this.getCardItemDataArray()
             },
             {
                 layoutConfig: this.getCardLayoutConfig(),
                 cardTemplate: this.getCardTemplate(),
-                cardDataArray: this.getCardDataArray()   // e.g., player spells
+                cardDataArray: await this.getCardDataArray()   // e.g., player spells
             }
         ];
     }

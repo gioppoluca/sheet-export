@@ -2,6 +2,256 @@ import baseMapping from "../../../../scripts/baseMapping.js";
 
 class MappingClass extends baseMapping {
 
+    authors = [
+        {
+            name: 'gioppoluca',
+            url: 'https://github.com/gioppoluca',
+            github: 'https://github.com/gioppoluca',
+        },
+    ];
+
+    // override createMappings method from base class
+    async createMappings() {
+        super.createMappings();
+
+        // Set the PDF files to use - MIND that the order of the files is important!
+        this.pdfFiles.push({
+            pdfUrl: '/modules/sheet-export/mappings/shadowrun6-eden/SR6-Character-Sheet-Fillable.pdf',
+            nameDownload: `${this.actor.name ?? "character"}.pdf`,
+            name: "SR6-Character-Sheet-Fillable.pdf",
+        });
+
+        // ── Identity ──────────────────────────────────────────────────────────
+        this.setCalculated("CHARACTER", this.actor.name);
+        this.setCalculated("CHARACTER_2", this.actor.name);
+        this.setCalculated("Name/Primary Alias", this.actor.name);
+        this.setCalculated("Metatype", this.actor.system.metatype || "");
+        this.setCalculated("Sex", this.actor.system.gender || "");
+        this.setCalculated("Reputation", this.actor.system.reputation || 0);
+        this.setCalculated("Heat", this.actor.system.heat || 0);
+        this.setCalculated("Karma", this.actor.system.karma || 0);
+        this.setCalculated("Total Karma", this.actor.system.karma_total || 0);
+        this.setCalculated("Nuyen", this.actor.system.nuyen || 0);
+        this.setCalculated("Notes", this.actor.system.notes || "");
+        this.setCalculated("NOTES", this.actor.system.notes || "");
+        this.setCalculated("NOTES_2", this.actor.system.notes || "");
+
+        // ── Core Attributes ───────────────────────────────────────────────────
+        // Use .pool which already includes base + mod + augment
+        this.setCalculated("Body", this.actor.system.attributes.bod.pool);
+        this.setCalculated("Agility", this.actor.system.attributes.agi.pool);
+        this.setCalculated("Reaction", this.actor.system.attributes.rea.pool);
+        this.setCalculated("Strength", this.actor.system.attributes.str.pool);
+        this.setCalculated("Willpower", this.actor.system.attributes.wil.pool);
+        this.setCalculated("Logic", this.actor.system.attributes.log.pool);
+        this.setCalculated("Intuition", this.actor.system.attributes.int.pool);
+        this.setCalculated("Charisma", this.actor.system.attributes.cha.pool);
+        this.setCalculated("Essence", this.actor.system.attributes.essence.pool);
+        this.setCalculated("Edge", this.actor.system.attributes.edg.max);
+
+        // Magic or Resonance — only one will be non-zero
+        this.setCalculated("MagicResonance",
+            this.actor.system.attributes.mag.pool > 0
+                ? this.actor.system.attributes.mag.pool
+                : this.actor.system.attributes.res.pool > 0
+                    ? this.actor.system.attributes.res.pool
+                    : "");
+
+        // ── Derived Stats ─────────────────────────────────────────────────────
+        // Composure = Willpower + Charisma
+        this.setCalculated("Composure",
+            this.actor.system.attributes.wil.pool +
+            this.actor.system.attributes.cha.pool +
+            (this.actor.system.derived.composure.mod || 0));
+
+        // Judge Intentions = Intuition + Charisma
+        this.setCalculated("Judge Intentions",
+            this.actor.system.attributes.int.pool +
+            this.actor.system.attributes.cha.pool +
+            (this.actor.system.derived.judge_intentions.mod || 0));
+
+        // Memory = Logic + Willpower
+        this.setCalculated("Memory",
+            this.actor.system.attributes.log.pool +
+            this.actor.system.attributes.wil.pool +
+            (this.actor.system.derived.memory.mod || 0));
+
+        // Lift/Carry = Body + Strength
+        this.setCalculated("LiftCarry",
+            this.actor.system.attributes.bod.pool +
+            this.actor.system.attributes.str.pool +
+            (this.actor.system.derived.lift_carry.mod || 0));
+
+        // Movement
+        this.setCalculated("Movement",
+            `${this.actor.system.walk}m / +${this.actor.system.sprint}m (+${this.actor.system.perHit}m/hit)`);
+
+        // ── Initiative ────────────────────────────────────────────────────────
+        const physIniBase = this.actor.system.attributes.rea.pool +
+            this.actor.system.attributes.int.pool +
+            (this.actor.system.initiative.physical.mod || 0);
+        const physIniDice = 1 + (this.actor.system.initiative.physical.diceMod || 0);
+        this.setCalculated("Initiative", `${physIniBase} + ${physIniDice}d6`);
+
+        const matIniBase = this.actor.system.attributes.int.pool +
+            (this.actor.system.initiative.matrix.mod || 0);
+        const matIniDice = (this.actor.system.initiative.matrix.dice || 1) +
+            (this.actor.system.initiative.matrix.diceMod || 0);
+        this.setCalculated("Matrix Initiative", `${matIniBase} + ${matIniDice}d6`);
+
+        const astIniBase = (this.actor.system.attributes.int.pool * 2) +
+            (this.actor.system.initiative.astral.mod || 0);
+        const astIniDice = (this.actor.system.initiative.astral.dice || 2) +
+            (this.actor.system.initiative.astral.diceMod || 0);
+        this.setCalculated("Astral Initiative", `${astIniBase} + ${astIniDice}d6`);
+
+        // ── Monitor tracks ────────────────────────────────────────────────────
+        this.setCalculated("Physical Limit", this.actor.system.physical.max);
+        this.setCalculated("Stun Limit", this.actor.system.stun.max);
+
+        // ── Defense Rating ────────────────────────────────────────────────────
+        this.setCalculated("Defense Rating",
+            this.actor.system.defenserating.physical.mod || 0);
+
+        // ── Matrix / Persona (device-based) ──────────────────────────────────
+        this.setCalculated("Attack", this.actor.system.persona.device.mod.a || "");
+        this.setCalculated("Sleaze", this.actor.system.persona.device.mod.s || "");
+        this.setCalculated("Data Proc", this.actor.system.persona.device.mod.d || "");
+        this.setCalculated("Firewall", this.actor.system.persona.device.mod.f || "");
+
+        // ── Skills ────────────────────────────────────────────────────────────
+        const skillLabels = {
+            astral: "Astral",
+            athletics: "Athletics",
+            biotech: "Biotech",
+            close_combat: "Close Combat",
+            con: "Con",
+            conjuring: "Conjuring",
+            cracking: "Cracking",
+            electronics: "Electronics",
+            enchanting: "Enchanting",
+            engineering: "Engineering",
+            exotic_weapons: "Exotic Weapons",
+            firearms: "Firearms",
+            influence: "Influence",
+            outdoors: "Outdoors",
+            perception: "Perception",
+            piloting: "Piloting",
+            sorcery: "Sorcery",
+            stealth: "Stealth",
+            tasking: "Tasking",
+        };
+
+        const skillLines = Object.entries(this.actor.system.skills)
+            .filter(([, sk]) => sk.points > 0)
+            .map(([key, sk]) => {
+                let line = `${skillLabels[key] ?? key} ${sk.points}`;
+                if (sk.specialization) line += ` [${sk.specialization}]`;
+                if (sk.expertise) line += ` (${sk.expertise})`;
+                return line;
+            });
+        this.setCalculated("Skills", skillLines.join("\n") || "");
+
+        // ── Gear items ────────────────────────────────────────────────────────
+        const gearItems = this.actor.items.filter(i => i.type === "gear");
+
+        // Melee weapons
+        const meleeWeapon = gearItems.find(i => i.system.type === "WEAPON_CLOSE_COMBAT");
+        this.setCalculated("Primary Melee Weapon",
+            meleeWeapon ? this.formatWeapon(meleeWeapon) : "");
+        this.setCalculated("Unarmed",
+            meleeWeapon
+                ? `${meleeWeapon.system.dmg}${meleeWeapon.system.stun ? "S" : "P"}`
+                : "");
+        const allMelee = gearItems.filter(i => i.system.type === "WEAPON_CLOSE_COMBAT");
+        this.setCalculated("Melee Weapons",
+            allMelee.map(w => this.formatWeapon(w)).join("\n") || "");
+
+        // Ranged weapons
+        const rangedTypes = ["WEAPON_PISTOLS", "WEAPON_AUTOMATICS", "WEAPON_LONGARMS",
+            "WEAPON_HEAVY_WEAPONS", "WEAPON_THROWN", "WEAPON_TASERS"];
+        const rangedWeapon = gearItems.find(i => rangedTypes.includes(i.system.type));
+        this.setCalculated("Primary Ranged Weapon",
+            rangedWeapon ? this.formatWeapon(rangedWeapon) : "");
+        const allRanged = gearItems.filter(i => rangedTypes.includes(i.system.type));
+        this.setCalculated("Ranged Weapons",
+            allRanged.map(w => this.formatWeapon(w)).join("\n") || "");
+
+        // Armor
+        const armor = gearItems.filter(i => i.system.type === "ARMOR");
+        this.setCalculated("Primary Armor",
+            armor.length ? (armor[0].system.customName || armor[0].name) : "");
+        this.setCalculated("Rating",
+            armor.length ? (armor[0].system.rating || "") : "");
+
+        // Augmentations
+        const augTypes = ["CYBERWARE", "BIOWARE", "NANOWARE", "GENETECH"];
+        const augs = gearItems.filter(i => augTypes.includes(i.system.type));
+        this.setCalculated("Augmentations",
+            augs.map(i => i.system.customName || i.name).join("\n") || "");
+
+        // Programs (matrix)
+        const programs = gearItems.filter(i => i.system.type === "PROGRAM");
+        this.setCalculated("Programs 1", programs[0] ? programs[0].name : "");
+        this.setCalculated("Programs 2", programs[1] ? programs[1].name : "");
+        this.setCalculated("Programs 3", programs[2] ? programs[2].name : "");
+        this.setCalculated("Programs 4", programs[3] ? programs[3].name : "");
+
+        // General Gear (everything else)
+        const miscGear = gearItems.filter(i =>
+            !["WEAPON_CLOSE_COMBAT", ...rangedTypes, "ARMOR", ...augTypes, "PROGRAM"]
+                .includes(i.system.type));
+        this.setCalculated("Gear",
+            miscGear.map(i => i.system.customName || i.name).join("\n") || "");
+
+        // ── Magic / Resonance items ───────────────────────────────────────────
+        const spellItems = this.actor.items.filter(i =>
+            ["spell", "ritual", "preparation", "complexform"].includes(i.type));
+        this.setCalculated("Spells/Preparations/Rituals/Complex Forms",
+            spellItems.map(i => i.name).join("\n") || "");
+
+        const powers = this.actor.items.filter(i => i.type === "adeptpower");
+        this.setCalculated("Adept Powers or Other Abilities",
+            powers.map(i => i.name).join("\n") || "");
+
+        // ── Qualities & Contacts ──────────────────────────────────────────────
+        const qualities = this.actor.items.filter(i => i.type === "quality");
+        this.setCalculated("Qualities",
+            qualities.map(i => i.name).join("\n") || "");
+
+        const contacts = this.actor.items.filter(i => i.type === "contact");
+        this.setCalculated("Contacts",
+            contacts.map(i => i.name).join("\n") || "");
+
+        // ── Tradition ─────────────────────────────────────────────────────────
+        this.setCalculated("Misc",
+            this.actor.system.tradition?.name
+                ? `Tradition: ${this.actor.system.tradition.name}`
+                : "");
+    }
+
+    // ── Helpers ───────────────────────────────────────────────────────────────
+
+    formatWeapon(item) {
+        const s = item.system;
+        const displayName = s.customName || item.name;
+        const dmg = `${s.dmg}${s.stun ? "S" : "P"}`;
+        const ar = (s.attackRating || []).join("/");
+        const modes = Object.entries(s.modes || {})
+            .filter(([, v]) => v).map(([k]) => k).join("/");
+        let line = `${displayName}  DMG: ${dmg}`;
+        if (ar && ar !== "0/0/0/0/0") line += `  AR: ${ar}`;
+        if (modes) line += `  ${modes}`;
+        return line;
+    }
+}
+
+export default MappingClass;
+/*
+import baseMapping from "../../../../scripts/baseMapping.js";
+
+class MappingClass extends baseMapping {
+
 
     authors = [
         {
@@ -44,9 +294,9 @@ class MappingClass extends baseMapping {
         this.setCalculated("Defense Rating", this.actor.SOMETHING);
         this.setCalculated("Fake IDs  Related Lifestyles  Funds  Licenses 2", this.actor.SOMETHING);
         this.setCalculated("Fake IDs  Related Lifestyles  Funds  Licenses 3", this.actor.SOMETHING);
-        */
+        
         this.setCalculated("CHARACTER", this.actor.name);
-        /*
+        
         this.setCalculated("PLAYER", this.actor.SOMETHING);
         this.setCalculated("NOTES", this.actor.SOMETHING);
         this.setCalculated("CHARACTER_2", this.actor.SOMETHING);
@@ -144,7 +394,7 @@ class MappingClass extends baseMapping {
         this.setCalculated("Acceleration.0.0", this.actor.SOMETHING);
         this.setCalculated("Speed Interval", this.actor.SOMETHING);
         this.setCalculated("Top Speed", this.actor.SOMETHING);
-        */
+        
         this.setCalculated("Body", this.actor.system.attributes.bod.base);
         /*
         this.setCalculated("Armor", this.actor.SOMETHING);
@@ -153,8 +403,9 @@ class MappingClass extends baseMapping {
         this.setCalculated("Seats", this.actor.SOMETHING);
         this.setCalculated("Vehicle", this.actor.SOMETHING);
         this.setCalculated("Handling", this.actor.SOMETHING);
-*/
+
     }
 }
 
 export default MappingClass;
+*/

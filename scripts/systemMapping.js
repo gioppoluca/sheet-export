@@ -29,6 +29,9 @@ const systemMapping = function () {
         "vtm5e":{
             "player": "vampire"
         },
+        "wod5e":{
+            "player": "vampire"
+        },
         "dragonbane":{
             "player": "character"
         },
@@ -80,6 +83,10 @@ const systemMappingSheet = function () {
             "character": "player"
         },
         "vtm5e":{
+            "vampire": "vampire",
+            "werewolf": "werewolf"
+        },
+        "wod5e":{
             "vampire": "vampire",
             "werewolf": "werewolf"
         },

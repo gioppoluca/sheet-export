@@ -240,7 +240,7 @@ class MappingClass extends baseMapping {
         this.setCalculated("Eyes", sys.details.eyeColor ?? "");
         this.setCalculated("Skin", sys.details.skinColor ?? "");
         this.setCalculated("Hair", sys.details.hairColor ?? "");
-        this.setCalculated("Character Backstory", this.htmlToText(sys.details.bio ?? ""));
+        this.setCalculated("Character Backstory", await this.htmlToText(sys.details.bio ?? ""));
         /*
         this.setCalculated("Character Appearance_af_image", this.actor.SOMETHING + "Character Appearance_af_image");
         this.setCalculated("Name 1", this.actor.SOMETHING + "Name 1");
