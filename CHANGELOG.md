@@ -1,4 +1,10 @@
 
+## [0.14.0] - 2026-04-04
+### :sparkles: New Features
+- [`780ba08`](https://github.com/gioppoluca/sheet-export/commit/780ba082e5484110eb72f59f0e96217fc84aa120) - V14 compatibility, fix for WoD5e closes [#54](https://github.com/gioppoluca/sheet-export/pull/54), cleanup *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+- [`5acf8ba`](https://github.com/gioppoluca/sheet-export/commit/5acf8baf8cef9884b0159206fd8fd5c4f106ec22) - V14 compatibility *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+
 ## [0.13.20] - 2026-02-15
 ### :sparkles: New Features
 - [`4de3628`](https://github.com/gioppoluca/sheet-export/commit/4de36289890460c6eb076a5be8da465efff8b239) - dragonbane now complete *(commit by [@gioppoluca](https://github.com/gioppoluca))*
@@ -381,3 +387,4 @@
 [0.13.18]: https://github.com/gioppoluca/sheet-export/compare/0.13.17...0.13.18
 [0.13.19]: https://github.com/gioppoluca/sheet-export/compare/0.13.18...0.13.19
 [0.13.20]: https://github.com/gioppoluca/sheet-export/compare/0.13.19...0.13.20
+[0.14.0]: https://github.com/gioppoluca/sheet-export/compare/0.13.20...0.14.0
