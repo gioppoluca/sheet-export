@@ -12,7 +12,7 @@ class MappingClass extends baseMapping {
     ];
     // override createMappings method from base class
     async createMappings() {
-        super.createMappings();
+        await super.createMappings();
 
         // Set the PDF files to use - MIND that the order of the files is important!
         this.pdfFiles.push({
@@ -135,46 +135,60 @@ class MappingClass extends baseMapping {
         let classFea1 = '';
         let classFea2 = '';
         let clidx = 0;
-        this.actor.items.filter(i => i.type === 'feat' && i.system?.type?.value === 'class').sort().forEach(i => {
-            if (clidx < 6) {
-                classFea1 += ("### " + i.name);
-                if (i.system?.source?.label) {
-                    classFea1 += (" (" + i.system.source?.label + ")");
-                }
-                classFea1 += " ###\n";
-                if (i.system?.description?.value) {
-                    classFea1 += await this.htmlToText(i.system.description.value);
-                    classFea1 += "\n";
-                }
-            } else {
-                classFea2 += ("### " + i.name);
-                if (i.system?.source?.label) {
-                    classFea2 += (" (" + i.system.source?.label + ")");
-                }
-                classFea2 += " ###\n";
-                if (i.system?.description?.value) {
-                    classFea2 += await this.htmlToText(i.system.description.value);
-                    classFea2 += "\n";
-                }
+
+        const classFeatures = this.actor.items
+            .filter(i => i.type === 'feat' && i.system?.type?.value === 'class')
+            .sort((a, b) => a.name.localeCompare(b.name));
+
+        for (const i of classFeatures) {
+            let text = `### ${i.name}`;
+
+            if (i.system?.source?.label) {
+                text += ` (${i.system.source.label})`;
             }
+
+            text += ` ###\n`;
+
+            if (i.system?.description?.value) {
+                text += await this.htmlToText(i.system.description.value);
+                text += "\n";
+            }
+
+            if (clidx < 6) {
+                classFea1 += text;
+            } else {
+                classFea2 += text;
+            }
+
             clidx++;
-        });
+        }
+
 
         this.setCalculated("CLASS FEATURES 1", classFea1);
         this.setCalculated("CLASS FEATURES 2", classFea2);
 
         let spceTraits = '';
-        let speciesT = this.actor.items.filter(i => i.type === 'feat' && i.system?.type?.value === 'race').sort().forEach(i => {
-            spceTraits += ("### " + i.name);
+
+        const speciesTraits = this.actor.items
+            .filter(i => i.type === 'feat' && i.system?.type?.value === 'race')
+            .sort((a, b) => a.name.localeCompare(b.name));
+
+        for (const i of speciesTraits) {
+            spceTraits += `### ${i.name}`;
+
             if (i.system?.source?.label) {
-                spceTraits += (" (" + i.system.source?.label + ")");
+                spceTraits += ` (${i.system.source.label})`;
             }
+
             spceTraits += " ###\n";
+
             if (i.system?.description?.value) {
                 spceTraits += await this.htmlToText(i.system.description.value);
                 spceTraits += "\n";
             }
-        });
+        }
+
+        this.setCalculated("SPECIES TRAITS", spceTraits);
 
         let armourProf = Array.from(this.actor.system.traits.armorProf.value)
         armourProf.forEach(x => {
@@ -194,7 +208,6 @@ class MappingClass extends baseMapping {
             }
         });
 
-        this.setCalculated("SPECIES TRAITS", spceTraits);
         this.setCalculated("FEATS", await this.getFeatsAndTraits());
         this.setCalculated("WEAPON PROF", await this.weapons());
         this.setCalculated("TOOL PROF", await this.traits());
@@ -214,20 +227,25 @@ class MappingClass extends baseMapping {
         this.setCalculated("SPELLCASTING MOD", (function (actor) { const ability = actor.system.attributes.spellcasting; return ability ? actor.system.abilities[ability].mod : ""; })(this.actor));
 
 
-        let prepSpells = this.actor.items.filter(i => i.type === 'spell' && i.system.prepared).sort((a, b) => { return (a.system.level - b.system.level || a.name.localeCompare(b.name)) }).map(spell => ({
-            title: spell.name,
-            description: await this.htmlToText(spell.system.description?.value || ""),
-            range: spell.labels.range,
-            casting: spell.labels.activation,
-            duration: spell.labels.duration,
-            verbal: spell.system.properties.has("verbal"),
-            somatic: spell.system.properties.has("somatic"),
-            material: spell.system.properties.has("mgc"),
-            ritual: spell.system.ritual === true,
-            level: spell.system.level,
-            concentration: spell.system.properties.has("concentration"),
-            school: spell.labels.school // must match image key in layoutConfig
-        }));
+        let prepSpells = await Promise.all(
+            this.actor.items
+                .filter(i => i.type === 'spell' && i.system.prepared)
+                .sort((a, b) => a.system.level - b.system.level || a.name.localeCompare(b.name))
+                .map(async spell => ({
+                    title: spell.name,
+                    description: await this.htmlToText(spell.system.description?.value || ""),
+                    range: spell.labels.range,
+                    casting: spell.labels.activation,
+                    duration: spell.labels.duration,
+                    verbal: spell.system.properties.has("verbal"),
+                    somatic: spell.system.properties.has("somatic"),
+                    material: spell.system.properties.has("mgc"),
+                    ritual: spell.system.ritual === true,
+                    level: spell.system.level,
+                    concentration: spell.system.properties.has("concentration"),
+                    school: spell.labels.school
+                }))
+        );
 
         for (let i = 0; i < prepSpells.length && i < 30; i++) {
             const spell = prepSpells[i];
@@ -279,19 +297,25 @@ class MappingClass extends baseMapping {
     async getFeatsAndTraits() {
         let featsAndTraits = '';
         const items = this.actor.items.filter(i => ['feat', 'trait'].includes(i.type));
+
         for (const i of items) {
-            if (i.system?.type?.value === 'class') return; // skip class features
-            if (i.system?.type?.value === 'race') return; // skip race features
-            featsAndTraits += ("### " + i.name);
+            if (i.system?.type?.value === 'class') continue;
+            if (i.system?.type?.value === 'race') continue;
+
+            featsAndTraits += `### ${i.name}`;
+
             if (i.system?.source?.label) {
-                featsAndTraits += (" (" + i.system.source?.label + ")");
+                featsAndTraits += ` (${i.system.source.label})`;
             }
+
             featsAndTraits += " ###\n";
+
             if (i.system?.description?.value) {
                 featsAndTraits += await this.htmlToText(i.system.description.value);
                 featsAndTraits += "\n";
             }
         }
+
         return featsAndTraits;
     }
 
@@ -328,7 +352,7 @@ class MappingClass extends baseMapping {
         }));
         if (a?.length > 0) { s = `${s}Tools: ${a.join(', ')} \n`; }
         let traitLang = Array.from(this.actor.system.traits.languages.value);
-        let confLang = Object.keys(flattenObject(game.dnd5e.config.languages))
+        let confLang = Object.keys(foundry.utils.flattenObject(game.dnd5e.config.languages))
         let actorLang = [];
         confLang.forEach(function myfunc(element) {
             //       console.log(this);
@@ -357,7 +381,7 @@ class MappingClass extends baseMapping {
     async languages() {
         let s = "";
         let traitLang = Array.from(this.actor.system.traits.languages.value);
-        let confLang = Object.keys(flattenObject(game.dnd5e.config.languages))
+        let confLang = Object.keys(foundry.utils.flattenObject(game.dnd5e.config.languages))
         let actorLang = [];
         confLang.forEach(function myfunc(element) {
             if (traitLang.some(function (v) { return element.indexOf(v) >= 0; })) {

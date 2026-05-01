@@ -15,6 +15,7 @@ class MappingClass extends baseMapping {
 
     // override createMappings method from base class
     async createMappings() {
+        await super.createMappings();
         this.systemName = "dnd5e";
         // Set the PDF files to use - MIND that the order of the files is important!
         this.pdfFiles.push({
