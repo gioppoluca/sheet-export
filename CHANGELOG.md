@@ -1,4 +1,9 @@
 
+## [0.14.2] - 2026-05-01
+### :bug: Bug Fixes
+- [`d73dde5`](https://github.com/gioppoluca/sheet-export/commit/d73dde5706c0bdd20379d62f894113081bab06c4) - error in 2024 dnd 5e export *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+
 ## [0.14.1] - 2026-04-04
 ### :bug: Bug Fixes
 - [`3cf2614`](https://github.com/gioppoluca/sheet-export/commit/3cf2614ffa2a6ea631139f07cacf9ff6a530db6d) - small fixes on dragonbane, should close [#53](https://github.com/gioppoluca/sheet-export/pull/53) *(commit by [@gioppoluca](https://github.com/gioppoluca))*
@@ -394,3 +399,4 @@
 [0.13.20]: https://github.com/gioppoluca/sheet-export/compare/0.13.19...0.13.20
 [0.14.0]: https://github.com/gioppoluca/sheet-export/compare/0.13.20...0.14.0
 [0.14.1]: https://github.com/gioppoluca/sheet-export/compare/0.14.0...0.14.1
+[0.14.2]: https://github.com/gioppoluca/sheet-export/compare/0.14.1...0.14.2
