@@ -500,7 +500,15 @@ class SheetExportconfig extends FormApplication {
 							console.log("PDFButton");
 							break;
 						case "PDFRadioGroup":
-							console.log("PDFRadioGroup");
+							input.setAttribute("type", "text");
+							input.value = fieldMapping ? fieldMapping.calculated : "";
+							if (fieldMapping && fieldMapping.calculated) {
+								try {
+									field.select(String(fieldMapping.calculated));
+								} catch (e) {
+									console.warn(`Sheet Export | radio "${name}": ${e.message}`);
+								}
+							}
 							break;
 
 						default:

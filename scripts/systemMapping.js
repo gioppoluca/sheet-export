@@ -50,6 +50,9 @@ const systemMapping = function () {
 		"a5e":{
 			"player": "character"
 		},
+		"daggerheart":{
+			"player": "character"
+		},
 
     }
 }
@@ -109,6 +112,9 @@ const systemMappingSheet = function () {
 			"Player": "player",
 		},
 		"a5e":{
+			"character": "player",
+		},
+		"daggerheart":{
 			"character": "player",
 		},
 
