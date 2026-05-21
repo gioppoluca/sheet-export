@@ -30,7 +30,7 @@ class MappingClass extends baseMapping {
         this.setCalculated("Background", bkground);
         this.setCalculated("Class", this.getClassLevel());
         this.setCalculated("Species", this.actor.system.details.race);
-        this.setCalculated("Subclass", (function (actor) { const mainClass = actor.items.filter(i => i.type === 'class')[0]; const sc = mainClass?.system?.subclass; return sc ? game.i18n.localize(sc) : ""; })(this.actor));
+        this.setCalculated("Subclass", this.getSubClass());
         this.setCalculated("Level", (function (actor) { return actor.items.filter(i => i.type === 'class').reduce((acc, i) => acc + (i.system?.levels ?? 0), 0); })(this.actor));
         this.setCalculated("SIZE", game.dnd5e.config.actorSizes[this.actor.system.traits.size].label);
         this.setCalculated("PROF BONUS", this.actor.system.attributes.prof);
@@ -279,6 +279,16 @@ class MappingClass extends baseMapping {
             arrClass.push(this.getLocalizedClassAndSubclassAndLevel(i))
         });
         return arrClass.join(", ")
+    }
+
+    getSubClass() {
+        const allClasses = this.actor.items.filter(i => i.type === 'class').map(i => i);
+        let arrSubClass = []
+        allClasses.forEach(i => {
+            const sc = i?.subclass?.name;
+            arrSubClass.push(sc ? game.i18n.localize(sc) : "")
+        });
+        return arrSubClass.join(", ")
     }
 
     getLocalizedClassAndSubclass(classItem) {
