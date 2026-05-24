@@ -21,7 +21,7 @@ At the moment the module manages:
 |                 | BR         | latest  | PC     |                                       | The Brazilian version of the classical PC PDF from WotC for the PC for latest release |
 | pf1             | standard   | latest  | PC     |                                       | The remastered PC PDF for Pathfinder 1° Edition                                      |
 | pfe2            | standard | latest  | PC     | [bushvin](https://github.com/bushvin) Original work | The remastered PC PDF for Pathfinder 2° Edition                                      |
-| CoC7            | standard   | latest  | PC     |                                       | The PC PDF for Call of Cthuluh 7° Edition                                            |
+| CoC7            | standard   | latest  | PC     |                                       | The PC PDF for Call of Cthulhu 7° Edition                                            |
 | sfrpg           | standard   | latest  | PC     |                                       | The PC PDF for Starfinder Edition                                                     |
 | shadowrun6-eden | standard   | latest  | PC     |                                       | The PC PDF for Shadowrun 6° Edition (incomplete)                                     |
 | swade           | standard   | latest  | PC     |                                       | The PC PDF for SWADE                                                                  |
