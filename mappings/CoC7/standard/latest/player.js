@@ -394,19 +394,19 @@ class MappingClass extends baseMapping {
         this.setCalculated("Traits", await this.htmlToText(this.actor.system.biography[5]?.value ?? ''));
         this.setCalculated("Injuries", await this.htmlToText(this.actor.system.biography[7]?.value ?? ''));
         this.setCalculated("Encounters", await this.htmlToText(this.actor.system.biography[8]?.value ?? ''));
-        this.setCalculated("Gear/Possessions", (this.actor.items.filter(item => item.type === "item")[0]?.name ?? '') + "\n" +
-            (this.actor.items.filter(item => item.type === "item")[1]?.name ?? '') + "\n" +
-            (this.actor.items.filter(item => item.type === "item")[2]?.name ?? '') + "\n" +
-            (this.actor.items.filter(item => item.type === "item")[3]?.name ?? '') + "\n" +
-            (this.actor.items.filter(item => item.type === "item")[4]?.name ?? ''));
-        this.setCalculated("Gear/Possessions1", (this.actor.items.filter(item => item.type === "item")[5]?.name ?? '') + "\n" +
-            (this.actor.items.filter(item => item.type === "item")[6]?.name ?? '') + "\n" +
-            (this.actor.items.filter(item => item.type === "item")[7]?.name ?? '') + "\n" +
-            (this.actor.items.filter(item => item.type === "item")[8]?.name ?? '') + "\n" +
-            (this.actor.items.filter(item => item.type === "item")[9]?.name ?? ''));
-        this.setCalculated("Tomes/Spells", (this.actor.items.filter(item => item.type === "book")[0]?.name ?? '') + "\n" +
-            (this.actor.items.filter(item => item.type === "book")[1]?.name ?? '') + "\n" +
-            (this.actor.items.filter(item => item.type === "book")[2]?.name ?? ''));
+        this.setCalculated("Gear/Possessions", (this.actor.items.filter(item => item.type === "item")[0]?.system?.quantity ?? '') + ' ' + (this.actor.items.filter(item => item.type === "item")[0]?.name ?? '') + "\n" +
+            (this.actor.items.filter(item => item.type === "item")[1]?.system?.quantity ?? '') + ' ' + (this.actor.items.filter(item => item.type === "item")[1]?.name ?? '') + "\n" +
+            (this.actor.items.filter(item => item.type === "item")[2]?.system?.quantity ?? '') + ' ' + (this.actor.items.filter(item => item.type === "item")[2]?.name ?? '') + "\n" +
+            (this.actor.items.filter(item => item.type === "item")[3]?.system?.quantity ?? '') + ' ' + (this.actor.items.filter(item => item.type === "item")[3]?.name ?? '') + "\n" +
+            (this.actor.items.filter(item => item.type === "item")[4]?.system?.quantity ?? '') + ' ' + (this.actor.items.filter(item => item.type === "item")[4]?.name ?? ''));
+        this.setCalculated("Gear/Possessions1", (this.actor.items.filter(item => item.type === "item")[5]?.system?.quantity ?? '') + ' ' + (this.actor.items.filter(item => item.type === "item")[5]?.name ?? '') + "\n" +
+            (this.actor.items.filter(item => item.type === "item")[6]?.system?.quantity ?? '') + ' ' + (this.actor.items.filter(item => item.type === "item")[6]?.name ?? '') + "\n" +
+            (this.actor.items.filter(item => item.type === "item")[7]?.system?.quantity ?? '') + ' ' + (this.actor.items.filter(item => item.type === "item")[7]?.name ?? '') + "\n" +
+            (this.actor.items.filter(item => item.type === "item")[8]?.system?.quantity ?? '') + ' ' + (this.actor.items.filter(item => item.type === "item")[8]?.name ?? '') + "\n" +
+            (this.actor.items.filter(item => item.type === "item")[9]?.system?.quantity ?? '') + ' ' + (this.actor.items.filter(item => item.type === "item")[9]?.name ?? ''));
+        this.setCalculated("Tomes/Spells", (this.actor.items.filter(item => item.type === "book")[0]?.system?.quantity ?? '') + ' ' + (this.actor.items.filter(item => item.type === "book")[0]?.name ?? '') + "\n" +
+            (this.actor.items.filter(item => item.type === "book")[1]?.system?.quantity ?? '') + ' ' + (this.actor.items.filter(item => item.type === "book")[1]?.name ?? '') + "\n" +
+            (this.actor.items.filter(item => item.type === "book")[2]?.system?.quantity ?? '') + ' ' + (this.actor.items.filter(item => item.type === "book")[2]?.name ?? ''));
         this.setCalculated("Pulp Talents", (this.actor.items.filter(item => item.type === "talent")[0]?.name ?? '') + "\n" +
             (this.actor.items.filter(item => item.type === "talent")[1]?.name ?? '') + "\n" +
             (this.actor.items.filter(item => item.type === "talent")[2]?.name ?? '') + "\n" +
