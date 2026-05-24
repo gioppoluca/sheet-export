@@ -39,8 +39,8 @@ class MappingClass extends baseMapping {
 
     /** Convert description HTML to plain text without relying on Foundry's TextEditor. */
     stripHtml(html) {
-        if (!html) return '';
-        const withBreaks = String(html)
+        if (typeof html !== 'string' || !html) return '';
+        const withBreaks = html
             .replace(/<li[^>]*>/gi, '• ')
             .replace(/<br\s*\/?>/gi, '\n')
             .replace(/<\/(p|div|li|tr|h[1-6])>/gi, '\n');
@@ -85,12 +85,12 @@ class MappingClass extends baseMapping {
     }
 
     /**
-     * Build a readable feature string for a weapon/armor item.
-     * `key` is "weaponFeatures" or "armorFeatures". Linked Active Effects are
-     * resolved into their description (e.g. armor "flexible" -> "+1 to Evasion").
+     * Internal: render a feature list (weaponFeatures or armorFeatures) into a
+     * readable string, resolving linked Active Effect descriptions (e.g. armor
+     * "flexible" -> "+1 to Evasion").
      */
-    itemFeatures(item, key) {
-        return this.toArray(item?.system?.[key]).map(f => {
+    _renderFeatures(item, list) {
+        return this.toArray(list).map(f => {
             const label = this.pretty(typeof f === 'string' ? f : f?.value);
             if (!label) return '';
             const notes = [];
@@ -101,6 +101,9 @@ class MappingClass extends baseMapping {
             return notes.length ? `${label} (${notes.join('; ')})` : label;
         }).filter(Boolean).join(', ');
     }
+
+    weaponFeatures(weapon) { return this._renderFeatures(weapon, weapon?.system?.weaponFeatures); }
+    armorFeatures(armor)   { return this._renderFeatures(armor,  armor?.system?.armorFeatures); }
 
     /** Compact "NAME: <description>" block for a feature item (heading upper-cased). */
     featureBlock(feat) {
@@ -149,9 +152,15 @@ class MappingClass extends baseMapping {
         // ---- Traits ---------------------------------------------------------
         // The per-trait checkbox ("<Trait> Mark") flags the Spellcast Trait.
         const spellcastTrait = subclassItem?.system?.spellcastingTrait;
-        for (const key of ['agility', 'strength', 'finesse', 'instinct', 'presence', 'knowledge']) {
-            const trait = sys.traits?.[key];
-            const label = key.charAt(0).toUpperCase() + key.slice(1);
+        const traitEntries = [
+            ['Agility',   'agility',   sys.traits?.agility],
+            ['Strength',  'strength',  sys.traits?.strength],
+            ['Finesse',   'finesse',   sys.traits?.finesse],
+            ['Instinct',  'instinct',  sys.traits?.instinct],
+            ['Presence',  'presence',  sys.traits?.presence],
+            ['Knowledge', 'knowledge', sys.traits?.knowledge],
+        ];
+        for (const [label, key, trait] of traitEntries) {
             this.setCalculated(label, this.signed(trait?.value));
             if (key === spellcastTrait) this.setCalculated(`${label} Mark`, true);
         }
@@ -181,7 +190,7 @@ class MappingClass extends baseMapping {
         // ---- Experiences (5 rows) ------------------------------------------
         const experiences = Object.values(sys.experiences ?? {});
         for (let i = 0; i < 5; i++) {
-            const exp = experiences[i];
+            const exp = experiences.at(i);
             this.setCalculated(`Experience ${i + 1}`, exp?.name ?? '');
             this.setCalculated(`Experience ${i + 1} Bonus`, exp ? this.signed(exp.value) : '');
         }
@@ -201,13 +210,13 @@ class MappingClass extends baseMapping {
             ...weapons.filter(w => !w.system?.equipped),
         ];
         for (let i = 0; i < 4; i++) {
-            const w = orderedWeapons[i];
+            const w = orderedWeapons.at(i);
             if (!w) continue;
             const n = i + 1;
             this.setCalculated(`Weapon ${n} Label`, w.name ?? '');
             this.setCalculated(`Weapon ${n} Trait and Range`, this.weaponTraitRange(w));
             this.setCalculated(`Weapon ${n} Damage and Type`, this.weaponDamage(w));
-            this.setCalculated(`Weapon ${n} Feature`, this.itemFeatures(w, 'weaponFeatures'));
+            this.setCalculated(`Weapon ${n} Feature`, this.weaponFeatures(w));
             if (w.system?.equipped) this.setCalculated(`Weapon ${n} Active`, true);
             this.setCalculated(`Weapon ${n} Hand 1`, true);
             if (w.system?.burden === 'twoHanded') this.setCalculated(`Weapon ${n} Hand 2`, true);
@@ -221,7 +230,7 @@ class MappingClass extends baseMapping {
             this.setCalculated("Armor Base Thresholds",
                 bt ? `${bt.major ?? ''} / ${bt.severe ?? ''}` : '');
             this.setCalculated("Base Armor Score", String(activeArmor.system?.armor?.max ?? ''));
-            this.setCalculated("Armor Feature", this.itemFeatures(activeArmor, 'armorFeatures'));
+            this.setCalculated("Armor Feature", this.armorFeatures(activeArmor));
         }
 
         // ---- Features -------------------------------------------------------
@@ -233,13 +242,13 @@ class MappingClass extends baseMapping {
         // (foundation >= 1, specialization >= 2, mastery >= 3); locked ones exist
         // as items on the actor but are hidden on the in-app sheet.
         const subclassState = Number(subclassItem?.system?.featureState ?? 0);
-        const subclassUnlock = { foundation: 1, specialization: 2, mastery: 3 };
+        const subclassUnlock = new Map([['foundation', 1], ['specialization', 2], ['mastery', 3]]);
         const classSubFeatures = items.filter(i => {
             if (i.type !== 'feature' || i.system?.identifier === 'hope') return false;
             const origin = i.system?.originItemType;
             if (origin === 'class') return true;
             if (origin === 'subclass') {
-                return subclassState >= (subclassUnlock[i.system?.identifier] ?? 1);
+                return subclassState >= (subclassUnlock.get(i.system?.identifier) ?? 1);
             }
             return false;
         });
@@ -263,7 +272,7 @@ class MappingClass extends baseMapping {
         // ---- Domain cards (up to 18) ---------------------------------------
         const domainCards = items.filter(i => i.type === 'domainCard');
         for (let i = 0; i < 18; i++) {
-            const card = domainCards[i];
+            const card = domainCards.at(i);
             if (!card) continue;
             const n = i + 1;
             this.setCalculated(`Domain Card ${n}, Name`, card.name ?? '');

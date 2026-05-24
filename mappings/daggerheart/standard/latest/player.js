@@ -42,8 +42,8 @@ class MappingClass extends baseMapping {
 
     /** Convert description HTML to plain text without relying on Foundry's TextEditor. */
     stripHtml(html) {
-        if (!html) return '';
-        const withBreaks = String(html)
+        if (typeof html !== 'string' || !html) return '';
+        const withBreaks = html
             .replace(/<li[^>]*>/gi, '• ')
             .replace(/<br\s*\/?>/gi, '\n')
             .replace(/<\/(p|div|li|tr|h[1-6])>/gi, '\n');
@@ -106,12 +106,12 @@ class MappingClass extends baseMapping {
     }
 
     /**
-     * Build a readable feature string for a weapon/armor item.
-     * `key` is "weaponFeatures" or "armorFeatures". Linked Active Effects are
-     * resolved into their description (e.g. armor "flexible" -> "+1 to Evasion").
+     * Internal: render a feature list (weaponFeatures or armorFeatures) into a
+     * readable string, resolving linked Active Effect descriptions (e.g. armor
+     * "flexible" -> "+1 to Evasion").
      */
-    itemFeatures(item, key) {
-        return this.toArray(item?.system?.[key]).map(f => {
+    _renderFeatures(item, list) {
+        return this.toArray(list).map(f => {
             const label = this.pretty(typeof f === 'string' ? f : f?.value);
             if (!label) return '';
             const notes = [];
@@ -122,6 +122,9 @@ class MappingClass extends baseMapping {
             return notes.length ? `${label} (${notes.join('; ')})` : label;
         }).filter(Boolean).join(', ');
     }
+
+    weaponFeatures(weapon) { return this._renderFeatures(weapon, weapon?.system?.weaponFeatures); }
+    armorFeatures(armor)   { return this._renderFeatures(armor,  armor?.system?.armorFeatures); }
 
     /** Tick the first `amount` checkboxes of a `${prefix}_N` (1-based) sequence. */
     markBoxes(prefix, amount) {
@@ -163,8 +166,15 @@ class MappingClass extends baseMapping {
         this.setCalculated("armor_score", String(activeArmor?.system?.armor?.max ?? ''));
 
         // ---- Traits ---------------------------------------------------------
-        for (const key of ['agility', 'strength', 'finesse', 'instinct', 'presence', 'knowledge']) {
-            const trait = sys.traits?.[key];
+        const traitEntries = [
+            ['agility',   sys.traits?.agility],
+            ['strength',  sys.traits?.strength],
+            ['finesse',   sys.traits?.finesse],
+            ['instinct',  sys.traits?.instinct],
+            ['presence',  sys.traits?.presence],
+            ['knowledge', sys.traits?.knowledge],
+        ];
+        for (const [key, trait] of traitEntries) {
             this.setCalculated(`trait_${key}`, this.signed(trait?.value));
             if (trait?.tierMarked) this.setCalculated(`trait_${key}_marked`, true);
         }
@@ -183,7 +193,7 @@ class MappingClass extends baseMapping {
         // ---- Experiences (5 rows) ------------------------------------------
         const experiences = Object.values(sys.experiences ?? {});
         for (let i = 0; i < 5; i++) {
-            const exp = experiences[i];
+            const exp = experiences.at(i);
             this.setCalculated(`experience_${i + 1}_name`, exp?.name ?? '');
             this.setCalculated(`experience_${i + 1}_value`, exp ? this.signed(exp.value) : '');
         }
@@ -204,14 +214,14 @@ class MappingClass extends baseMapping {
             this.setCalculated("primary_weapon_trait_range", this.weaponTraitRange(primary));
             this.setCalculated("primary_weapon_damage", this.weaponDamage(primary));
             this.setFeature("primary_weapon_feature", "primary_weapon_feature_2",
-                this.itemFeatures(primary, 'weaponFeatures'));
+                this.weaponFeatures(primary));
         }
         if (secondary) {
             this.setCalculated("secondary_weapon_name", secondary.name ?? '');
             this.setCalculated("secondary_weapon_trait_range", this.weaponTraitRange(secondary));
             this.setCalculated("secondary_weapon_damage", this.weaponDamage(secondary));
             this.setFeature("secondary_weapon_feature", "secondary_weapon_feature_2",
-                this.itemFeatures(secondary, 'weaponFeatures'));
+                this.weaponFeatures(secondary));
         }
 
         // ---- Active armor ---------------------------------------------------
@@ -220,7 +230,7 @@ class MappingClass extends baseMapping {
             this.setCalculated("active_armor_base_score",
                 String(activeArmor.system?.armor?.max ?? ''));
             this.setFeature("active_armor_feature", "active_armor_feature_2",
-                this.itemFeatures(activeArmor, 'armorFeatures'));
+                this.armorFeatures(activeArmor));
         }
 
         // ---- Inventory (general gear: comma-separated, wrapped to 5 lines) --
@@ -233,7 +243,7 @@ class MappingClass extends baseMapping {
         for (let i = 0; i < 5; i++) {
             // The last line absorbs any overflow.
             this.setCalculated(`inventory_${i + 1}`,
-                i < 4 ? (invLines[i] ?? '') : invLines.slice(i).join(' '));
+                i < 4 ? (invLines.at(i) ?? '') : invLines.slice(i).join(' '));
         }
 
         // ---- Inventory weapon (first non-equipped weapon) -------------------
@@ -243,7 +253,7 @@ class MappingClass extends baseMapping {
             this.setCalculated("inventory_weapon_trait_range", this.weaponTraitRange(invWeapon));
             this.setCalculated("inventory_weapon_damage", this.weaponDamage(invWeapon));
             this.setFeature("inventory_weapon_feature", "inventory_weapon_feature_2",
-                this.itemFeatures(invWeapon, 'weaponFeatures'));
+                this.weaponFeatures(invWeapon));
         }
 
         // ---- Inventory armor (first non-equipped armor) ---------------------
@@ -253,7 +263,7 @@ class MappingClass extends baseMapping {
             this.setCalculated("inventory_armor_base_score",
                 String(invArmor.system?.armor?.max ?? ''));
             this.setFeature("inventory_armor_feature", "inventory_armor_feature_2",
-                this.itemFeatures(invArmor, 'armorFeatures'));
+                this.armorFeatures(invArmor));
         }
 
         // ---- Class feature box ----------------------------------------------
