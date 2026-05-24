@@ -1,4 +1,9 @@
 
+## [0.14.6] - 2026-05-24
+### :bug: Bug Fixes
+- [`aa96283`](https://github.com/gioppoluca/sheet-export/commit/aa96283e76b7fc6ca231b60ac19b0ad58f97a5b9) - CoC7 fixes *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+
 ## [0.14.4] - 2026-05-19
 ### :bug: Bug Fixes
 - [`f03a50a`](https://github.com/gioppoluca/sheet-export/commit/f03a50a73baae48323dd28278a5ae7c37a5e7d3b) - missing subclasses on dnd 2024 *(commit by [@gioppoluca](https://github.com/gioppoluca))*
@@ -406,3 +411,4 @@
 [0.14.1]: https://github.com/gioppoluca/sheet-export/compare/0.14.0...0.14.1
 [0.14.2]: https://github.com/gioppoluca/sheet-export/compare/0.14.1...0.14.2
 [0.14.4]: https://github.com/gioppoluca/sheet-export/compare/0.14.3...0.14.4
+[0.14.6]: https://github.com/gioppoluca/sheet-export/compare/0.14.5...0.14.6
