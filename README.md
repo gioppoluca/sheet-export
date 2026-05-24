@@ -31,6 +31,7 @@ At the moment the module manages:
 | dragonbane           | standard   | latest  | PC     |               | The PC PDF for Dragonbane English and Swedish                                                         |
 | forbidden-lands           | standard   | latest  | PC     |               | The PC PDF for Forbidden Lands (draft)  thanks johndoe1972        |
 | a5e           | standard   | latest  | PC     |               | The PC PDF for Level UP (draft)                                                          |
+| daggerheart           | standard, oldgus   | latest  | PC     |               | The PC PDF for Daggerheart (thanks to lizzard77)                                                          |
 
 If you want to become a mantainer of a game system, please contact me.
 
