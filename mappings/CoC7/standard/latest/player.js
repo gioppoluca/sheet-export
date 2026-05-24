@@ -71,8 +71,8 @@ class MappingClass extends baseMapping {
         this.setCalculated("MOV", this.actor.system.attribs.mov?.value ?? '');
         this.setCalculated("Build", this.actor.system.attribs.build.value ?? '');
         this.setCalculated("DamageBonus", this.actor.system.attribs.db.value ?? '');
-        this.setCalculated("InsaneSanity", this.actor.dailySanLimit ?? '');
-        this.setCalculated("MaxSanity", this.actor.sanMax ?? '');
+        this.setCalculated("InsaneSanity", this.actor.system?.attribs?.san?.dailyLimit ?? 0);
+        this.setCalculated("MaxSanity", this.actor.system?.attribs?.san?.max ?? 99);
         this.setCalculated("TempInsanity_Chk", this.actor.system.conditions.tempoInsane.value);
         this.setCalculated("IndefInsanity_Chk", this.actor.system.conditions.indefInsane.value);
         this.setCalculated("MajorWound_Chk", this.actor.system.conditions.criticalWounds.value);
@@ -377,18 +377,23 @@ class MappingClass extends baseMapping {
         this.setCalculated("Weapon_Range3", this.actor.items.filter(item => item.type === 'weapon').length <= 3 ? "" : this.actor.items.filter(item => item.type === 'weapon' && !['Brawl', 'Punch'].includes(item.name) && !item.flags?.CoC7?.cocidFlag?.id.match(/^i\.weapon\.(punch|brawl)$/))[2].system.range?.normal?.value ?? '');
         this.setCalculated("Weapon_Ammo3", this.actor.items.filter(item => item.type === 'weapon').length <= 3 ? "" : this.actor.items.filter(item => item.type === 'weapon' && !['Brawl', 'Punch'].includes(item.name) && !item.flags?.CoC7?.cocidFlag?.id.match(/^i\.weapon\.(punch|brawl)$/))[2].system.bullets ?? '');
         this.setCalculated("Weapon_Malf3", this.actor.items.filter(item => item.type === 'weapon').length <= 3 ? "" : this.actor.items.filter(item => item.type === 'weapon' && !['Brawl', 'Punch'].includes(item.name) && !item.flags?.CoC7?.cocidFlag?.id.match(/^i\.weapon\.(punch|brawl)$/))[2].system.malfunction ?? '');
-        this.setCalculated("SpendingLevel", (this.actor.system.flags.manualCredit ? this.actor.system.monetary.spendingLevel : CONFIG.Actor.documentClass.monetaryFormat(this.actor.system.monetary.format, this.actor.system.monetary.symbol, this.actor.spendingLevel)));
-        this.setCalculated("Cash", (this.actor.system.flags.manualCredit ? this.actor.system.monetary.cash : CONFIG.Actor.documentClass.monetaryFormat(this.actor.system.monetary.format, this.actor.system.monetary.symbol, this.actor.cash)));
-        this.setCalculated("Assets1", (this.actor.system.flags.manualCredit ? this.actor.system.monetary.assets : CONFIG.Actor.documentClass.monetaryFormat(this.actor.system.monetary.format, this.actor.system.monetary.symbol, this.actor.assets)));
-        this.setCalculated("PersonalDescription", this.actor.system.biography[0]?.value ?? '');
-        this.setCalculated("Ideology/Beliefs", this.actor.system.biography[1]?.value ?? '');
-        this.setCalculated("Significant People", this.actor.system.biography[2]?.value ?? '');
-        this.setCalculated("Locations", this.actor.system.biography[3]?.value ?? '');
-        this.setCalculated("Possessions", this.actor.system.biography[4]?.value ?? '');
-        this.setCalculated("Phobias/Manias", this.actor.system.biography[5]?.value ?? '');
-        this.setCalculated("Traits", this.actor.system.biography[6]?.value ?? '');
-        this.setCalculated("Injuries", this.actor.system.biography[7]?.value ?? '');
-        this.setCalculated("Encounters", this.actor.system.biography[8]?.value ?? '');
+        const monetary = this.actor.system?.monetary ?? {};
+        console.log(monetary);
+        const cashFormatted = this.formatCoC7Monetary(monetary.cash, monetary);
+        const assetsFormatted = this.formatCoC7Monetary(monetary.assets, monetary);
+        const spendingLevelFormatted = this.formatCoC7Monetary(monetary.spendingLevel, monetary);
+        this.setCalculated("SpendingLevel", spendingLevelFormatted);
+        this.setCalculated("Cash", cashFormatted);
+        this.setCalculated("Assets1", assetsFormatted);
+        this.setCalculated("PersonalDescription", await this.htmlToText(this.actor.system.biography[0]?.value ?? ''));
+        this.setCalculated("Ideology/Beliefs", await this.htmlToText(this.actor.system.biography[1]?.value ?? ''));
+        this.setCalculated("Significant People", await this.htmlToText(this.actor.system.biography[2]?.value ?? ''));
+        this.setCalculated("Locations", await this.htmlToText(this.actor.system.biography[3]?.value ?? ''));
+        this.setCalculated("Possessions", await this.htmlToText(this.actor.system.biography[4]?.value ?? ''));
+        this.setCalculated("Phobias/Manias", await this.htmlToText(this.actor.system.biography[6]?.value ?? ''));
+        this.setCalculated("Traits", await this.htmlToText(this.actor.system.biography[5]?.value ?? ''));
+        this.setCalculated("Injuries", await this.htmlToText(this.actor.system.biography[7]?.value ?? ''));
+        this.setCalculated("Encounters", await this.htmlToText(this.actor.system.biography[8]?.value ?? ''));
         this.setCalculated("Gear/Possessions", (this.actor.items.filter(item => item.type === "item")[0]?.name ?? '') + "\n" +
             (this.actor.items.filter(item => item.type === "item")[1]?.name ?? '') + "\n" +
             (this.actor.items.filter(item => item.type === "item")[2]?.name ?? '') + "\n" +
@@ -408,6 +413,19 @@ class MappingClass extends baseMapping {
             (this.actor.items.filter(item => item.type === "talent")[3]?.name ?? '') + "\n" +
             (this.actor.items.filter(item => item.type === "talent")[4]?.name ?? '') + "\n" +
             (this.actor.items.filter(item => item.type === "talent")[5]?.name ?? ''));
+    }
+
+    formatCoC7Monetary(value, monetarySystem) {
+        if (value === null || value === undefined) return '';
+        const fmt = monetarySystem?.format ?? 'decimalLeft';
+        const sym = monetarySystem?.symbol ?? '$';
+
+        const num = parseFloat(value) || 0;
+        const formattedNum = fmt === 'decimalLeft'
+            ? num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+            : num.toString();
+
+        return fmt === 'decimalLeft' ? `${sym}${formattedNum}` : `${formattedNum}${sym}`;
     }
 }
 
