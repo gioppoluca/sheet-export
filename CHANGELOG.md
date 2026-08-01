@@ -1,4 +1,12 @@
 
+## [0.14.7] - 2026-08-01
+### :sparkles: New Features
+- [`d8961b6`](https://github.com/gioppoluca/sheet-export/commit/d8961b6c6c3e4a383101633d2b93bb0cfff65b64) - better shadowrun sheets *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+### :bug: Bug Fixes
+- [`51a8bf9`](https://github.com/gioppoluca/sheet-export/commit/51a8bf9510d8ebf4ca2928a0245ab7fe6f68f0b4) - closes [#58](https://github.com/gioppoluca/sheet-export/pull/58) *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+
 ## [0.14.6] - 2026-05-24
 ### :bug: Bug Fixes
 - [`aa96283`](https://github.com/gioppoluca/sheet-export/commit/aa96283e76b7fc6ca231b60ac19b0ad58f97a5b9) - CoC7 fixes *(commit by [@gioppoluca](https://github.com/gioppoluca))*
@@ -412,3 +420,4 @@
 [0.14.2]: https://github.com/gioppoluca/sheet-export/compare/0.14.1...0.14.2
 [0.14.4]: https://github.com/gioppoluca/sheet-export/compare/0.14.3...0.14.4
 [0.14.6]: https://github.com/gioppoluca/sheet-export/compare/0.14.5...0.14.6
+[0.14.7]: https://github.com/gioppoluca/sheet-export/compare/0.14.6...0.14.7
