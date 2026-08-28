@@ -1,4 +1,9 @@
 
+## [0.14.8] - 2026-08-28
+### :bug: Bug Fixes
+- [`f29048e`](https://github.com/gioppoluca/sheet-export/commit/f29048eb2868a9d0024bcee2a9dc185e7334b191) - [#59](https://github.com/gioppoluca/sheet-export/pull/59) closed *(commit by [@gioppoluca](https://github.com/gioppoluca))*
+
+
 ## [0.14.7] - 2026-08-01
 ### :sparkles: New Features
 - [`d8961b6`](https://github.com/gioppoluca/sheet-export/commit/d8961b6c6c3e4a383101633d2b93bb0cfff65b64) - better shadowrun sheets *(commit by [@gioppoluca](https://github.com/gioppoluca))*
@@ -421,3 +426,4 @@
 [0.14.4]: https://github.com/gioppoluca/sheet-export/compare/0.14.3...0.14.4
 [0.14.6]: https://github.com/gioppoluca/sheet-export/compare/0.14.5...0.14.6
 [0.14.7]: https://github.com/gioppoluca/sheet-export/compare/0.14.6...0.14.7
+[0.14.8]: https://github.com/gioppoluca/sheet-export/compare/0.14.7...0.14.8
