@@ -118,6 +118,41 @@ class MappingClass extends baseMapping {
         for (let i = 1; i <= n; i++) this.setCalculated(`${prefix} ${i}`, true);
     }
 
+    /** Resolve a Daggerheart level-up selection to the matching Old Gus field. */
+    advancementField(selection) {
+        const tier = Number(selection?.tier);
+        if (![2, 3, 4].includes(tier)) return null;
+
+        const option = selection?.optionKey ?? selection?.type;
+        const slot = Number(selection?.checkboxNr);
+        switch (option) {
+            case 'trait':
+                return slot ? `Tier ${tier}, Traits, Slot ${slot}` : null;
+            case 'hitPoint':
+                return slot ? `Tier ${tier}, Hit Point, Slot ${slot}` : null;
+            case 'stress':
+                return slot ? `Tier ${tier}, Stress, Slot ${slot}` : null;
+            case 'experience':
+                return `Tier ${tier}, Experiences`;
+            case 'domainCard':
+                return `Tier ${tier}, Domain Card`;
+            case 'evasion':
+                return `Tier ${tier}, Evasion`;
+            case 'proficiency':
+                return `Tier ${tier}, Proficiency`;
+            case 'multiclass':
+                return 'Tier 3-4, Multiclassing';
+            case 'subclass': {
+                const isMulticlass = selection?.secondaryData?.isMulticlass;
+                return isMulticlass === true || isMulticlass === 'true'
+                    ? 'Tier 3-4, Multiclassing'
+                    : `Tier ${tier}, Enhanced Subclass`;
+            }
+            default:
+                return null;
+        }
+    }
+
     async createMappings() {
         super.createMappings();
 
@@ -201,6 +236,14 @@ class MappingClass extends baseMapping {
         this.setCalculated("Gold, Chests", String(sys.gold?.chests ?? ''));
         this.setCalculated("Gold, Coins", String(sys.gold?.coins ?? ''));
         // "Gold, Stashed" has no system equivalent -> left empty.
+
+        // ---- Advancements ---------------------------------------------------
+        for (const levelUp of Object.values(sys.levelData?.levelups ?? {})) {
+            for (const selection of this.toArray(levelUp?.selections)) {
+                const field = this.advancementField(selection);
+                if (field) this.setCalculated(field, true);
+            }
+        }
 
         // ---- Weapons (up to 4: primary, secondary, then the rest) ----------
         const weapons = items.filter(i => i.type === 'weapon');
